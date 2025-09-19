@@ -1,4 +1,4 @@
-import type { AxiosError } from 'axios';
+import type { AxiosError } from 'axios'
 
 // Error types
 export enum ErrorType {
@@ -6,22 +6,22 @@ export enum ErrorType {
   AUTHORIZATION = 'authorization',
   NETWORK = 'network',
   SERVER = 'server',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 export interface ApiError {
-  code: string;
-  message: string;
-  status: number;
-  type: ErrorType;
-  originalError?: AxiosError;
+  code: string
+  message: string
+  status: number
+  type: ErrorType
+  originalError?: AxiosError
 }
 
 export class ErrorHandler {
   static handle(error: AxiosError): ApiError {
-    const status = error.response?.status || 0;
-    const errorData = error.response?.data as Record<string, unknown>;
-    const errorInfo = errorData?.error as Record<string, unknown> | undefined;
+    const status = error.response?.status || 0
+    const errorData = error.response?.data as Record<string, unknown>
+    const errorInfo = errorData?.error as Record<string, unknown> | undefined
 
     switch (status) {
       case 400:
@@ -30,8 +30,8 @@ export class ErrorHandler {
           message: (errorInfo?.message as string) || 'Ошибка валидации данных',
           status,
           type: ErrorType.VALIDATION,
-          originalError: error
-        };
+          originalError: error,
+        }
 
       case 401:
         return {
@@ -39,8 +39,8 @@ export class ErrorHandler {
           message: 'Требуется авторизация',
           status,
           type: ErrorType.AUTHORIZATION,
-          originalError: error
-        };
+          originalError: error,
+        }
 
       case 403:
         return {
@@ -48,8 +48,8 @@ export class ErrorHandler {
           message: 'Недостаточно прав доступа',
           status,
           type: ErrorType.AUTHORIZATION,
-          originalError: error
-        };
+          originalError: error,
+        }
 
       case 404:
         return {
@@ -57,8 +57,8 @@ export class ErrorHandler {
           message: 'Запрашиваемый объект не найден',
           status,
           type: ErrorType.VALIDATION,
-          originalError: error
-        };
+          originalError: error,
+        }
 
       case 409:
         return {
@@ -66,8 +66,8 @@ export class ErrorHandler {
           message: (errorInfo?.message as string) || 'Невозможно удалить объект из-за зависимостей',
           status,
           type: ErrorType.VALIDATION,
-          originalError: error
-        };
+          originalError: error,
+        }
 
       case 500:
         return {
@@ -75,8 +75,8 @@ export class ErrorHandler {
           message: 'Внутренняя ошибка сервера',
           status,
           type: ErrorType.SERVER,
-          originalError: error
-        };
+          originalError: error,
+        }
 
       default:
         if (error.code === 'ECONNABORTED' || error.code === 'NETWORK_ERROR') {
@@ -85,8 +85,8 @@ export class ErrorHandler {
             message: 'Превышено время ожидания запроса',
             status: 0,
             type: ErrorType.NETWORK,
-            originalError: error
-          };
+            originalError: error,
+          }
         }
 
         return {
@@ -94,35 +94,35 @@ export class ErrorHandler {
           message: 'Ошибка сети или сервер недоступен',
           status,
           type: ErrorType.NETWORK,
-          originalError: error
-        };
+          originalError: error,
+        }
     }
   }
 
   static getUserFriendlyMessage(error: ApiError): string {
     switch (error.type) {
       case ErrorType.VALIDATION:
-        return error.message;
-      
+        return error.message
+
       case ErrorType.AUTHORIZATION:
         if (error.status === 401) {
-          return 'Сессия истекла. Пожалуйста, войдите в систему заново.';
+          return 'Сессия истекла. Пожалуйста, войдите в систему заново.'
         }
-        return 'У вас недостаточно прав для выполнения этого действия.';
-      
+        return 'У вас недостаточно прав для выполнения этого действия.'
+
       case ErrorType.NETWORK:
-        return 'Проблемы с подключением к серверу. Проверьте интернет-соединение и повторите попытку.';
-      
+        return 'Проблемы с подключением к серверу. Проверьте интернет-соединение и повторите попытку.'
+
       case ErrorType.SERVER:
-        return 'Произошла ошибка на сервере. Попробуйте позже или обратитесь к администратору.';
-      
+        return 'Произошла ошибка на сервере. Попробуйте позже или обратитесь к администратору.'
+
       default:
-        return 'Произошла неожиданная ошибка. Попробуйте обновить страницу.';
+        return 'Произошла неожиданная ошибка. Попробуйте обновить страницу.'
     }
   }
 
   static shouldRetry(error: ApiError): boolean {
-    return error.type === ErrorType.NETWORK && error.status === 0;
+    return error.type === ErrorType.NETWORK && error.status === 0
   }
 
   static logError(error: ApiError, context?: string): void {
@@ -135,11 +135,11 @@ export class ErrorHandler {
       timestamp: new Date().toISOString(),
       url: error.originalError?.config?.url,
       method: error.originalError?.config?.method?.toUpperCase(),
-    };
+    }
 
     // Log to console in development
     if (import.meta.env.DEV) {
-      console.error('API Error:', logData);
+      console.error('API Error:', logData)
     }
 
     // In production, you would send this to your logging service (e.g., Sentry)

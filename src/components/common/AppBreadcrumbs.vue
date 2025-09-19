@@ -1,15 +1,7 @@
 <template>
-  <v-breadcrumbs
-    v-if="breadcrumbs.length > 0"
-    :items="breadcrumbs"
-    divider="/"
-    class="pa-0"
-  >
+  <v-breadcrumbs v-if="breadcrumbs.length > 0" :items="breadcrumbs" divider="/" class="pa-0">
     <template v-slot:item="{ item }">
-      <v-breadcrumbs-item
-        :to="item.disabled ? undefined : item.to"
-        :disabled="item.disabled"
-      >
+      <v-breadcrumbs-item :to="item.disabled ? undefined : item.to" :disabled="item.disabled">
         <template v-if="(item as BreadcrumbItem).icon">
           <v-icon :icon="(item as BreadcrumbItem).icon" size="small" class="mr-1" />
         </template>
@@ -41,7 +33,7 @@ const breadcrumbs = computed((): BreadcrumbItem[] => {
     items.push({
       title: 'Главная',
       to: '/dashboard',
-      icon: 'mdi-home'
+      icon: 'mdi-home',
     })
   }
 
@@ -50,64 +42,64 @@ const breadcrumbs = computed((): BreadcrumbItem[] => {
     items.push({
       title: 'Эпики',
       to: path === '/epics' ? undefined : '/epics',
-      disabled: path === '/epics'
+      disabled: path === '/epics',
     })
-    
+
     if (route.params.id) {
       items.push({
         title: `Эпик ${route.params.id}`,
-        disabled: true
+        disabled: true,
       })
     }
   } else if (path.startsWith('/user-stories')) {
     items.push({
       title: 'Пользовательские истории',
       to: path === '/user-stories' ? undefined : '/user-stories',
-      disabled: path === '/user-stories'
+      disabled: path === '/user-stories',
     })
-    
+
     if (route.params.id) {
       items.push({
         title: `История ${route.params.id}`,
-        disabled: true
+        disabled: true,
       })
     }
   } else if (path.startsWith('/requirements')) {
     items.push({
       title: 'Требования',
       to: path === '/requirements' ? undefined : '/requirements',
-      disabled: path === '/requirements'
+      disabled: path === '/requirements',
     })
-    
+
     if (route.params.id) {
       items.push({
         title: `Требование ${route.params.id}`,
-        disabled: true
+        disabled: true,
       })
     }
   } else if (path === '/search') {
     items.push({
       title: 'Поиск',
       disabled: true,
-      icon: 'mdi-magnify'
+      icon: 'mdi-magnify',
     })
   } else if (path.startsWith('/admin')) {
     items.push({
       title: 'Администрирование',
       to: path === '/admin' ? undefined : '/admin',
       disabled: path === '/admin',
-      icon: 'mdi-cog'
+      icon: 'mdi-cog',
     })
-    
+
     if (path === '/admin/users') {
       items.push({
         title: 'Пользователи',
-        disabled: true
+        disabled: true,
       })
     } else if (path === '/admin/config') {
       items.push({
         title: 'Конфигурация',
-        disabled: true
+        disabled: true,
       })
     }
   }

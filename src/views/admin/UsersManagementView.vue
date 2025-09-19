@@ -25,33 +25,20 @@
               density="compact"
             />
           </v-card-title>
-          
-          <v-data-table
-            :headers="headers"
-            :items="users"
-            :search="search"
-            class="elevation-1"
-          >
+
+          <v-data-table :headers="headers" :items="users" :search="search" class="elevation-1">
             <template v-slot:[`item.role`]="{ item }">
-              <v-chip
-                :color="getRoleColor(item.role)"
-                size="small"
-              >
+              <v-chip :color="getRoleColor(item.role)" size="small">
                 {{ getRoleLabel(item.role) }}
               </v-chip>
             </template>
-            
+
             <template v-slot:[`item.created_at`]="{ item }">
               {{ formatDate(item.created_at) }}
             </template>
-            
+
             <template v-slot:[`item.actions`]="{ item }">
-              <v-btn
-                icon="mdi-pencil"
-                size="small"
-                variant="text"
-                @click="openEditDialog(item)"
-              />
+              <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog(item)" />
               <v-btn
                 icon="mdi-delete"
                 size="small"
@@ -71,7 +58,7 @@
         <v-card-title>
           {{ editingUser ? 'Редактировать пользователя' : 'Создать пользователя' }}
         </v-card-title>
-        
+
         <v-card-text>
           <v-form ref="userForm" v-model="formValid">
             <v-text-field
@@ -81,7 +68,7 @@
               variant="outlined"
               class="mb-3"
             />
-            
+
             <v-text-field
               v-model="userForm.email"
               label="Email"
@@ -89,7 +76,7 @@
               variant="outlined"
               class="mb-3"
             />
-            
+
             <v-select
               v-model="userForm.role"
               :items="roleOptions"
@@ -98,7 +85,7 @@
               variant="outlined"
               class="mb-3"
             />
-            
+
             <v-text-field
               v-if="!editingUser"
               v-model="userForm.password"
@@ -109,15 +96,11 @@
             />
           </v-form>
         </v-card-text>
-        
+
         <v-card-actions>
           <v-spacer />
           <v-btn @click="closeUserDialog">Отмена</v-btn>
-          <v-btn
-            color="primary"
-            @click="saveUser"
-            :disabled="!formValid"
-          >
+          <v-btn color="primary" @click="saveUser" :disabled="!formValid">
             {{ editingUser ? 'Сохранить' : 'Создать' }}
           </v-btn>
         </v-card-actions>
@@ -129,8 +112,8 @@
       <v-card>
         <v-card-title>Подтверждение удаления</v-card-title>
         <v-card-text>
-          Вы уверены, что хотите удалить пользователя "{{ userToDelete?.username }}"?
-          Это действие нельзя отменить.
+          Вы уверены, что хотите удалить пользователя "{{ userToDelete?.username }}"? Это действие
+          нельзя отменить.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -167,7 +150,7 @@ const headers = [
   { title: 'Роль', key: 'role', sortable: true },
   { title: 'Создан', key: 'created_at', sortable: true },
   { title: 'Последний вход', key: 'last_login', sortable: true },
-  { title: 'Действия', key: 'actions', sortable: false }
+  { title: 'Действия', key: 'actions', sortable: false },
 ]
 
 // Mock data - will be replaced with real API calls
@@ -178,7 +161,7 @@ const users = ref([
     email: 'admin@example.com',
     role: 'Administrator',
     created_at: '2024-01-01',
-    last_login: '2024-01-20'
+    last_login: '2024-01-20',
   },
   {
     id: '2',
@@ -186,7 +169,7 @@ const users = ref([
     email: 'ivan@example.com',
     role: 'User',
     created_at: '2024-01-05',
-    last_login: '2024-01-19'
+    last_login: '2024-01-19',
   },
   {
     id: '3',
@@ -194,7 +177,7 @@ const users = ref([
     email: 'petr@example.com',
     role: 'User',
     created_at: '2024-01-10',
-    last_login: '2024-01-18'
+    last_login: '2024-01-18',
   },
   {
     id: '4',
@@ -202,21 +185,21 @@ const users = ref([
     email: 'anna@example.com',
     role: 'Commenter',
     created_at: '2024-01-15',
-    last_login: '2024-01-17'
-  }
+    last_login: '2024-01-17',
+  },
 ])
 
 const userForm = ref({
   username: '',
   email: '',
   role: '',
-  password: ''
+  password: '',
 })
 
 const roleOptions = [
   { title: 'Администратор', value: 'Administrator' },
   { title: 'Пользователь', value: 'User' },
-  { title: 'Комментатор', value: 'Commenter' }
+  { title: 'Комментатор', value: 'Commenter' },
 ]
 
 const rules = {
@@ -225,23 +208,23 @@ const rules = {
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return pattern.test(value) || 'Некорректный email адрес'
   },
-  minLength: (value: string) => value.length >= 8 || 'Минимум 8 символов'
+  minLength: (value: string) => value.length >= 8 || 'Минимум 8 символов',
 }
 
 const getRoleColor = (role: string) => {
   const colors: Record<string, string> = {
-    'Administrator': 'red',
-    'User': 'blue',
-    'Commenter': 'green'
+    Administrator: 'red',
+    User: 'blue',
+    Commenter: 'green',
   }
   return colors[role] || 'grey'
 }
 
 const getRoleLabel = (role: string) => {
   const labels: Record<string, string> = {
-    'Administrator': 'Администратор',
-    'User': 'Пользователь',
-    'Commenter': 'Комментатор'
+    Administrator: 'Администратор',
+    User: 'Пользователь',
+    Commenter: 'Комментатор',
   }
   return labels[role] || role
 }
@@ -256,7 +239,7 @@ const openCreateDialog = () => {
     username: '',
     email: '',
     role: '',
-    password: ''
+    password: '',
   }
   userDialog.value = true
 }
@@ -267,7 +250,7 @@ const openEditDialog = (user: User) => {
     username: user.username,
     email: user.email,
     role: user.role,
-    password: ''
+    password: '',
   }
   userDialog.value = true
 }

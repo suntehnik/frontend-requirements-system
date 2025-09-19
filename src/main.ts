@@ -10,8 +10,19 @@ import vuetify from './plugins/vuetify'
 
 const app = createApp(App)
 
-app.use(createPinia())
+const pinia = createPinia()
+app.use(pinia)
 app.use(router)
 app.use(vuetify)
+
+// Initialize auth store after pinia is set up
+import { useAuthStore } from '@/stores/auth'
+const authStore = useAuthStore()
+authStore.initializeAuth()
+
+// Import dev testing utilities in development
+if (import.meta.env.DEV) {
+  import('@/utils/dev-auth-test')
+}
 
 app.mount('#app')

@@ -16,7 +16,7 @@
           </v-card-text>
         </v-card>
       </v-col>
-      
+
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
@@ -25,7 +25,7 @@
           </v-card-text>
         </v-card>
       </v-col>
-      
+
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
@@ -34,7 +34,7 @@
           </v-card-text>
         </v-card>
       </v-col>
-      
+
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
@@ -74,29 +74,15 @@
         <v-card>
           <v-card-title>Быстрые действия</v-card-title>
           <v-card-text>
-            <v-btn
-              color="primary"
-              block
-              class="mb-2"
-              to="/epics"
-            >
+            <v-btn color="primary" block class="mb-2" to="/epics">
               <v-icon left>mdi-plus</v-icon>
               Создать эпик
             </v-btn>
-            <v-btn
-              color="success"
-              block
-              class="mb-2"
-              to="/user-stories"
-            >
+            <v-btn color="success" block class="mb-2" to="/user-stories">
               <v-icon left>mdi-plus</v-icon>
               Создать историю
             </v-btn>
-            <v-btn
-              color="info"
-              block
-              to="/requirements"
-            >
+            <v-btn color="info" block to="/requirements">
               <v-icon left>mdi-plus</v-icon>
               Создать требование
             </v-btn>

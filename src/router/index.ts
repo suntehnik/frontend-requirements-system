@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AppLayout from '@/layouts/AppLayout.vue'
+import type { UserRole } from '@/types'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,9 +10,9 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
-      meta: { requiresAuth: false }
+      meta: { requiresAuth: false },
     },
-    
+
     // Main application routes (with layout)
     {
       path: '/',
@@ -21,110 +22,119 @@ const router = createRouter({
         // Redirect root to dashboard
         {
           path: '',
-          redirect: '/dashboard'
+          redirect: '/dashboard',
         },
-        
+
         // Dashboard
         {
           path: '/dashboard',
           name: 'dashboard',
-          component: () => import('@/views/DashboardView.vue')
+          component: () => import('@/views/DashboardView.vue'),
         },
-        
+
         // Epics
         {
           path: '/epics',
           name: 'epics',
-          component: () => import('@/views/EpicsListView.vue')
+          component: () => import('@/views/EpicsListView.vue'),
         },
         {
           path: '/epics/:id',
           name: 'epic-detail',
-          component: () => import('@/views/EpicDetailView.vue')
+          component: () => import('@/views/EpicDetailView.vue'),
         },
-        
+
         // User Stories
         {
           path: '/user-stories',
           name: 'user-stories',
-          component: () => import('@/views/UserStoriesListView.vue')
+          component: () => import('@/views/UserStoriesListView.vue'),
         },
         {
           path: '/user-stories/:id',
           name: 'user-story-detail',
-          component: () => import('@/views/UserStoryDetailView.vue')
+          component: () => import('@/views/UserStoryDetailView.vue'),
         },
-        
+
         // Requirements
         {
           path: '/requirements',
           name: 'requirements',
-          component: () => import('@/views/RequirementsListView.vue')
+          component: () => import('@/views/RequirementsListView.vue'),
         },
         {
           path: '/requirements/:id',
           name: 'requirement-detail',
-          component: () => import('@/views/RequirementDetailView.vue')
+          component: () => import('@/views/RequirementDetailView.vue'),
         },
-        
+
         // Search
         {
           path: '/search',
           name: 'search',
-          component: () => import('@/views/SearchView.vue')
+          component: () => import('@/views/SearchView.vue'),
         },
-        
+
         // Admin routes
         {
           path: '/admin/users',
           name: 'admin-users',
           component: () => import('@/views/admin/UsersManagementView.vue'),
-          meta: { requiresRole: 'Administrator' }
+          meta: { requiresRole: 'Administrator' },
         },
         {
           path: '/admin/config',
           name: 'admin-config',
           component: () => import('@/views/admin/ConfigManagementView.vue'),
-          meta: { requiresRole: 'Administrator' }
-        }
-      ]
+          meta: { requiresRole: 'Administrator' },
+        },
+      ],
     },
-    
+
     // Catch all route - redirect to dashboard
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/dashboard'
-    }
+      redirect: '/dashboard',
+    },
   ],
 })
 
 // Authentication guard
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  // Import auth store dynamically to avoid circular dependency
+  const { useAuthStore } = await import('@/stores/auth')
+  const authStore = useAuthStore()
+
   // Check if route requires authentication
   if (to.meta.requiresAuth !== false) {
-    // TODO: Check if user is authenticated
-    // For now, we'll assume user is authenticated if not going to login
-    const isAuthenticated = to.path !== '/login' // Temporary logic
-    
-    if (!isAuthenticated) {
-      next('/login')
+    if (!authStore.isAuthenticated) {
+      // Store the intended destination for redirect after login
+      const redirectQuery = to.fullPath !== '/' ? { redirect: to.fullPath } : {}
+      next({
+        path: '/login',
+        query: redirectQuery,
+      })
       return
     }
-    
+
     // Check role-based access
     if (to.meta.requiresRole) {
-      // TODO: Check user role
-      // For now, we'll allow access
-      const userRole = 'Administrator' // Temporary - will be replaced with actual auth store
-      
-      if (to.meta.requiresRole !== userRole) {
+      const requiredRole = to.meta.requiresRole as string
+
+      if (!authStore.hasRole(requiredRole as UserRole)) {
         // Redirect to dashboard if insufficient permissions
         next('/dashboard')
         return
       }
     }
+  } else {
+    // If going to login page but already authenticated, redirect to dashboard
+    if (to.path === '/login' && authStore.isAuthenticated) {
+      next('/dashboard')
+      return
+    }
   }
-  
+
   next()
 })
 

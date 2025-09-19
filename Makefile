@@ -1,7 +1,7 @@
 # Frontend Requirements System - Makefile
 # This Makefile provides convenient commands for development, testing, and building
 
-.PHONY: help dev build preview install clean lint format type-check test test-unit test-e2e test-watch all
+.PHONY: help dev build preview install clean lint format type-check test test-unit test-e2e test-watch test-ui test-coverage test-quick all
 
 # Default target
 .DEFAULT_GOAL := help
@@ -28,10 +28,13 @@ help:
 	@echo "  make check        - Run all code quality checks"
 	@echo ""
 	@echo "$(YELLOW)Testing:$(NC)"
-	@echo "  make test         - Run all tests (when configured)"
-	@echo "  make test-unit    - Run unit tests (when configured)"
-	@echo "  make test-e2e     - Run E2E tests (when configured)"
-	@echo "  make test-watch   - Run tests in watch mode (when configured)"
+	@echo "  make test         - Run all tests"
+	@echo "  make test-unit    - Run unit tests"
+	@echo "  make test-watch   - Run tests in watch mode"
+	@echo "  make test-ui      - Run tests with UI"
+	@echo "  make test-coverage - Run tests with coverage"
+	@echo "  make test-quick   - Run quick test with basic output"
+	@echo "  make test-e2e     - Run E2E tests (not configured yet)"
 	@echo ""
 	@echo "$(YELLOW)Building:$(NC)"
 	@echo "  make build        - Build for production"
@@ -82,38 +85,44 @@ type-check:
 check: lint format type-check
 	@echo "$(GREEN)All code quality checks completed$(NC)"
 
-## Testing Commands (placeholders for when testing is configured)
-# To set up testing, install the following packages:
-# npm install -D vitest @vue/test-utils jsdom @vitest/ui
-# npm install -D playwright @playwright/test
-# Then add test scripts to package.json
+## Testing Commands
 
 # Run all tests
 test:
-	@echo "$(YELLOW)Testing not yet configured. Please set up Vitest first.$(NC)"
-	@echo "$(YELLOW)To set up testing:$(NC)"
-	@echo "$(YELLOW)  npm install -D vitest @vue/test-utils jsdom @vitest/ui$(NC)"
-	@echo "$(YELLOW)  npm install -D playwright @playwright/test$(NC)"
-	@echo "$(YELLOW)Planned command: npm run test$(NC)"
-	# npm run test
+	@echo "$(GREEN)Running all tests...$(NC)"
+	npm run test:run
 
-# Run unit tests
+# Run unit tests (same as test for now, can be separated later)
 test-unit:
-	@echo "$(YELLOW)Unit testing not yet configured. Please set up Vitest first.$(NC)"
-	@echo "$(YELLOW)Planned command: npm run test:unit$(NC)"
-	# npm run test:unit
-
-# Run E2E tests
-test-e2e:
-	@echo "$(YELLOW)E2E testing not yet configured. Please set up Playwright first.$(NC)"
-	@echo "$(YELLOW)Planned command: npm run test:e2e$(NC)"
-	# npm run test:e2e
+	@echo "$(GREEN)Running unit tests...$(NC)"
+	npm run test:run
 
 # Run tests in watch mode
 test-watch:
-	@echo "$(YELLOW)Test watch mode not yet configured. Please set up Vitest first.$(NC)"
-	@echo "$(YELLOW)Planned command: npm run test:watch$(NC)"
-	# npm run test:watch
+	@echo "$(GREEN)Running tests in watch mode...$(NC)"
+	npm run test
+
+# Run tests with UI
+test-ui:
+	@echo "$(GREEN)Running tests with UI...$(NC)"
+	npm run test:ui
+
+# Run tests with coverage
+test-coverage:
+	@echo "$(GREEN)Running tests with coverage...$(NC)"
+	npm run test:coverage
+
+# Quick test - run tests once and show summary
+test-quick:
+	@echo "$(GREEN)Running quick test...$(NC)"
+	npm run test:run --reporter=basic
+
+# Run E2E tests (placeholder for future implementation)
+test-e2e:
+	@echo "$(YELLOW)E2E testing not yet configured. Please set up Playwright first.$(NC)"
+	@echo "$(YELLOW)To set up E2E testing:$(NC)"
+	@echo "$(YELLOW)  npm install -D playwright @playwright/test$(NC)"
+	# npm run test:e2e
 
 ## Building Commands
 
@@ -130,7 +139,7 @@ preview: build
 ## Utility Commands
 
 # Run complete workflow: install, check, test, build
-all: install check build
+all: install check test build
 	@echo "$(GREEN)Complete workflow finished successfully!$(NC)"
 
 # Quick development setup
@@ -146,4 +155,4 @@ node_modules:
 	fi
 
 # Ensure dependencies are installed before running commands
-dev install check lint format type-check build preview: | node_modules
+dev install check lint format type-check test test-unit test-watch test-ui test-coverage test-quick build preview: | node_modules
