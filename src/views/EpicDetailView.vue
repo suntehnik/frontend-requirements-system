@@ -10,19 +10,8 @@
             </div>
           </div>
           <div>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-pencil"
-              class="mr-2"
-            >
-              Редактировать
-            </v-btn>
-            <v-btn
-              color="success"
-              prepend-icon="mdi-plus"
-            >
-              Добавить историю
-            </v-btn>
+            <v-btn color="primary" prepend-icon="mdi-pencil" class="mr-2"> Редактировать </v-btn>
+            <v-btn color="success" prepend-icon="mdi-plus"> Добавить историю </v-btn>
           </div>
         </div>
       </v-col>
@@ -37,31 +26,23 @@
           <v-card-text>
             <div class="mb-4">
               <strong>Статус:</strong>
-              <v-chip
-                :color="getStatusColor(epic.status)"
-                size="small"
-                class="ml-2"
-              >
+              <v-chip :color="getStatusColor(epic.status)" size="small" class="ml-2">
                 {{ epic.status }}
               </v-chip>
             </div>
-            
+
             <div class="mb-4">
               <strong>Приоритет:</strong>
-              <v-chip
-                :color="getPriorityColor(epic.priority)"
-                size="small"
-                class="ml-2"
-              >
+              <v-chip :color="getPriorityColor(epic.priority)" size="small" class="ml-2">
                 {{ getPriorityText(epic.priority) }}
               </v-chip>
             </div>
-            
+
             <div class="mb-4">
               <strong>Ответственный:</strong>
               {{ epic.assignee || 'Не назначен' }}
             </div>
-            
+
             <div v-if="epic.description">
               <strong>Описание:</strong>
               <div class="mt-2" v-html="epic.description"></div>
@@ -74,13 +55,7 @@
           <v-card-title>
             Пользовательские истории
             <v-spacer />
-            <v-btn
-              color="primary"
-              size="small"
-              prepend-icon="mdi-plus"
-            >
-              Добавить историю
-            </v-btn>
+            <v-btn color="primary" size="small" prepend-icon="mdi-plus"> Добавить историю </v-btn>
           </v-card-title>
           <v-card-text>
             <v-list v-if="userStories.length > 0">
@@ -95,10 +70,7 @@
                 <v-list-item-title>{{ story.reference_id }}: {{ story.title }}</v-list-item-title>
                 <v-list-item-subtitle>{{ story.status }}</v-list-item-subtitle>
                 <template v-slot:append>
-                  <v-chip
-                    :color="getStatusColor(story.status)"
-                    size="small"
-                  >
+                  <v-chip :color="getStatusColor(story.status)" size="small">
                     {{ story.status }}
                   </v-chip>
                 </template>
@@ -117,36 +89,16 @@
         <v-card class="mb-4">
           <v-card-title>Действия</v-card-title>
           <v-card-text>
-            <v-btn
-              block
-              color="primary"
-              class="mb-2"
-              prepend-icon="mdi-pencil"
-            >
+            <v-btn block color="primary" class="mb-2" prepend-icon="mdi-pencil">
               Редактировать эпик
             </v-btn>
-            <v-btn
-              block
-              color="success"
-              class="mb-2"
-              prepend-icon="mdi-plus"
-            >
+            <v-btn block color="success" class="mb-2" prepend-icon="mdi-plus">
               Добавить историю
             </v-btn>
-            <v-btn
-              block
-              color="info"
-              class="mb-2"
-              prepend-icon="mdi-account"
-            >
+            <v-btn block color="info" class="mb-2" prepend-icon="mdi-account">
               Назначить ответственного
             </v-btn>
-            <v-btn
-              block
-              color="warning"
-              class="mb-2"
-              prepend-icon="mdi-swap-horizontal"
-            >
+            <v-btn block color="warning" class="mb-2" prepend-icon="mdi-swap-horizontal">
               Изменить статус
             </v-btn>
           </v-card-text>
@@ -162,11 +114,11 @@
             </div>
             <div class="d-flex justify-space-between mb-2">
               <span>Завершено:</span>
-              <strong>{{ userStories.filter(s => s.status === 'Done').length }}</strong>
+              <strong>{{ userStories.filter((s) => s.status === 'Done').length }}</strong>
             </div>
             <div class="d-flex justify-space-between">
               <span>В работе:</span>
-              <strong>{{ userStories.filter(s => s.status === 'In Progress').length }}</strong>
+              <strong>{{ userStories.filter((s) => s.status === 'In Progress').length }}</strong>
             </div>
           </v-card-text>
         </v-card>
@@ -186,12 +138,13 @@ const epic = ref({
   id: route.params.id,
   reference_id: 'EP-001',
   title: 'Система аутентификации',
-  description: 'Реализация безопасной системы аутентификации пользователей с поддержкой JWT токенов и ролевой модели доступа.',
+  description:
+    'Реализация безопасной системы аутентификации пользователей с поддержкой JWT токенов и ролевой модели доступа.',
   status: 'In Progress',
   priority: 1,
   assignee: 'Иван Иванов',
   created_at: '2024-01-15',
-  last_modified: '2024-01-20'
+  last_modified: '2024-01-20',
 })
 
 const userStories = ref([
@@ -199,29 +152,29 @@ const userStories = ref([
     id: '1',
     reference_id: 'US-001',
     title: 'Вход в систему',
-    status: 'Done'
+    status: 'Done',
   },
   {
     id: '2',
     reference_id: 'US-002',
     title: 'Регистрация пользователя',
-    status: 'In Progress'
+    status: 'In Progress',
   },
   {
     id: '3',
     reference_id: 'US-003',
     title: 'Восстановление пароля',
-    status: 'Draft'
-  }
+    status: 'Draft',
+  },
 ])
 
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
-    'Backlog': 'grey',
-    'Draft': 'orange',
+    Backlog: 'grey',
+    Draft: 'orange',
     'In Progress': 'blue',
-    'Done': 'green',
-    'Cancelled': 'red'
+    Done: 'green',
+    Cancelled: 'red',
   }
   return colors[status] || 'grey'
 }
@@ -231,7 +184,7 @@ const getPriorityColor = (priority: number) => {
     1: 'red',
     2: 'orange',
     3: 'yellow',
-    4: 'green'
+    4: 'green',
   }
   return colors[priority] || 'grey'
 }
@@ -241,7 +194,7 @@ const getPriorityText = (priority: number) => {
     1: 'Критический',
     2: 'Высокий',
     3: 'Средний',
-    4: 'Низкий'
+    4: 'Низкий',
   }
   return texts[priority] || 'Неизвестно'
 }

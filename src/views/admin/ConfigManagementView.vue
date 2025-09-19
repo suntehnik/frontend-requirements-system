@@ -14,7 +14,7 @@
             <v-tab value="relationship-types">Типы связей</v-tab>
             <v-tab value="status-models">Модели статусов</v-tab>
           </v-tabs>
-          
+
           <v-tabs-window v-model="activeTab">
             <!-- Requirement Types Tab -->
             <v-tabs-window-item value="requirement-types">
@@ -25,7 +25,7 @@
                     Добавить тип
                   </v-btn>
                 </div>
-                
+
                 <v-data-table
                   :headers="requirementTypeHeaders"
                   :items="requirementTypes"
@@ -34,7 +34,7 @@
                   <template v-slot:[`item.created_at`]="{ item }">
                     {{ formatDate(item.created_at) }}
                   </template>
-                  
+
                   <template v-slot:[`item.actions`]="{ item }">
                     <v-btn
                       icon="mdi-pencil"
@@ -59,11 +59,15 @@
               <v-card-text>
                 <div class="d-flex justify-space-between align-center mb-4">
                   <h3 class="text-h6">Типы связей</h3>
-                  <v-btn color="primary" prepend-icon="mdi-plus" @click="openRelationshipTypeDialog">
+                  <v-btn
+                    color="primary"
+                    prepend-icon="mdi-plus"
+                    @click="openRelationshipTypeDialog"
+                  >
                     Добавить тип
                   </v-btn>
                 </div>
-                
+
                 <v-data-table
                   :headers="relationshipTypeHeaders"
                   :items="relationshipTypes"
@@ -72,7 +76,7 @@
                   <template v-slot:[`item.created_at`]="{ item }">
                     {{ formatDate(item.created_at) }}
                   </template>
-                  
+
                   <template v-slot:[`item.actions`]="{ item }">
                     <v-btn
                       icon="mdi-pencil"
@@ -101,29 +105,26 @@
                     Добавить модель
                   </v-btn>
                 </div>
-                
+
                 <v-data-table
                   :headers="statusModelHeaders"
                   :items="statusModels"
                   class="elevation-1"
                 >
                   <template v-slot:[`item.is_default`]="{ item }">
-                    <v-chip
-                      :color="item.is_default ? 'success' : 'grey'"
-                      size="small"
-                    >
+                    <v-chip :color="item.is_default ? 'success' : 'grey'" size="small">
                       {{ item.is_default ? 'По умолчанию' : 'Обычная' }}
                     </v-chip>
                   </template>
-                  
+
                   <template v-slot:[`item.entity_type`]="{ item }">
                     {{ getEntityTypeLabel(item.entity_type) }}
                   </template>
-                  
+
                   <template v-slot:[`item.created_at`]="{ item }">
                     {{ formatDate(item.created_at) }}
                   </template>
-                  
+
                   <template v-slot:[`item.actions`]="{ item }">
                     <v-btn
                       icon="mdi-eye"
@@ -225,14 +226,14 @@ const requirementTypeHeaders = [
   { title: 'Название', key: 'name', sortable: true },
   { title: 'Описание', key: 'description', sortable: false },
   { title: 'Создан', key: 'created_at', sortable: true },
-  { title: 'Действия', key: 'actions', sortable: false }
+  { title: 'Действия', key: 'actions', sortable: false },
 ]
 
 const relationshipTypeHeaders = [
   { title: 'Название', key: 'name', sortable: true },
   { title: 'Описание', key: 'description', sortable: false },
   { title: 'Создан', key: 'created_at', sortable: true },
-  { title: 'Действия', key: 'actions', sortable: false }
+  { title: 'Действия', key: 'actions', sortable: false },
 ]
 
 const statusModelHeaders = [
@@ -240,7 +241,7 @@ const statusModelHeaders = [
   { title: 'Тип сущности', key: 'entity_type', sortable: true },
   { title: 'По умолчанию', key: 'is_default', sortable: true },
   { title: 'Создана', key: 'created_at', sortable: true },
-  { title: 'Действия', key: 'actions', sortable: false }
+  { title: 'Действия', key: 'actions', sortable: false },
 ]
 
 // Mock data
@@ -249,20 +250,20 @@ const requirementTypes = ref([
     id: '1',
     name: 'Функциональное',
     description: 'Функциональные требования к системе',
-    created_at: '2024-01-01'
+    created_at: '2024-01-01',
   },
   {
     id: '2',
     name: 'Техническое',
     description: 'Технические требования и ограничения',
-    created_at: '2024-01-01'
+    created_at: '2024-01-01',
   },
   {
     id: '3',
     name: 'Безопасность',
     description: 'Требования к безопасности системы',
-    created_at: '2024-01-01'
-  }
+    created_at: '2024-01-01',
+  },
 ])
 
 const relationshipTypes = ref([
@@ -270,20 +271,20 @@ const relationshipTypes = ref([
     id: '1',
     name: 'Зависит от',
     description: 'Требование зависит от другого требования',
-    created_at: '2024-01-01'
+    created_at: '2024-01-01',
   },
   {
     id: '2',
     name: 'Связано с',
     description: 'Требование связано с другим требованием',
-    created_at: '2024-01-01'
+    created_at: '2024-01-01',
   },
   {
     id: '3',
     name: 'Конфликтует с',
     description: 'Требование конфликтует с другим требованием',
-    created_at: '2024-01-01'
-  }
+    created_at: '2024-01-01',
+  },
 ])
 
 const statusModels = ref([
@@ -292,27 +293,27 @@ const statusModels = ref([
     name: 'Стандартная модель эпиков',
     entity_type: 'epic',
     is_default: true,
-    created_at: '2024-01-01'
+    created_at: '2024-01-01',
   },
   {
     id: '2',
     name: 'Стандартная модель историй',
     entity_type: 'user_story',
     is_default: true,
-    created_at: '2024-01-01'
+    created_at: '2024-01-01',
   },
   {
     id: '3',
     name: 'Стандартная модель требований',
     entity_type: 'requirement',
     is_default: true,
-    created_at: '2024-01-01'
-  }
+    created_at: '2024-01-01',
+  },
 ])
 
 const requirementTypeForm = ref({
   name: '',
-  description: ''
+  description: '',
 })
 
 // Methods
@@ -322,10 +323,10 @@ const formatDate = (dateString: string) => {
 
 const getEntityTypeLabel = (type: string) => {
   const labels: Record<string, string> = {
-    'epic': 'Эпик',
-    'user_story': 'Пользовательская история',
-    'acceptance_criteria': 'Критерий приемки',
-    'requirement': 'Требование'
+    epic: 'Эпик',
+    user_story: 'Пользовательская история',
+    acceptance_criteria: 'Критерий приемки',
+    requirement: 'Требование',
   }
   return labels[type] || type
 }

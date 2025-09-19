@@ -3,7 +3,7 @@
     <!-- App Bar / Header -->
     <v-app-bar app color="primary" dark elevation="1">
       <v-app-bar-nav-icon @click="toggleSidebar" />
-      
+
       <v-app-bar-title>
         <router-link to="/dashboard" class="text-decoration-none text-white">
           Requirements Management System
@@ -29,10 +29,19 @@
       <v-menu>
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props">
-            <v-icon>mdi-account-circle</v-icon>
+            <v-avatar size="32" color="secondary">
+              <span class="text-white text-caption">
+                {{ userInitials }}
+              </span>
+            </v-avatar>
           </v-btn>
         </template>
         <v-list>
+          <v-list-item>
+            <v-list-item-title>{{ authStore.user?.username || 'Пользователь' }}</v-list-item-title>
+            <v-list-item-subtitle>{{ authStore.user?.role || '' }}</v-list-item-subtitle>
+          </v-list-item>
+          <v-divider />
           <v-list-item>
             <v-list-item-title>Профиль</v-list-item-title>
           </v-list-item>
@@ -40,44 +49,30 @@
             <v-list-item-title>Настройки</v-list-item-title>
           </v-list-item>
           <v-divider />
-          <v-list-item @click="logout">
-            <v-list-item-title>Выйти</v-list-item-title>
+          <v-list-item @click="handleLogout" :disabled="loggingOut">
+            <v-list-item-title>
+              <v-icon v-if="loggingOut" start size="small">mdi-loading</v-icon>
+              Выйти
+            </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
     </v-app-bar>
 
     <!-- Navigation Drawer / Sidebar -->
-    <v-navigation-drawer
-      v-model="sidebarOpen"
-      app
-      width="280"
-      color="grey-lighten-5"
-    >
+    <v-navigation-drawer v-model="sidebarOpen" app width="280" color="grey-lighten-5">
       <v-list nav>
         <!-- Dashboard -->
-        <v-list-item
-          to="/dashboard"
-          prepend-icon="mdi-view-dashboard"
-          title="Главная"
-        />
+        <v-list-item to="/dashboard" prepend-icon="mdi-view-dashboard" title="Главная" />
 
         <v-divider class="my-2" />
 
         <!-- Epics Section -->
         <v-list-group value="epics">
           <template v-slot:activator="{ props }">
-            <v-list-item
-              v-bind="props"
-              prepend-icon="mdi-folder-multiple"
-              title="Эпики"
-            />
+            <v-list-item v-bind="props" prepend-icon="mdi-folder-multiple" title="Эпики" />
           </template>
-          <v-list-item
-            to="/epics"
-            prepend-icon="mdi-format-list-bulleted"
-            title="Все эпики"
-          />
+          <v-list-item to="/epics" prepend-icon="mdi-format-list-bulleted" title="Все эпики" />
         </v-list-group>
 
         <!-- User Stories Section -->
@@ -115,33 +110,17 @@
         <v-divider class="my-2" />
 
         <!-- Search -->
-        <v-list-item
-          to="/search"
-          prepend-icon="mdi-magnify"
-          title="Поиск"
-        />
+        <v-list-item to="/search" prepend-icon="mdi-magnify" title="Поиск" />
 
         <v-divider class="my-2" />
 
-        <!-- Admin Section -->
-        <v-list-group value="admin">
+        <!-- Admin Section (only for administrators) -->
+        <v-list-group v-if="authStore.hasRole('Administrator')" value="admin">
           <template v-slot:activator="{ props }">
-            <v-list-item
-              v-bind="props"
-              prepend-icon="mdi-cog"
-              title="Администрирование"
-            />
+            <v-list-item v-bind="props" prepend-icon="mdi-cog" title="Администрирование" />
           </template>
-          <v-list-item
-            to="/admin/users"
-            prepend-icon="mdi-account-multiple"
-            title="Пользователи"
-          />
-          <v-list-item
-            to="/admin/config"
-            prepend-icon="mdi-cog-outline"
-            title="Конфигурация"
-          />
+          <v-list-item to="/admin/users" prepend-icon="mdi-account-multiple" title="Пользователи" />
+          <v-list-item to="/admin/config" prepend-icon="mdi-cog-outline" title="Конфигурация" />
         </v-list-group>
       </v-list>
     </v-navigation-drawer>
@@ -151,7 +130,7 @@
       <v-container fluid class="pa-4">
         <!-- Breadcrumbs -->
         <AppBreadcrumbs class="mb-4" />
-        
+
         <!-- Page Content -->
         <router-view />
       </v-container>
@@ -160,11 +139,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import AppBreadcrumbs from '@/components/common/AppBreadcrumbs.vue'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 // Sidebar state
 const sidebarOpen = ref(true)
@@ -172,6 +153,20 @@ const sidebarOpen = ref(true)
 // Search functionality
 const searchQuery = ref('')
 
+// Logout state
+const loggingOut = ref(false)
+
+// Computed
+const userInitials = computed(() => {
+  if (!authStore.user?.username) return 'U'
+  const parts = authStore.user.username.split(' ')
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase()
+  }
+  return authStore.user.username.substring(0, 2).toUpperCase()
+})
+
+// Methods
 const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value
 }
@@ -182,9 +177,18 @@ const performSearch = () => {
   }
 }
 
-const logout = () => {
-  // TODO: Implement logout logic
-  router.push('/login')
+const handleLogout = async () => {
+  loggingOut.value = true
+  try {
+    await authStore.logout()
+    await router.push('/login')
+  } catch (error) {
+    console.error('Logout failed:', error)
+    // Even if logout API fails, redirect to login
+    await router.push('/login')
+  } finally {
+    loggingOut.value = false
+  }
 }
 </script>
 

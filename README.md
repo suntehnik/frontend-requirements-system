@@ -75,6 +75,9 @@ src/
 - ✅ Modern ES modules
 - ✅ Environment configuration
 - ✅ Production-ready build setup
+- ✅ **Comprehensive testing with Vitest**
+- ✅ **Authentication system with tests**
+- ✅ **Makefile for development workflow**
 - ✅ Git repository with proper commit structure
 
 ## Next Steps
@@ -88,11 +91,78 @@ This is the foundation setup. The next tasks will involve:
 5. Creating CRUD interfaces for Epics, User Stories, and Requirements
 6. Adding search, comments, and advanced features
 
+## Testing
+
+This project uses **Vitest** for unit testing with comprehensive coverage of authentication functionality.
+
+### Test Commands
+
+```bash
+# Run all tests
+npm run test:run
+# or
+make test
+
+# Run tests in watch mode
+npm run test
+# or
+make test-watch
+
+# Run tests with UI
+npm run test:ui
+# or
+make test-ui
+
+# Run tests with coverage
+npm run test:coverage
+# or
+make test-coverage
+
+# Quick test run
+make test-quick
+```
+
+### Test Structure
+
+- `src/**/__tests__/` - Test files co-located with source code
+- `src/test/setup.ts` - Global test setup and mocks
+- `vitest.config.ts` - Vitest configuration
+
+### Current Test Coverage
+
+- ✅ **AuthStore** (26 tests) - Complete authentication state management
+- ✅ **AuthService** (23 tests) - API authentication methods
+- ✅ **LoginForm** (11 tests) - Form validation and user interaction
+
+Total: **60 tests** covering authentication, state management, and form validation.
+
 ## Scripts
 
+### Development
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
+
+### Code Quality
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
 - `npm run type-check` - Run TypeScript type checking
+
+### Testing
+- `npm run test` - Run tests in watch mode
+- `npm run test:run` - Run tests once
+- `npm run test:ui` - Run tests with UI
+- `npm run test:coverage` - Run tests with coverage
+
+### Makefile Commands
+
+For convenience, you can also use Make commands:
+
+```bash
+make help          # Show all available commands
+make dev           # Start development server
+make test          # Run all tests
+make check         # Run all code quality checks
+make build         # Build for production
+make all           # Complete workflow: install, check, test, build
+```

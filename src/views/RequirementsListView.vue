@@ -4,9 +4,7 @@
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center mb-4">
           <h1 class="text-h4">Требования</h1>
-          <v-btn color="primary" prepend-icon="mdi-plus">
-            Создать требование
-          </v-btn>
+          <v-btn color="primary" prepend-icon="mdi-plus"> Создать требование </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -51,7 +49,7 @@
               </v-col>
             </v-row>
           </v-card-title>
-          
+
           <v-data-table
             :headers="headers"
             :items="filteredRequirements"
@@ -63,43 +61,23 @@
                 {{ item.user_story }}
               </router-link>
             </template>
-            
+
             <template v-slot:[`item.status`]="{ item }">
-              <v-chip
-                :color="getStatusColor(item.status)"
-                size="small"
-              >
+              <v-chip :color="getStatusColor(item.status)" size="small">
                 {{ item.status }}
               </v-chip>
             </template>
-            
+
             <template v-slot:[`item.priority`]="{ item }">
-              <v-chip
-                :color="getPriorityColor(item.priority)"
-                size="small"
-              >
+              <v-chip :color="getPriorityColor(item.priority)" size="small">
                 {{ getPriorityText(item.priority) }}
               </v-chip>
             </template>
-            
+
             <template v-slot:[`item.actions`]="{ item }">
-              <v-btn
-                icon="mdi-eye"
-                size="small"
-                variant="text"
-                :to="`/requirements/${item.id}`"
-              />
-              <v-btn
-                icon="mdi-pencil"
-                size="small"
-                variant="text"
-              />
-              <v-btn
-                icon="mdi-delete"
-                size="small"
-                variant="text"
-                color="error"
-              />
+              <v-btn icon="mdi-eye" size="small" variant="text" :to="`/requirements/${item.id}`" />
+              <v-btn icon="mdi-pencil" size="small" variant="text" />
+              <v-btn icon="mdi-delete" size="small" variant="text" color="error" />
             </template>
           </v-data-table>
         </v-card>
@@ -124,7 +102,7 @@ const headers = [
   { title: 'Приоритет', key: 'priority', sortable: true },
   { title: 'Ответственный', key: 'assignee', sortable: true },
   { title: 'Создано', key: 'created_at', sortable: true },
-  { title: 'Действия', key: 'actions', sortable: false }
+  { title: 'Действия', key: 'actions', sortable: false },
 ]
 
 // Mock data - will be replaced with real API calls
@@ -139,7 +117,7 @@ const requirements = ref([
     status: 'Active',
     priority: 1,
     assignee: 'Иван Иванов',
-    created_at: '2024-01-15'
+    created_at: '2024-01-15',
   },
   {
     id: '2',
@@ -151,7 +129,7 @@ const requirements = ref([
     status: 'Active',
     priority: 2,
     assignee: 'Петр Петров',
-    created_at: '2024-01-16'
+    created_at: '2024-01-16',
   },
   {
     id: '3',
@@ -163,7 +141,7 @@ const requirements = ref([
     status: 'Draft',
     priority: 3,
     assignee: 'Анна Сидорова',
-    created_at: '2024-01-17'
+    created_at: '2024-01-17',
   },
   {
     id: '4',
@@ -175,32 +153,32 @@ const requirements = ref([
     status: 'Active',
     priority: 2,
     assignee: 'Мария Петрова',
-    created_at: '2024-01-18'
-  }
+    created_at: '2024-01-18',
+  },
 ])
 
 const userStoryOptions = [
   { title: 'US-001: Вход в систему', value: '1' },
   { title: 'US-002: Регистрация пользователя', value: '2' },
-  { title: 'US-003: Управление профилем', value: '3' }
+  { title: 'US-003: Управление профилем', value: '3' },
 ]
 
 const typeOptions = [
   { title: 'Функциональное', value: 'Функциональное' },
   { title: 'Техническое', value: 'Техническое' },
   { title: 'Безопасность', value: 'Безопасность' },
-  { title: 'Производительность', value: 'Производительность' }
+  { title: 'Производительность', value: 'Производительность' },
 ]
 
 const filteredRequirements = computed(() => {
   let filtered = requirements.value
 
   if (selectedUserStory.value) {
-    filtered = filtered.filter(req => req.user_story_id === selectedUserStory.value)
+    filtered = filtered.filter((req) => req.user_story_id === selectedUserStory.value)
   }
 
   if (selectedType.value) {
-    filtered = filtered.filter(req => req.type === selectedType.value)
+    filtered = filtered.filter((req) => req.type === selectedType.value)
   }
 
   return filtered
@@ -208,9 +186,9 @@ const filteredRequirements = computed(() => {
 
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
-    'Draft': 'orange',
-    'Active': 'green',
-    'Obsolete': 'red'
+    Draft: 'orange',
+    Active: 'green',
+    Obsolete: 'red',
   }
   return colors[status] || 'grey'
 }
@@ -220,7 +198,7 @@ const getPriorityColor = (priority: number) => {
     1: 'red',
     2: 'orange',
     3: 'yellow',
-    4: 'green'
+    4: 'green',
   }
   return colors[priority] || 'grey'
 }
@@ -230,7 +208,7 @@ const getPriorityText = (priority: number) => {
     1: 'Критический',
     2: 'Высокий',
     3: 'Средний',
-    4: 'Низкий'
+    4: 'Низкий',
   }
   return texts[priority] || 'Неизвестно'
 }
