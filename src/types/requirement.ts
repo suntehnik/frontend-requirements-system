@@ -1,9 +1,7 @@
 import type { User } from './auth';
-import type { UserStory } from './user-story';
-import type { AcceptanceCriteria } from './acceptance-criteria';
 import type { RequirementType, RequirementRelationship } from './config';
-import type { Comment } from './comment';
 import type { RequirementStatus, Priority, ListResponse } from './common';
+import type { BaseUserStory, BaseAcceptanceCriteria, BaseComment } from './base-entities';
 
 // Requirement Types
 export interface Requirement {
@@ -22,14 +20,14 @@ export interface Requirement {
   last_modified: string;
   
   // Optional populated fields
-  user_story?: UserStory;
-  acceptance_criteria?: AcceptanceCriteria;
+  user_story?: BaseUserStory;
+  acceptance_criteria?: BaseAcceptanceCriteria;
   type?: RequirementType;
   creator?: User;
   assignee?: User;
   source_relationships?: RequirementRelationship[];
   target_relationships?: RequirementRelationship[];
-  comments?: Comment[];
+  comments?: BaseComment[];
 }
 
 export interface CreateRequirementRequest {

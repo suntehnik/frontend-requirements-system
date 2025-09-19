@@ -1,6 +1,6 @@
 import type { User } from './auth';
-import type { Requirement } from './requirement';
 import type { EntityType } from './common';
+import type { BaseRequirement } from './base-entities';
 
 // Configuration Types
 export interface RequirementType {
@@ -28,8 +28,8 @@ export interface RequirementRelationship {
   created_at: string;
   
   // Optional populated fields
-  source_requirement?: Requirement;
-  target_requirement?: Requirement;
+  source_requirement?: BaseRequirement;
+  target_requirement?: BaseRequirement;
   relationship_type?: RelationshipType;
   creator?: User;
 }

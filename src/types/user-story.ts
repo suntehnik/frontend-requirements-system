@@ -1,9 +1,6 @@
 import type { User } from './auth';
-import type { Epic } from './epic';
-import type { AcceptanceCriteria } from './acceptance-criteria';
-import type { Requirement } from './requirement';
-import type { Comment } from './comment';
 import type { UserStoryStatus, Priority, ListResponse } from './common';
+import type { BaseEpic, BaseAcceptanceCriteria, BaseRequirement, BaseComment } from './base-entities';
 
 // User Story Types
 export interface UserStory {
@@ -20,12 +17,12 @@ export interface UserStory {
   last_modified: string;
   
   // Optional populated fields
-  epic?: Epic;
+  epic?: BaseEpic;
   creator?: User;
   assignee?: User;
-  acceptance_criteria?: AcceptanceCriteria[];
-  requirements?: Requirement[];
-  comments?: Comment[];
+  acceptance_criteria?: BaseAcceptanceCriteria[];
+  requirements?: BaseRequirement[];
+  comments?: BaseComment[];
 }
 
 export interface CreateUserStoryRequest {
