@@ -1,5 +1,6 @@
 import type { User } from './auth';
 import type { EntityType, ListResponse } from './common';
+import type { BaseComment } from './base-entities';
 
 // Comment Types
 export interface Comment {
@@ -18,8 +19,8 @@ export interface Comment {
   
   // Optional populated fields
   author?: User;
-  parent_comment?: Comment;
-  replies?: Comment[];
+  parent_comment?: BaseComment;
+  replies?: BaseComment[];
 }
 
 export interface CreateCommentRequest {

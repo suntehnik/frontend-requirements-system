@@ -1,8 +1,6 @@
 import type { User } from './auth';
-import type { UserStory } from './user-story';
-import type { Requirement } from './requirement';
-import type { Comment } from './comment';
 import type { ListResponse } from './common';
+import type { BaseUserStory, BaseRequirement, BaseComment } from './base-entities';
 
 // Acceptance Criteria Types
 export interface AcceptanceCriteria {
@@ -13,12 +11,12 @@ export interface AcceptanceCriteria {
   author_id: string;
   created_at: string;
   last_modified: string;
-  
+
   // Optional populated fields
-  user_story?: UserStory;
+  user_story?: BaseUserStory;
   author?: User;
-  requirements?: Requirement[];
-  comments?: Comment[];
+  requirements?: BaseRequirement[];
+  comments?: BaseComment[];
 }
 
 export interface CreateAcceptanceCriteriaRequest {

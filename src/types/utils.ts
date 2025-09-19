@@ -1,15 +1,15 @@
 // Utility types for common patterns
+import type { Epic } from './epic';
+import type { UserStory } from './user-story';
+import type { AcceptanceCriteria } from './acceptance-criteria';
+import type { Requirement } from './requirement';
 import type { 
-  Epic, 
-  UserStory, 
-  AcceptanceCriteria, 
-  Requirement,
   EntityType,
   Priority,
   EpicStatus,
   UserStoryStatus,
   RequirementStatus
-} from './index';
+} from './common';
 
 // Union type for all entities
 export type Entity = Epic | UserStory | AcceptanceCriteria | Requirement;

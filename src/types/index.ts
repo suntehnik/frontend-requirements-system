@@ -6,6 +6,9 @@ export type * from './auth';
 // Common types
 export type * from './common';
 
+// Base entity types (for avoiding circular imports)
+export type * from './base-entities';
+
 // Entity types
 export type * from './epic';
 export type * from './user-story';
@@ -22,8 +25,8 @@ export type * from './search';
 // Hierarchy types
 export type * from './hierarchy';
 
-// Type guards
-export * from './guards';
+// Type guards (exported separately to avoid circular imports)
+// Import guards directly: import { isUser, isEpic, ... } from './types/guards';
 
 // Utility types and functions
 export * from './utils';

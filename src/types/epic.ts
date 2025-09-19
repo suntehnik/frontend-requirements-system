@@ -1,7 +1,6 @@
 import type { User } from './auth';
-import type { UserStory } from './user-story';
-import type { Comment } from './comment';
 import type { EpicStatus, Priority, ListResponse } from './common';
+import type { BaseUserStory, BaseComment } from './base-entities';
 
 // Epic Types
 export interface Epic {
@@ -19,8 +18,8 @@ export interface Epic {
   // Optional populated fields
   creator?: User;
   assignee?: User;
-  user_stories?: UserStory[];
-  comments?: Comment[];
+  user_stories?: BaseUserStory[];
+  comments?: BaseComment[];
 }
 
 export interface CreateEpicRequest {
