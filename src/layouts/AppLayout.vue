@@ -147,15 +147,13 @@
     </v-navigation-drawer>
 
     <!-- Main Content Area -->
-    <v-main class="d-flex flex-column">
-      <v-container fluid class="pa-4 flex-grow-1 d-flex flex-column">
+    <v-main>
+      <v-container fluid class="pa-4">
         <!-- Breadcrumbs -->
         <AppBreadcrumbs class="mb-4" />
         
         <!-- Page Content -->
-        <div class="flex-grow-1">
-          <router-view />
-        </div>
+        <router-view />
       </v-container>
     </v-main>
   </v-app>
@@ -196,12 +194,9 @@ const logout = () => {
   color: inherit;
 }
 
-/* Ensure full height layout */
+/* Main content area should be scrollable */
 .v-main {
-  height: 100%;
-}
-
-.v-container {
-  height: 100%;
+  height: calc(100vh - 64px); /* Subtract app bar height */
+  overflow-y: auto;
 }
 </style>
