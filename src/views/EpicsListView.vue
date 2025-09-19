@@ -32,7 +32,7 @@
             :search="search"
             class="elevation-1"
           >
-            <template v-slot:item.status="{ item }">
+            <template v-slot:[`item.status`]="{ item }">
               <v-chip
                 :color="getStatusColor(item.status)"
                 size="small"
@@ -41,7 +41,7 @@
               </v-chip>
             </template>
             
-            <template v-slot:item.priority="{ item }">
+            <template v-slot:[`item.priority`]="{ item }">
               <v-chip
                 :color="getPriorityColor(item.priority)"
                 size="small"
@@ -50,7 +50,7 @@
               </v-chip>
             </template>
             
-            <template v-slot:item.actions="{ item }">
+            <template v-slot:[`item.actions`]="{ item }">
               <v-btn
                 icon="mdi-eye"
                 size="small"

@@ -32,7 +32,7 @@
             :search="search"
             class="elevation-1"
           >
-            <template v-slot:item.role="{ item }">
+            <template v-slot:[`item.role`]="{ item }">
               <v-chip
                 :color="getRoleColor(item.role)"
                 size="small"
@@ -41,11 +41,11 @@
               </v-chip>
             </template>
             
-            <template v-slot:item.created_at="{ item }">
+            <template v-slot:[`item.created_at`]="{ item }">
               {{ formatDate(item.created_at) }}
             </template>
             
-            <template v-slot:item.actions="{ item }">
+            <template v-slot:[`item.actions`]="{ item }">
               <v-btn
                 icon="mdi-pencil"
                 size="small"
@@ -145,12 +145,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+interface User {
+  id: string
+  username: string
+  email: string
+  role: string
+  created_at: string
+  last_login: string
+}
+
 const search = ref('')
 const userDialog = ref(false)
 const deleteDialog = ref(false)
 const formValid = ref(false)
-const editingUser = ref<any>(null)
-const userToDelete = ref<any>(null)
+const editingUser = ref<User | null>(null)
+const userToDelete = ref<User | null>(null)
 
 const headers = [
   { title: 'Имя пользователя', key: 'username', sortable: true },
@@ -252,7 +261,7 @@ const openCreateDialog = () => {
   userDialog.value = true
 }
 
-const openEditDialog = (user: any) => {
+const openEditDialog = (user: User) => {
   editingUser.value = user
   userForm.value = {
     username: user.username,
@@ -274,7 +283,7 @@ const saveUser = () => {
   closeUserDialog()
 }
 
-const openDeleteDialog = (user: any) => {
+const openDeleteDialog = (user: User) => {
   userToDelete.value = user
   deleteDialog.value = true
 }

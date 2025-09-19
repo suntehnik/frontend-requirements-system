@@ -88,7 +88,7 @@
           <v-card-text>
             <v-list v-if="acceptanceCriteria.length > 0">
               <v-list-item
-                v-for="(criteria, index) in acceptanceCriteria"
+                v-for="criteria in acceptanceCriteria"
                 :key="criteria.id"
               >
                 <template v-slot:prepend>

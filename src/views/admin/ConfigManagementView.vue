@@ -31,11 +31,11 @@
                   :items="requirementTypes"
                   class="elevation-1"
                 >
-                  <template v-slot:item.created_at="{ item }">
+                  <template v-slot:[`item.created_at`]="{ item }">
                     {{ formatDate(item.created_at) }}
                   </template>
                   
-                  <template v-slot:item.actions="{ item }">
+                  <template v-slot:[`item.actions`]="{ item }">
                     <v-btn
                       icon="mdi-pencil"
                       size="small"
@@ -69,11 +69,11 @@
                   :items="relationshipTypes"
                   class="elevation-1"
                 >
-                  <template v-slot:item.created_at="{ item }">
+                  <template v-slot:[`item.created_at`]="{ item }">
                     {{ formatDate(item.created_at) }}
                   </template>
                   
-                  <template v-slot:item.actions="{ item }">
+                  <template v-slot:[`item.actions`]="{ item }">
                     <v-btn
                       icon="mdi-pencil"
                       size="small"
@@ -107,7 +107,7 @@
                   :items="statusModels"
                   class="elevation-1"
                 >
-                  <template v-slot:item.is_default="{ item }">
+                  <template v-slot:[`item.is_default`]="{ item }">
                     <v-chip
                       :color="item.is_default ? 'success' : 'grey'"
                       size="small"
@@ -116,15 +116,15 @@
                     </v-chip>
                   </template>
                   
-                  <template v-slot:item.entity_type="{ item }">
+                  <template v-slot:[`item.entity_type`]="{ item }">
                     {{ getEntityTypeLabel(item.entity_type) }}
                   </template>
                   
-                  <template v-slot:item.created_at="{ item }">
+                  <template v-slot:[`item.created_at`]="{ item }">
                     {{ formatDate(item.created_at) }}
                   </template>
                   
-                  <template v-slot:item.actions="{ item }">
+                  <template v-slot:[`item.actions`]="{ item }">
                     <v-btn
                       icon="mdi-eye"
                       size="small"
@@ -194,9 +194,31 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+interface RequirementType {
+  id: string
+  name: string
+  description: string
+  created_at: string
+}
+
+interface RelationshipType {
+  id: string
+  name: string
+  description: string
+  created_at: string
+}
+
+interface StatusModel {
+  id: string
+  name: string
+  entity_type: string
+  is_default: boolean
+  created_at: string
+}
+
 const activeTab = ref('requirement-types')
 const requirementTypeDialog = ref(false)
-const editingRequirementType = ref<any>(null)
+const editingRequirementType = ref<RequirementType | null>(null)
 
 // Headers
 const requirementTypeHeaders = [
@@ -314,7 +336,7 @@ const openRequirementTypeDialog = () => {
   requirementTypeDialog.value = true
 }
 
-const openEditRequirementTypeDialog = (item: any) => {
+const openEditRequirementTypeDialog = (item: RequirementType) => {
   editingRequirementType.value = item
   requirementTypeForm.value = { ...item }
   requirementTypeDialog.value = true
@@ -331,7 +353,7 @@ const saveRequirementType = () => {
   closeRequirementTypeDialog()
 }
 
-const openDeleteRequirementTypeDialog = (item: any) => {
+const openDeleteRequirementTypeDialog = (item: RequirementType) => {
   // TODO: Implement delete confirmation dialog
   console.log('Delete requirement type:', item)
 }
@@ -341,11 +363,11 @@ const openRelationshipTypeDialog = () => {
   console.log('Open relationship type dialog')
 }
 
-const openEditRelationshipTypeDialog = (item: any) => {
+const openEditRelationshipTypeDialog = (item: RelationshipType) => {
   console.log('Edit relationship type:', item)
 }
 
-const openDeleteRelationshipTypeDialog = (item: any) => {
+const openDeleteRelationshipTypeDialog = (item: RelationshipType) => {
   console.log('Delete relationship type:', item)
 }
 
@@ -353,15 +375,15 @@ const openStatusModelDialog = () => {
   console.log('Open status model dialog')
 }
 
-const openEditStatusModelDialog = (item: any) => {
+const openEditStatusModelDialog = (item: StatusModel) => {
   console.log('Edit status model:', item)
 }
 
-const openDeleteStatusModelDialog = (item: any) => {
+const openDeleteStatusModelDialog = (item: StatusModel) => {
   console.log('Delete status model:', item)
 }
 
-const viewStatusModel = (item: any) => {
+const viewStatusModel = (item: StatusModel) => {
   console.log('View status model:', item)
 }
 </script>

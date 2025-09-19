@@ -153,6 +153,19 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+interface SearchResult {
+  entity_type: string
+  entity_id: string
+  reference_id: string
+  title: string
+  description: string
+}
+
+interface SearchResultGroup {
+  type: string
+  results: SearchResult[]
+}
+
 const route = useRoute()
 const router = useRouter()
 
@@ -165,7 +178,7 @@ const loading = ref(false)
 const hasSearched = ref(false)
 
 // Results
-const searchResults = ref<any[]>([])
+const searchResults = ref<SearchResult[]>([])
 const totalResults = ref(0)
 const totalPages = ref(0)
 
@@ -197,8 +210,8 @@ const searchSuggestions = [
 ]
 
 // Computed
-const groupedResults = computed(() => {
-  const groups: Record<string, any[]> = {}
+const groupedResults = computed((): SearchResultGroup[] => {
+  const groups: Record<string, SearchResult[]> = {}
   
   searchResults.value.forEach(result => {
     if (!groups[result.entity_type]) {
@@ -295,7 +308,7 @@ const getEntityIcon = (type: string) => {
   return icons[type] || 'mdi-file'
 }
 
-const getResultLink = (result: any) => {
+const getResultLink = (result: SearchResult) => {
   const links: Record<string, string> = {
     'epic': `/epics/${result.entity_id}`,
     'user_story': `/user-stories/${result.entity_id}`,
