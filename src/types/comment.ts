@@ -38,4 +38,4 @@ export interface UpdateCommentRequest {
   content?: string;
 }
 
-export interface CommentListResponse extends ListResponse<Comment> {}
+export type CommentListResponse = ListResponse<Comment>;

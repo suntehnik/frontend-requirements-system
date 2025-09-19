@@ -30,4 +30,4 @@ export interface UpdateAcceptanceCriteriaRequest {
   description?: string;
 }
 
-export interface AcceptanceCriteriaListResponse extends ListResponse<AcceptanceCriteria> {}
+export type AcceptanceCriteriaListResponse = ListResponse<AcceptanceCriteria>;

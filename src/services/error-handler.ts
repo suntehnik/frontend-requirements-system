@@ -20,14 +20,14 @@ export interface ApiError {
 export class ErrorHandler {
   static handle(error: AxiosError): ApiError {
     const status = error.response?.status || 0;
-    const errorData = error.response?.data as any;
-    const errorInfo = errorData?.error;
+    const errorData = error.response?.data as Record<string, unknown>;
+    const errorInfo = errorData?.error as Record<string, unknown> | undefined;
 
     switch (status) {
       case 400:
         return {
-          code: errorInfo?.code || 'VALIDATION_ERROR',
-          message: errorInfo?.message || 'Ошибка валидации данных',
+          code: (errorInfo?.code as string) || 'VALIDATION_ERROR',
+          message: (errorInfo?.message as string) || 'Ошибка валидации данных',
           status,
           type: ErrorType.VALIDATION,
           originalError: error
@@ -63,7 +63,7 @@ export class ErrorHandler {
       case 409:
         return {
           code: 'DELETION_CONFLICT',
-          message: errorInfo?.message || 'Невозможно удалить объект из-за зависимостей',
+          message: (errorInfo?.message as string) || 'Невозможно удалить объект из-за зависимостей',
           status,
           type: ErrorType.VALIDATION,
           originalError: error

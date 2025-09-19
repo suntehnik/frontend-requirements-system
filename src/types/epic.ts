@@ -48,4 +48,4 @@ export interface EpicListParams {
   include?: string;
 }
 
-export interface EpicListResponse extends ListResponse<Epic> {}
+export type EpicListResponse = ListResponse<Epic>;

@@ -1,5 +1,5 @@
 import axios, { type AxiosInstance, type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
-import type { ErrorResponse } from '@/types';
+
 import { ErrorHandler } from './error-handler';
 
 // HTTP Client Configuration
@@ -82,12 +82,17 @@ class HttpClient {
   }
 
   private isTokenValid(token: string): boolean {
+    if (!token) return false;
+    
     try {
       const authData = localStorage.getItem('auth');
       if (authData) {
         const parsed = JSON.parse(authData);
         const expiresAt = parsed.expires_at;
-        if (expiresAt) {
+        const storedToken = parsed.token;
+        
+        // Check if token matches and is not expired
+        if (expiresAt && storedToken === token) {
           return new Date(expiresAt) > new Date();
         }
       }
@@ -108,27 +113,27 @@ class HttpClient {
   }
 
   // Public HTTP methods
-  async get<T = any>(url: string, params?: any): Promise<T> {
+  async get<T = unknown>(url: string, params?: Record<string, unknown>): Promise<T> {
     const response = await this.axiosInstance.get<T>(url, { params });
     return response.data;
   }
 
-  async post<T = any>(url: string, data?: any): Promise<T> {
+  async post<T = unknown>(url: string, data?: unknown): Promise<T> {
     const response = await this.axiosInstance.post<T>(url, data);
     return response.data;
   }
 
-  async put<T = any>(url: string, data?: any): Promise<T> {
+  async put<T = unknown>(url: string, data?: unknown): Promise<T> {
     const response = await this.axiosInstance.put<T>(url, data);
     return response.data;
   }
 
-  async patch<T = any>(url: string, data?: any): Promise<T> {
+  async patch<T = unknown>(url: string, data?: unknown): Promise<T> {
     const response = await this.axiosInstance.patch<T>(url, data);
     return response.data;
   }
 
-  async delete<T = any>(url: string): Promise<T> {
+  async delete<T = unknown>(url: string): Promise<T> {
     const response = await this.axiosInstance.delete<T>(url);
     return response.data;
   }

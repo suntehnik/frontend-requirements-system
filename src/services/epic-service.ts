@@ -51,7 +51,7 @@ export class EpicService extends BaseApiService {
     return await this.apiGet<Epic>(`${this.entityPath}/${id}/user-stories`);
   }
 
-  async createUserStory(id: string, userStoryData: any): Promise<any> {
+  async createUserStory(id: string, userStoryData: unknown): Promise<unknown> {
     return await this.apiPost(`${this.entityPath}/${id}/user-stories`, userStoryData);
   }
 

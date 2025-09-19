@@ -114,7 +114,7 @@ export function getPriorityColor(priority: Priority): string {
 // Utility function to get status color
 export function getStatusColor(entityType: EntityType, status: string): string {
   const colors = STATUS_COLORS[entityType as keyof typeof STATUS_COLORS];
-  return (colors as any)?.[status] || '#9e9e9e';
+  return (colors as Record<string, string>)?.[status] || '#9e9e9e';
 }
 
 // Utility function to get entity type label

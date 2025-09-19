@@ -55,4 +55,4 @@ export interface UserStoryListParams {
   include?: string;
 }
 
-export interface UserStoryListResponse extends ListResponse<UserStory> {}
+export type UserStoryListResponse = ListResponse<UserStory>;

@@ -63,4 +63,4 @@ export interface RequirementListParams {
   include?: string;
 }
 
-export interface RequirementListResponse extends ListResponse<Requirement> {}
+export type RequirementListResponse = ListResponse<Requirement>;

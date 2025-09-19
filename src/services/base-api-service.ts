@@ -4,7 +4,7 @@ import { ErrorHandler, type ApiError } from './error-handler';
 export abstract class BaseApiService {
   protected baseUrl: string = '/api/v1';
 
-  protected async apiGet<T>(url: string, params?: any): Promise<T> {
+  protected async apiGet<T>(url: string, params?: Record<string, unknown>): Promise<T> {
     try {
       return await httpClient.get<T>(`${this.baseUrl}${url}`, params);
     } catch (error) {
@@ -13,7 +13,7 @@ export abstract class BaseApiService {
     }
   }
 
-  protected async apiPost<T>(url: string, data?: any): Promise<T> {
+  protected async apiPost<T>(url: string, data?: unknown): Promise<T> {
     try {
       return await httpClient.post<T>(`${this.baseUrl}${url}`, data);
     } catch (error) {
@@ -22,7 +22,7 @@ export abstract class BaseApiService {
     }
   }
 
-  protected async apiPut<T>(url: string, data?: any): Promise<T> {
+  protected async apiPut<T>(url: string, data?: unknown): Promise<T> {
     try {
       return await httpClient.put<T>(`${this.baseUrl}${url}`, data);
     } catch (error) {
@@ -31,7 +31,7 @@ export abstract class BaseApiService {
     }
   }
 
-  protected async apiPatch<T>(url: string, data?: any): Promise<T> {
+  protected async apiPatch<T>(url: string, data?: unknown): Promise<T> {
     try {
       return await httpClient.patch<T>(`${this.baseUrl}${url}`, data);
     } catch (error) {
@@ -55,8 +55,8 @@ export abstract class BaseApiService {
   }
 
   // Utility method to build query parameters
-  protected buildQueryParams(params: Record<string, any>): Record<string, any> {
-    const cleanParams: Record<string, any> = {};
+  protected buildQueryParams(params: Record<string, unknown>): Record<string, unknown> {
+    const cleanParams: Record<string, unknown> = {};
     
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {

@@ -12,7 +12,7 @@ export type RequirementStatus = 'Draft' | 'Active' | 'Obsolete';
 export type EntityType = 'epic' | 'user_story' | 'acceptance_criteria' | 'requirement';
 
 // Standard API Response
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data?: T;
   error?: {
     code: string;

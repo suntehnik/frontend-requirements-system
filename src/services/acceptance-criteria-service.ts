@@ -1,7 +1,6 @@
 import { BaseApiService } from './base-api-service';
 import type {
   AcceptanceCriteria,
-  CreateAcceptanceCriteriaRequest,
   UpdateAcceptanceCriteriaRequest,
   AcceptanceCriteriaListResponse,
   DependencyInfo,
