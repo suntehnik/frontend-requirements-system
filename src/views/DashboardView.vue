@@ -49,7 +49,6 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import { useEntitiesStore } from '@/stores/entities'
 import { useUIStore } from '@/stores/ui'
 import DashboardStats from '@/components/dashboard/DashboardStats.vue'
@@ -57,7 +56,6 @@ import RecentActivity from '@/components/dashboard/RecentActivity.vue'
 import QuickActions from '@/components/dashboard/QuickActions.vue'
 
 // Stores
-const authStore = useAuthStore()
 const entitiesStore = useEntitiesStore()
 const uiStore = useUIStore()
 

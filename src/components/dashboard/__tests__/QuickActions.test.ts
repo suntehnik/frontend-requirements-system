@@ -37,7 +37,7 @@ describe('QuickActions', () => {
         if (role === 'User') return true
         return false
       }),
-    } as any)
+    } as ReturnType<typeof useAuthStore>)
   })
 
   it('should render quick action buttons for users', () => {
@@ -65,7 +65,7 @@ describe('QuickActions', () => {
         if (role === 'User') return true
         return false
       }),
-    } as any)
+    } as ReturnType<typeof useAuthStore>)
 
     const wrapper = mount(QuickActions, {
       global: {
@@ -100,7 +100,7 @@ describe('QuickActions', () => {
         if (role === 'User') return false
         return true // Only commenter role
       }),
-    } as any)
+    } as ReturnType<typeof useAuthStore>)
 
     const wrapper = mount(QuickActions, {
       global: {

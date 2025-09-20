@@ -151,14 +151,12 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useUIStore } from '@/stores/ui'
 
 // Router
 const router = useRouter()
 
 // Stores
 const authStore = useAuthStore()
-const uiStore = useUIStore()
 
 // Computed
 const isAdmin = computed(() => authStore.hasRole('Administrator'))

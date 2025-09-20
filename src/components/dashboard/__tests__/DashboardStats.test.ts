@@ -22,7 +22,7 @@ describe('DashboardStats', () => {
         requirements: 25,
         activeTasks: 8,
       },
-    } as any)
+    } as ReturnType<typeof useEntitiesStore>)
   })
 
   it('should render stats correctly', () => {
