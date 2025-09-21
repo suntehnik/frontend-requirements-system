@@ -73,6 +73,36 @@
             <v-list-item v-bind="props" prepend-icon="mdi-folder-multiple" title="Эпики" />
           </template>
           <v-list-item to="/epics" prepend-icon="mdi-format-list-bulleted" title="Все эпики" />
+          
+          <!-- Recent Epics -->
+          <template v-if="recentEpics.length > 0">
+            <v-divider class="my-1" />
+            <v-list-subheader class="text-caption text-medium-emphasis px-4">
+              Последние эпики
+            </v-list-subheader>
+            <v-list-item
+              v-for="epic in recentEpics"
+              :key="epic.entity_id"
+              :to="`/epics/${epic.entity_id}`"
+              :prepend-icon="hierarchyStore.getEntityIcon('epic')"
+              density="compact"
+              class="pl-8"
+            >
+              <v-list-item-title class="text-body-2">
+                <span class="text-caption text-medium-emphasis mr-2">{{ epic.reference_id }}</span>
+                {{ epic.title }}
+              </v-list-item-title>
+              <template #append>
+                <v-chip
+                  :color="hierarchyStore.getStatusColor(epic.status)"
+                  size="x-small"
+                  variant="flat"
+                >
+                  {{ epic.status }}
+                </v-chip>
+              </template>
+            </v-list-item>
+          </template>
         </v-list-group>
 
         <!-- User Stories Section -->
@@ -139,17 +169,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useHierarchyStore } from '@/stores/hierarchy'
 import AppBreadcrumbs from '@/components/common/AppBreadcrumbs.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const hierarchyStore = useHierarchyStore()
 
 // Sidebar state
 const sidebarOpen = ref(true)
 
+// Search funct
 // Search functionality
 const searchQuery = ref('')
 
@@ -164,6 +197,12 @@ const userInitials = computed(() => {
     return (parts[0][0] + parts[1][0]).toUpperCase()
   }
   return authStore.user.username.substring(0, 2).toUpperCase()
+})
+
+// Get last 5 epics for quick navigation
+const recentEpics = computed(() => {
+  if (!hierarchyStore.hierarchyData.length) return []
+  return hierarchyStore.hierarchyData.slice(-5).reverse() // Last 5 epics, reversed to show newest first
 })
 
 // Methods
@@ -190,6 +229,11 @@ const handleLogout = async () => {
     loggingOut.value = false
   }
 }
+
+// Initialize hierarchy data on mount
+onMounted(() => {
+  hierarchyStore.initialize()
+})
 </script>
 
 <style scoped>
