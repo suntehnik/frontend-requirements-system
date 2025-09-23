@@ -12,8 +12,6 @@ import type {
   DeletionResult,
   RequirementRelationship,
   CreateRelationshipRequest,
-  SearchParams,
-  SearchResponse,
 } from '@/types'
 
 export class RequirementService extends BaseApiService {
@@ -39,16 +37,7 @@ export class RequirementService extends BaseApiService {
     return await this.apiGet<RequirementListResponse>(this.entityPath, queryParams)
   }
 
-  async search(params: SearchParams): Promise<SearchResponse> {
-    const queryParams = this.buildQueryParams({
-      q: params.q,
-      entity_types: params.entity_types,
-      limit: params.limit,
-      offset: params.offset,
-    })
 
-    return await this.apiGet<SearchResponse>(`${this.entityPath}/search`, queryParams)
-  }
 
   async get(id: string, include?: string): Promise<Requirement> {
     const params = include ? { include: this.buildIncludeParam(include) } : {}
@@ -82,7 +71,7 @@ export class RequirementService extends BaseApiService {
   }
 
   async createRelationship(request: CreateRelationshipRequest): Promise<RequirementRelationship> {
-    return await this.apiPost<RequirementRelationship>('/requirement-relationships', request)
+    return await this.apiPost<RequirementRelationship>(`${this.entityPath}/relationships`, request)
   }
 
   async deleteRelationship(relationshipId: string): Promise<void> {

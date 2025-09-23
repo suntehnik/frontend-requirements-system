@@ -139,7 +139,7 @@ watch(
   { immediate: true },
 )
 
-// Expose form validation method
+// Expose form validation method and internal properties for testing
 defineExpose({
   validate: () => formRef.value?.validate(),
   reset: () => {
@@ -149,5 +149,12 @@ defineExpose({
     fieldErrors.username = []
     fieldErrors.password = []
   },
+  // Expose internal properties for testing
+  credentials,
+  fieldErrors,
+  generalError,
+  showPassword,
+  usernameRules,
+  passwordRules,
 })
 </script>

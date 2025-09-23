@@ -1,27 +1,60 @@
 <template>
   <div>
-    <v-row>
-      <v-col cols="12">
-        <div class="d-flex justify-space-between align-center mb-4">
-          <div>
-            <h1 class="text-h4">{{ userStory.reference_id }}: {{ userStory.title }}</h1>
-            <div class="text-subtitle-1 text-grey-darken-1 mt-1">
-              Эпик:
-              <router-link :to="`/epics/${userStory.epic_id}`" class="text-decoration-none">{{
-                userStory.epic
-              }}</router-link>
+    <!-- Loading State -->
+    <div v-if="loading" class="d-flex justify-center align-center" style="min-height: 400px">
+      <v-progress-circular indeterminate size="64" color="primary" />
+    </div>
+
+    <!-- Error State -->
+    <v-alert v-else-if="error" type="error" class="mb-4">
+      {{ error }}
+      <template v-slot:append>
+        <v-btn @click="loadUserStory" variant="text" size="small">Повторить</v-btn>
+      </template>
+    </v-alert>
+
+    <!-- Content -->
+    <div v-else-if="userStory">
+      <v-row>
+        <v-col cols="12">
+          <div class="d-flex justify-space-between align-center mb-4">
+            <div>
+              <h1 class="text-h4">{{ userStory.reference_id }}: {{ userStory.title }}</h1>
+              <div class="text-subtitle-1 text-grey-darken-1 mt-1">
+                Эпик:
+                <router-link 
+                  :to="`/epics/${userStory.epic_id}`" 
+                  class="text-decoration-none"
+                >
+                  {{ userStory.epic?.reference_id }}: {{ userStory.epic?.title }}
+                </router-link>
+              </div>
+              <div class="text-subtitle-1 text-grey-darken-1">
+                Создана {{ formatDate(userStory.created_at) }} • Обновлена {{ formatDate(userStory.last_modified) }}
+              </div>
             </div>
-            <div class="text-subtitle-1 text-grey-darken-1">
-              Создана {{ userStory.created_at }} • Обновлена {{ userStory.last_modified }}
+            <div>
+              <v-btn 
+                color="primary" 
+                prepend-icon="mdi-pencil" 
+                class="mr-2"
+                @click="editUserStory"
+                :disabled="actionLoading"
+              > 
+                Редактировать 
+              </v-btn>
+              <v-btn 
+                color="success" 
+                prepend-icon="mdi-plus"
+                @click="addRequirement"
+                :disabled="actionLoading"
+              > 
+                Добавить требование 
+              </v-btn>
             </div>
           </div>
-          <div>
-            <v-btn color="primary" prepend-icon="mdi-pencil" class="mr-2"> Редактировать </v-btn>
-            <v-btn color="success" prepend-icon="mdi-plus"> Добавить требование </v-btn>
-          </div>
-        </div>
-      </v-col>
-    </v-row>
+        </v-col>
+      </v-row>
 
     <v-row>
       <!-- Main Content -->
@@ -46,7 +79,7 @@
 
             <div class="mb-4">
               <strong>Ответственный:</strong>
-              {{ userStory.assignee || 'Не назначен' }}
+              {{ userStory.assignee?.username || 'Не назначен' }}
             </div>
 
             <div v-if="userStory.description">
@@ -61,10 +94,21 @@
           <v-card-title>
             Критерии приемки
             <v-spacer />
-            <v-btn color="primary" size="small" prepend-icon="mdi-plus"> Добавить критерий </v-btn>
+            <v-btn 
+              color="primary" 
+              size="small" 
+              prepend-icon="mdi-plus"
+              @click="addAcceptanceCriteria"
+              :disabled="actionLoading"
+            > 
+              Добавить критерий 
+            </v-btn>
           </v-card-title>
           <v-card-text>
-            <v-list v-if="acceptanceCriteria.length > 0">
+            <div v-if="acceptanceCriteriaLoading" class="text-center py-4">
+              <v-progress-circular indeterminate size="32" color="primary" />
+            </div>
+            <v-list v-else-if="acceptanceCriteria && acceptanceCriteria.length > 0">
               <v-list-item v-for="criteria in acceptanceCriteria" :key="criteria.id">
                 <template v-slot:prepend>
                   <v-icon>mdi-check-circle-outline</v-icon>
@@ -72,8 +116,19 @@
                 <v-list-item-title>{{ criteria.reference_id }}</v-list-item-title>
                 <v-list-item-subtitle>{{ criteria.description }}</v-list-item-subtitle>
                 <template v-slot:append>
-                  <v-btn icon="mdi-pencil" size="small" variant="text" />
-                  <v-btn icon="mdi-delete" size="small" variant="text" color="error" />
+                  <v-btn 
+                    icon="mdi-pencil" 
+                    size="small" 
+                    variant="text"
+                    @click="editAcceptanceCriteria(criteria.id)"
+                  />
+                  <v-btn 
+                    icon="mdi-delete" 
+                    size="small" 
+                    variant="text" 
+                    color="error"
+                    @click="deleteAcceptanceCriteria(criteria.id)"
+                  />
                 </template>
               </v-list-item>
             </v-list>
@@ -88,12 +143,21 @@
           <v-card-title>
             Требования
             <v-spacer />
-            <v-btn color="primary" size="small" prepend-icon="mdi-plus">
+            <v-btn 
+              color="primary" 
+              size="small" 
+              prepend-icon="mdi-plus"
+              @click="addRequirement"
+              :disabled="actionLoading"
+            >
               Добавить требование
             </v-btn>
           </v-card-title>
           <v-card-text>
-            <v-list v-if="requirements.length > 0">
+            <div v-if="requirementsLoading" class="text-center py-4">
+              <v-progress-circular indeterminate size="32" color="primary" />
+            </div>
+            <v-list v-else-if="requirements && requirements.length > 0">
               <v-list-item
                 v-for="requirement in requirements"
                 :key="requirement.id"
@@ -102,12 +166,14 @@
                 <template v-slot:prepend>
                   <v-icon>mdi-file-document</v-icon>
                 </template>
-                <v-list-item-title
-                  >{{ requirement.reference_id }}: {{ requirement.title }}</v-list-item-title
-                >
-                <v-list-item-subtitle
-                  >{{ requirement.type }} • {{ requirement.status }}</v-list-item-subtitle
-                >
+                <v-list-item-title>
+                  {{ requirement.reference_id }}: {{ requirement.title }}
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ requirement.type?.name || 'Неизвестный тип' }} • 
+                  Создано {{ formatDate(requirement.created_at) }}
+                  <span v-if="requirement.assignee"> • {{ requirement.assignee.username }}</span>
+                </v-list-item-subtitle>
                 <template v-slot:append>
                   <v-chip :color="getStatusColor(requirement.status)" size="small">
                     {{ requirement.status }}
@@ -126,16 +192,44 @@
         <v-card class="mb-4">
           <v-card-title>Действия</v-card-title>
           <v-card-text>
-            <v-btn block color="primary" class="mb-2" prepend-icon="mdi-pencil">
+            <v-btn 
+              block 
+              color="primary" 
+              class="mb-2" 
+              prepend-icon="mdi-pencil"
+              @click="editUserStory"
+              :disabled="actionLoading"
+            >
               Редактировать историю
             </v-btn>
-            <v-btn block color="success" class="mb-2" prepend-icon="mdi-plus">
+            <v-btn 
+              block 
+              color="success" 
+              class="mb-2" 
+              prepend-icon="mdi-plus"
+              @click="addAcceptanceCriteria"
+              :disabled="actionLoading"
+            >
               Добавить критерий
             </v-btn>
-            <v-btn block color="info" class="mb-2" prepend-icon="mdi-plus">
+            <v-btn 
+              block 
+              color="info" 
+              class="mb-2" 
+              prepend-icon="mdi-plus"
+              @click="addRequirement"
+              :disabled="actionLoading"
+            >
               Добавить требование
             </v-btn>
-            <v-btn block color="warning" class="mb-2" prepend-icon="mdi-swap-horizontal">
+            <v-btn 
+              block 
+              color="warning" 
+              class="mb-2" 
+              prepend-icon="mdi-swap-horizontal"
+              @click="changeStatus"
+              :disabled="actionLoading"
+            >
               Изменить статус
             </v-btn>
           </v-card-text>
@@ -147,86 +241,145 @@
           <v-card-text>
             <div class="d-flex justify-space-between mb-2">
               <span>Критериев приемки:</span>
-              <strong>{{ acceptanceCriteria.length }}</strong>
+              <strong>{{ Array.isArray(acceptanceCriteria) ? acceptanceCriteria.length : 0 }}</strong>
             </div>
             <div class="d-flex justify-space-between mb-2">
               <span>Требований:</span>
-              <strong>{{ requirements.length }}</strong>
+              <strong>{{ Array.isArray(requirements) ? requirements.length : 0 }}</strong>
             </div>
             <div class="d-flex justify-space-between">
               <span>Активных требований:</span>
-              <strong>{{ requirements.filter((r) => r.status === 'Active').length }}</strong>
+              <strong>{{ (Array.isArray(requirements) ? requirements.filter((r) => r.status === 'Active') : []).length }}</strong>
             </div>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
+    </div>
+
+    <!-- Not Found State -->
+    <div v-else class="text-center py-8">
+      <v-icon size="64" color="grey">mdi-book-open-variant</v-icon>
+      <h2 class="text-h5 mt-4 mb-2">Пользовательская история не найдена</h2>
+      <p class="text-grey-darken-1">История с ID {{ route.params.id }} не существует</p>
+      <v-btn color="primary" @click="$router.push('/user-stories')">Вернуться к списку</v-btn>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { userStoryService } from '@/services/user-story-service'
+import type { UserStory, AcceptanceCriteria, Requirement } from '@/types'
 
 const route = useRoute()
+const router = useRouter()
 
-// Mock data - will be replaced with real API calls
-const userStory = ref({
-  id: route.params.id,
-  reference_id: 'US-001',
-  title: 'Вход в систему',
-  description:
-    'Как пользователь, я хочу войти в систему, чтобы получить доступ к функциональности управления требованиями.',
-  epic: 'EP-001: Система аутентификации',
-  epic_id: '1',
-  status: 'In Progress',
-  priority: 1,
-  assignee: 'Иван Иванов',
-  created_at: '2024-01-15',
-  last_modified: '2024-01-20',
-})
+// Reactive state
+const userStory = ref<UserStory | null>(null)
+const acceptanceCriteria = ref<AcceptanceCriteria[] | null>(null)
+const requirements = ref<Requirement[] | null>(null)
+const loading = ref(true)
+const acceptanceCriteriaLoading = ref(false)
+const requirementsLoading = ref(false)
+const actionLoading = ref(false)
+const error = ref<string | null>(null)
 
-const acceptanceCriteria = ref([
-  {
-    id: '1',
-    reference_id: 'AC-001',
-    description: 'Пользователь может ввести логин и пароль',
-  },
-  {
-    id: '2',
-    reference_id: 'AC-002',
-    description: 'Система проверяет корректность учетных данных',
-  },
-  {
-    id: '3',
-    reference_id: 'AC-003',
-    description: 'При успешной аутентификации пользователь перенаправляется на главную страницу',
-  },
-])
+// Computed properties
+const userStoryId = computed(() => route.params.id as string)
 
-const requirements = ref([
-  {
-    id: '1',
-    reference_id: 'REQ-001',
-    title: 'Валидация пароля',
-    type: 'Функциональное',
-    status: 'Active',
-  },
-  {
-    id: '2',
-    reference_id: 'REQ-002',
-    title: 'JWT токен аутентификации',
-    type: 'Техническое',
-    status: 'Active',
-  },
-  {
-    id: '3',
-    reference_id: 'REQ-003',
-    title: 'Защита от брутфорса',
-    type: 'Безопасность',
-    status: 'Draft',
-  },
-])
+// Methods
+const loadUserStory = async () => {
+  try {
+    loading.value = true
+    error.value = null
+    
+    // Load user story with related data
+    const userStoryData = await userStoryService.get(userStoryId.value, 'epic,creator,assignee,acceptance_criteria,requirements')
+    userStory.value = userStoryData
+    
+    // Extract acceptance criteria and requirements from user story data or load separately
+    if (userStoryData.acceptance_criteria) {
+      acceptanceCriteria.value = userStoryData.acceptance_criteria as AcceptanceCriteria[]
+    } else {
+      await loadAcceptanceCriteria()
+    }
+    
+    if (userStoryData.requirements) {
+      requirements.value = userStoryData.requirements as Requirement[]
+    } else {
+      await loadRequirements()
+    }
+  } catch (err) {
+    console.error('Failed to load user story:', err)
+    error.value = err instanceof Error ? err.message : 'Не удалось загрузить пользовательскую историю'
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadAcceptanceCriteria = async () => {
+  try {
+    acceptanceCriteriaLoading.value = true
+    const criteriaData = await userStoryService.getAcceptanceCriteria(userStoryId.value)
+    acceptanceCriteria.value = criteriaData
+  } catch (err) {
+    console.error('Failed to load acceptance criteria:', err)
+    // Don't show error for acceptance criteria, just keep empty array
+    acceptanceCriteria.value = []
+  } finally {
+    acceptanceCriteriaLoading.value = false
+  }
+}
+
+const loadRequirements = async () => {
+  try {
+    requirementsLoading.value = true
+    const requirementsData = await userStoryService.getRequirements(userStoryId.value)
+    requirements.value = requirementsData
+  } catch (err) {
+    console.error('Failed to load requirements:', err)
+    // Don't show error for requirements, just keep empty array
+    requirements.value = []
+  } finally {
+    requirementsLoading.value = false
+  }
+}
+
+const editUserStory = () => {
+  router.push(`/user-stories/${userStoryId.value}/edit`)
+}
+
+const addAcceptanceCriteria = () => {
+  router.push(`/user-stories/${userStoryId.value}/acceptance-criteria/new`)
+}
+
+const addRequirement = () => {
+  router.push(`/user-stories/${userStoryId.value}/requirements/new`)
+}
+
+const editAcceptanceCriteria = (criteriaId: string) => {
+  router.push(`/acceptance-criteria/${criteriaId}/edit`)
+}
+
+const deleteAcceptanceCriteria = (criteriaId: string) => {
+  // TODO: Implement delete confirmation dialog
+  console.log('Delete acceptance criteria:', criteriaId)
+}
+
+const changeStatus = () => {
+  // TODO: Implement status change dialog
+  console.log('Change status functionality to be implemented')
+}
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('ru-RU', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
@@ -260,4 +413,9 @@ const getPriorityText = (priority: number) => {
   }
   return texts[priority] || 'Неизвестно'
 }
+
+// Lifecycle
+onMounted(() => {
+  loadUserStory()
+})
 </script>

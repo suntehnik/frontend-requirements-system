@@ -25,7 +25,8 @@ export class ConfigService extends BaseApiService {
   }
 
   async getRequirementTypes(): Promise<RequirementTypeListResponse> {
-    return await this.apiGet<RequirementTypeListResponse>(`${this.configPath}/requirement-types`)
+    const response = await this.apiGet<{ requirement_types: RequirementType[]; count: number }>(`${this.configPath}/requirement-types`)
+    return response
   }
 
   async getRequirementType(id: string): Promise<RequirementType> {
@@ -52,7 +53,8 @@ export class ConfigService extends BaseApiService {
   }
 
   async getRelationshipTypes(): Promise<RelationshipTypeListResponse> {
-    return await this.apiGet<RelationshipTypeListResponse>(`${this.configPath}/relationship-types`)
+    const response = await this.apiGet<{ relationship_types: RelationshipType[]; count: number }>(`${this.configPath}/relationship-types`)
+    return response
   }
 
   async getRelationshipType(id: string): Promise<RelationshipType> {
@@ -81,7 +83,8 @@ export class ConfigService extends BaseApiService {
   }
 
   async getStatusModels(): Promise<StatusModelListResponse> {
-    return await this.apiGet<StatusModelListResponse>(`${this.configPath}/status-models`)
+    const response = await this.apiGet<{ status_models: StatusModel[]; count: number }>(`${this.configPath}/status-models`)
+    return response
   }
 
   async getStatusModel(id: string): Promise<StatusModel> {
@@ -108,15 +111,17 @@ export class ConfigService extends BaseApiService {
   }
 
   async getStatusesByModel(modelId: string): Promise<StatusListResponse> {
-    return await this.apiGet<StatusListResponse>(
+    const response = await this.apiGet<{ statuses: Status[]; count: number }>(
       `${this.configPath}/status-models/${modelId}/statuses`,
     )
+    return response
   }
 
   async getTransitionsByModel(modelId: string): Promise<StatusTransitionListResponse> {
-    return await this.apiGet<StatusTransitionListResponse>(
+    const response = await this.apiGet<{ transitions: StatusTransition[]; count: number }>(
       `${this.configPath}/status-models/${modelId}/transitions`,
     )
+    return response
   }
 
   // Statuses
