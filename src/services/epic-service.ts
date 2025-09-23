@@ -10,6 +10,8 @@ import type {
   AssignmentRequest,
   DependencyInfo,
   DeletionResult,
+  UserStory,
+  CreateUserStoryRequest,
 } from '@/types'
 
 export class EpicService extends BaseApiService {
@@ -53,8 +55,8 @@ export class EpicService extends BaseApiService {
     return await this.apiGet<Epic>(`${this.entityPath}/${id}/user-stories`)
   }
 
-  async createUserStory(id: string, userStoryData: unknown): Promise<unknown> {
-    return await this.apiPost(`${this.entityPath}/${id}/user-stories`, userStoryData)
+  async createUserStory(id: string, userStoryData: CreateUserStoryRequest): Promise<UserStory> {
+    return await this.apiPost<UserStory>(`${this.entityPath}/${id}/user-stories`, userStoryData)
   }
 
   async changeStatus(id: string, status: EpicStatus): Promise<Epic> {

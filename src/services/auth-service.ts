@@ -17,7 +17,7 @@ export class AuthService {
 
   async logout(): Promise<void> {
     try {
-      // Call logout endpoint if it exists
+      // Call logout endpoint - according to API spec, this endpoint should exist
       await httpClient.post(`${this.baseUrl}/logout`)
     } catch (error) {
       // Continue with logout even if API call fails

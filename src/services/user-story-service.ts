@@ -11,7 +11,9 @@ import type {
   DependencyInfo,
   DeletionResult,
   AcceptanceCriteria,
+  CreateAcceptanceCriteriaRequest,
   Requirement,
+  CreateRequirementRequest,
 } from '@/types'
 
 export class UserStoryService extends BaseApiService {
@@ -56,7 +58,7 @@ export class UserStoryService extends BaseApiService {
     return await this.apiGet<AcceptanceCriteria[]>(`${this.entityPath}/${id}/acceptance-criteria`)
   }
 
-  async createAcceptanceCriteria(id: string, criteriaData: unknown): Promise<AcceptanceCriteria> {
+  async createAcceptanceCriteria(id: string, criteriaData: CreateAcceptanceCriteriaRequest): Promise<AcceptanceCriteria> {
     return await this.apiPost<AcceptanceCriteria>(
       `${this.entityPath}/${id}/acceptance-criteria`,
       criteriaData,
@@ -67,7 +69,7 @@ export class UserStoryService extends BaseApiService {
     return await this.apiGet<Requirement[]>(`${this.entityPath}/${id}/requirements`)
   }
 
-  async createRequirement(id: string, requirementData: unknown): Promise<Requirement> {
+  async createRequirement(id: string, requirementData: CreateRequirementRequest): Promise<Requirement> {
     return await this.apiPost<Requirement>(`${this.entityPath}/${id}/requirements`, requirementData)
   }
 

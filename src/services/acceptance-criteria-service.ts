@@ -1,6 +1,7 @@
 import { BaseApiService } from './base-api-service'
 import type {
   AcceptanceCriteria,
+  CreateAcceptanceCriteriaRequest,
   UpdateAcceptanceCriteriaRequest,
   AcceptanceCriteriaListResponse,
   DependencyInfo,
@@ -10,8 +11,28 @@ import type {
 export class AcceptanceCriteriaService extends BaseApiService {
   private entityPath = '/acceptance-criteria'
 
-  async list(): Promise<AcceptanceCriteriaListResponse> {
-    return await this.apiGet<AcceptanceCriteriaListResponse>(this.entityPath)
+  async list(params?: {
+    user_story_id?: string
+    author_id?: string
+    limit?: number
+    offset?: number
+    include?: string
+  }): Promise<AcceptanceCriteriaListResponse> {
+    const queryParams = params
+      ? this.buildQueryParams({
+          user_story_id: params.user_story_id,
+          author_id: params.author_id,
+          limit: params.limit,
+          offset: params.offset,
+          include: this.buildIncludeParam(params.include),
+        })
+      : {}
+
+    return await this.apiGet<AcceptanceCriteriaListResponse>(this.entityPath, queryParams)
+  }
+
+  async create(request: CreateAcceptanceCriteriaRequest): Promise<AcceptanceCriteria> {
+    return await this.apiPost<AcceptanceCriteria>(this.entityPath, request)
   }
 
   async get(id: string, include?: string): Promise<AcceptanceCriteria> {
