@@ -21,6 +21,12 @@ function adaptApiResponse(realResponse: RealApiEpicListResponse, limit?: number,
 
 describe('Epics Backend Integration', () => {
   beforeAll(async () => {
+    // Skip integration tests in CI environment
+    if (process.env.CI) {
+      console.log('⏭️ Skipping backend integration tests in CI environment')
+      return
+    }
+
     // Аутентификация перед тестами
     try {
       await authService.login({
@@ -33,7 +39,7 @@ describe('Epics Backend Integration', () => {
     }
   })
 
-  it('should fetch first 50 epics from backend', async () => {
+  it.skipIf(!!process.env.CI)('should fetch first 50 epics from backend', async () => {
     // Получаем первые 50 эпиков (реальный API возвращает {count, epics})
     const realResponse = await epicService.list({
       limit: 50,
@@ -108,7 +114,7 @@ describe('Epics Backend Integration', () => {
     }
   })
 
-  it('should handle pagination correctly', async () => {
+  it.skipIf(!!process.env.CI)('should handle pagination correctly', async () => {
     // Получаем первую страницу
     const realFirstPage = await epicService.list({
       limit: 10,
@@ -147,7 +153,7 @@ describe('Epics Backend Integration', () => {
     }
   })
 
-  it('should filter epics by status', async () => {
+  it.skipIf(!!process.env.CI)('should filter epics by status', async () => {
     // Тестируем фильтрацию по статусу
     const statuses: EpicStatus[] = ['Backlog', 'Draft', 'In Progress', 'Done', 'Cancelled']
 
@@ -174,7 +180,7 @@ describe('Epics Backend Integration', () => {
     }
   })
 
-  it('should filter epics by priority', async () => {
+  it.skipIf(!!process.env.CI)('should filter epics by priority', async () => {
     // Тестируем фильтрацию по приоритету
     const priorities: Priority[] = [1, 2, 3, 4]
 
@@ -202,7 +208,7 @@ describe('Epics Backend Integration', () => {
     }
   })
 
-  it('should include related data when requested', async () => {
+  it.skipIf(!!process.env.CI)('should include related data when requested', async () => {
     const realResponse = await epicService.list({
       limit: 5,
       include: 'creator,assignee,user_stories'
@@ -260,7 +266,7 @@ describe('Epics Backend Integration', () => {
     }
   })
 
-  it('should get individual epic by ID', async () => {
+  it.skipIf(!!process.env.CI)('should get individual epic by ID', async () => {
     // Сначала получаем список эпиков
     const realListResponse = await epicService.list({ limit: 1 }) as unknown as RealApiEpicListResponse
     const listResponse = adaptApiResponse(realListResponse, 1, 0)
@@ -295,7 +301,7 @@ describe('Epics Backend Integration', () => {
     }
   })
 
-  it('should handle sorting correctly', async () => {
+  it.skipIf(!!process.env.CI)('should handle sorting correctly', async () => {
     const sortOrders = ['created_at', 'last_modified', 'title', 'priority']
     
     console.log('\n📊 Testing sorting options:')
@@ -343,7 +349,7 @@ describe('Epics Backend Integration', () => {
     }
   })
 
-  it('should handle combined filters correctly', async () => {
+  it.skipIf(!!process.env.CI)('should handle combined filters correctly', async () => {
     console.log('\n🔍 Testing combined filters:')
     
     // Тестируем комбинацию фильтров
@@ -383,7 +389,7 @@ describe('Epics Backend Integration', () => {
     }
   })
 
-  it('should handle empty results gracefully', async () => {
+  it.skipIf(!!process.env.CI)('should handle empty results gracefully', async () => {
     // Тестируем запрос который может вернуть пустой результат
     const realResponse = await epicService.list({
       status: 'Cancelled',
@@ -415,7 +421,7 @@ describe('Epics Backend Integration', () => {
     }
   })
 
-  it('should validate real API response structure', async () => {
+  it.skipIf(!!process.env.CI)('should validate real API response structure', async () => {
     console.log('\n🔍 Validating real API response structure:')
     
     const realResponse = await epicService.list({

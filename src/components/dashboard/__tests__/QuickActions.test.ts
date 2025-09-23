@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
 import { setActivePinia, createPinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
+import { ref, computed } from 'vue'
 import QuickActions from '../QuickActions.vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -31,13 +32,31 @@ describe('QuickActions', () => {
     setActivePinia(createPinia())
     
     // Mock the auth store with User role by default
-    vi.mocked(useAuthStore).mockReturnValue({
+    const mockAuthStore = {
+      user: ref(null),
+      token: ref(null),
+      expiresAt: ref(null),
+      isAuthenticated: computed(() => true),
+      login: vi.fn(),
+      logout: vi.fn(),
+      getCurrentUser: vi.fn(),
+      changePassword: vi.fn(),
       hasRole: vi.fn((role: string) => {
         if (role === 'Administrator') return false
         if (role === 'User') return true
         return false
       }),
-    } as ReturnType<typeof useAuthStore>)
+      checkTokenExpiry: vi.fn(),
+      initializeAuth: vi.fn(),
+      $state: {},
+      $patch: vi.fn(),
+      $reset: vi.fn(),
+      $subscribe: vi.fn(),
+      $dispose: vi.fn(),
+      $onAction: vi.fn(),
+      $id: 'auth',
+    }
+    vi.mocked(useAuthStore).mockReturnValue(mockAuthStore as unknown as ReturnType<typeof useAuthStore>)
   })
 
   it('should render quick action buttons for users', () => {
@@ -59,13 +78,31 @@ describe('QuickActions', () => {
 
   it('should show admin actions for administrators', () => {
     // Mock admin role
-    vi.mocked(useAuthStore).mockReturnValue({
+    const mockAdminAuthStore = {
+      user: ref(null),
+      token: ref(null),
+      expiresAt: ref(null),
+      isAuthenticated: computed(() => true),
+      login: vi.fn(),
+      logout: vi.fn(),
+      getCurrentUser: vi.fn(),
+      changePassword: vi.fn(),
       hasRole: vi.fn((role: string) => {
         if (role === 'Administrator') return true
         if (role === 'User') return true
         return false
       }),
-    } as ReturnType<typeof useAuthStore>)
+      checkTokenExpiry: vi.fn(),
+      initializeAuth: vi.fn(),
+      $state: {},
+      $patch: vi.fn(),
+      $reset: vi.fn(),
+      $subscribe: vi.fn(),
+      $dispose: vi.fn(),
+      $onAction: vi.fn(),
+      $id: 'auth',
+    }
+    vi.mocked(useAuthStore).mockReturnValue(mockAdminAuthStore as unknown as ReturnType<typeof useAuthStore>)
 
     const wrapper = mount(QuickActions, {
       global: {
@@ -94,13 +131,31 @@ describe('QuickActions', () => {
 
   it('should disable create buttons for commenters', () => {
     // Mock commenter role
-    vi.mocked(useAuthStore).mockReturnValue({
+    const mockCommenterAuthStore = {
+      user: ref(null),
+      token: ref(null),
+      expiresAt: ref(null),
+      isAuthenticated: computed(() => true),
+      login: vi.fn(),
+      logout: vi.fn(),
+      getCurrentUser: vi.fn(),
+      changePassword: vi.fn(),
       hasRole: vi.fn((role: string) => {
         if (role === 'Administrator') return false
         if (role === 'User') return false
         return true // Only commenter role
       }),
-    } as ReturnType<typeof useAuthStore>)
+      checkTokenExpiry: vi.fn(),
+      initializeAuth: vi.fn(),
+      $state: {},
+      $patch: vi.fn(),
+      $reset: vi.fn(),
+      $subscribe: vi.fn(),
+      $dispose: vi.fn(),
+      $onAction: vi.fn(),
+      $id: 'auth',
+    }
+    vi.mocked(useAuthStore).mockReturnValue(mockCommenterAuthStore as unknown as ReturnType<typeof useAuthStore>)
 
     const wrapper = mount(QuickActions, {
       global: {

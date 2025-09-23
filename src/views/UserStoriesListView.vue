@@ -178,7 +178,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { userStoryService } from '@/services/user-story-service'
 import { epicService } from '@/services/epic-service'
-import type { UserStory, Epic, UserStoryListParams } from '@/types'
+import type { UserStory, Epic, UserStoryListParams, UserStoryStatus, Priority } from '@/types'
 
 const router = useRouter()
 
@@ -260,10 +260,10 @@ const loadUserStories = async () => {
         params.epic_id = selectedEpic.value
       }
       if (selectedStatus.value) {
-        params.status = selectedStatus.value as any
+        params.status = selectedStatus.value as UserStoryStatus
       }
       if (selectedPriority.value) {
-        params.priority = selectedPriority.value as any
+        params.priority = selectedPriority.value as Priority
       }
     }
 
@@ -277,11 +277,12 @@ const loadUserStories = async () => {
       userStories.value = response.data
       totalCount.value = response.total_count || response.data.length
       console.log('Loaded user stories (standard format):', response.data.length, 'total:', totalCount.value)
-    } else if (response && response.user_stories && Array.isArray(response.user_stories)) {
+    } else if (response && 'user_stories' in response && Array.isArray((response as { user_stories: UserStory[] }).user_stories)) {
       // Alternative format: {user_stories: Array, count: number}
-      userStories.value = response.user_stories
-      totalCount.value = response.count || response.user_stories.length
-      console.log('Loaded user stories (alternative format):', response.user_stories.length, 'total:', totalCount.value)
+      const altResponse = response as { user_stories: UserStory[]; count?: number }
+      userStories.value = altResponse.user_stories
+      totalCount.value = altResponse.count || altResponse.user_stories.length
+      console.log('Loaded user stories (alternative format):', altResponse.user_stories.length, 'total:', totalCount.value)
     } else if (Array.isArray(response)) {
       // Direct array response
       userStories.value = response
@@ -305,7 +306,7 @@ const loadEpics = async () => {
     epicsLoading.value = true
     
     // Try without parameters first
-    let params = undefined
+    const params = undefined
     
     console.log('Loading epics with params:', params)
     const response = await epicService.list(params)
@@ -362,7 +363,7 @@ const handleItemsPerPageChange = (items: number) => {
   loadUserStories()
 }
 
-const handleSortChange = (sortItems: any[]) => {
+const handleSortChange = (sortItems: { key: string; order: 'asc' | 'desc' }[]) => {
   if (sortItems.length > 0) {
     const sortItem = sortItems[0]
     sortBy.value = sortItem.key

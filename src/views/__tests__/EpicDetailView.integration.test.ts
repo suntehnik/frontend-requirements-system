@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useEntitiesStore } from '@/stores/entities'
 import { epicService } from '@/services/epic-service'
 import type { Epic, UserStory } from '@/types'
 
@@ -75,11 +74,8 @@ const mockEpic: Epic = {
 }
 
 describe('EpicDetailView Integration', () => {
-  let entitiesStore: ReturnType<typeof useEntitiesStore>
-
   beforeEach(() => {
     setActivePinia(createPinia())
-    entitiesStore = useEntitiesStore()
     vi.clearAllMocks()
   })
 
