@@ -1,4 +1,9 @@
 import { vi, beforeEach } from 'vitest'
+import { config } from 'dotenv'
+import { resolve } from 'path'
+
+// Load integration test environment variables
+config({ path: resolve(process.cwd(), '.env.integration.local') })
 
 // Mock localStorage
 const localStorageMock = {
