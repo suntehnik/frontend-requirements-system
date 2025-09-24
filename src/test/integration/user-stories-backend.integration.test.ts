@@ -58,7 +58,7 @@ class TestAuthManager {
       })
 
       // Update the mocked localStorage
-      const localStorageMock = (window as unknown as { localStorage: Storage }).localStorage
+      const localStorageMock = (window as unknown as { localStorage: { getItem: { mockImplementation: (fn: (key: string) => string | null) => void } } }).localStorage
       localStorageMock.getItem.mockImplementation((key: string) => {
         if (key === 'auth') {
           return authData
@@ -79,8 +79,8 @@ class TestAuthManager {
     this.expiresAt = null
 
     // Clear localStorage mock
-    const localStorageMock = (window as unknown as { localStorage: Storage }).localStorage
-    localStorageMock.getItem.mockReturnValue(null)
+    const localStorageMock = (window as unknown as { localStorage: { getItem: { mockImplementation: (fn: (key: string) => string | null) => void } } }).localStorage
+    localStorageMock.getItem.mockImplementation(() => null)
   }
 }
 

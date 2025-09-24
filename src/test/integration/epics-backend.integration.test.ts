@@ -48,7 +48,7 @@ class TestAuthManager {
         token: this.authToken,
         expires_at: this.expiresAt
       })
-      
+
       // Update the mocked localStorage
       const localStorageMock = (window as unknown as { localStorage: { getItem: { mockImplementation: (fn: (key: string) => string | null) => void } } }).localStorage
       localStorageMock.getItem.mockImplementation((key: string) => {
@@ -69,7 +69,7 @@ class TestAuthManager {
     this.isAuthenticated = false
     this.authToken = null
     this.expiresAt = null
-    
+
     // Clear localStorage mock
     const localStorageMock = (window as unknown as { localStorage: { getItem: { mockImplementation: (fn: (key: string) => string | null) => void } } }).localStorage
     localStorageMock.getItem.mockImplementation(() => null)
@@ -184,7 +184,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
       // Логируем информацию о первом эпике
       console.log(`🎯 First epic: ${firstEpic.reference_id} - "${firstEpic.title}"`)
       console.log(`📊 Status: ${firstEpic.status}, Priority: ${firstEpic.priority}`)
-      
+
       if (firstEpic.assignee) {
         console.log(`👤 Assignee: ${firstEpic.assignee.username}`)
       }
@@ -248,7 +248,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
     const statuses: EpicStatus[] = ['Backlog', 'Draft', 'In Progress', 'Done', 'Cancelled']
 
     console.log('\n🔍 Testing status filtering:')
-    
+
     for (const status of statuses) {
       const response = await epicService.list({
         status,
@@ -258,7 +258,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
       expect(response).toBeDefined()
       expect(response.data).toBeDefined()
       expect(Array.isArray(response.data)).toBe(true)
-      
+
       console.log(`   Status "${status}": ${response.data.length} epics`)
 
       // Проверяем что все эпики имеют правильный статус
@@ -283,7 +283,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
       expect(response).toBeDefined()
       expect(response.data).toBeDefined()
       expect(Array.isArray(response.data)).toBe(true)
-      
+
       const priorityText = ['', 'Critical', 'High', 'Medium', 'Low'][priority]
       console.log(`   Priority ${priority} (${priorityText}): ${response.data.length} epics`)
 
@@ -305,9 +305,9 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
 
     if (response.data.length > 0) {
       const epicWithIncludes: Epic = response.data[0]
-      
+
       console.log('\n🔗 Testing included related data:')
-      
+
       // Проверяем что связанные данные включены
       if (epicWithIncludes.creator) {
         expect(epicWithIncludes.creator.id).toBeDefined()
@@ -336,7 +336,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
       if (epicWithIncludes.user_stories) {
         expect(Array.isArray(epicWithIncludes.user_stories)).toBe(true)
         console.log(`   📚 User stories: ${epicWithIncludes.user_stories.length}`)
-        
+
         // Проверяем структуру пользовательских историй если они есть
         if (epicWithIncludes.user_stories.length > 0) {
           const firstUserStory = epicWithIncludes.user_stories[0]
@@ -353,28 +353,28 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
   it.skipIf(!!process.env.CI)('should get individual epic by ID', async () => {
     // Сначала получаем список эпиков
     const listResponse = await epicService.list({ limit: 1 }) as unknown as EpicListResponse
-    
+
     if (listResponse.data.length > 0) {
       const epicId = listResponse.data[0].id
-      
+
       // Получаем эпик по ID
       const epic: Epic = await epicService.get(epicId, 'creator,assignee')
-      
+
       expect(epic).toBeDefined()
       expect(epic.id).toBe(epicId)
       expect(epic.reference_id).toBeDefined()
       expect(epic.title).toBeDefined()
       expect(epic.status).toBeDefined()
       expect(epic.priority).toBeDefined()
-      
+
       console.log(`\n🎯 Retrieved epic by ID: ${epic.reference_id} - "${epic.title}"`)
-      
+
       // Проверяем что включенные данные присутствуют
       if (epic.creator) {
         expect(epic.creator.username).toBeDefined()
         console.log(`   👨‍💻 Creator: ${epic.creator.username}`)
       }
-      
+
       if (epic.assignee) {
         expect(epic.assignee.username).toBeDefined()
         console.log(`   👤 Assignee: ${epic.assignee.username}`)
@@ -386,9 +386,9 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
 
   it.skipIf(!!process.env.CI)('should handle sorting correctly', async () => {
     const sortOrders = ['created_at', 'last_modified', 'title', 'priority']
-    
+
     console.log('\n📊 Testing sorting options:')
-    
+
     for (const orderBy of sortOrders) {
       const response = await epicService.list({
         limit: 5,
@@ -398,14 +398,14 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
       expect(response).toBeDefined()
       expect(response.data).toBeDefined()
       expect(Array.isArray(response.data)).toBe(true)
-      
+
       console.log(`   Sort by "${orderBy}": ${response.data.length} epics`)
-      
+
       // Проверяем что данные отсортированы (если есть больше одного эпика)
       if (response.data.length > 1) {
         const first = response.data[0]
         const second = response.data[1]
-        
+
         switch (orderBy) {
           case 'title':
             // Проверяем что заголовки определены
@@ -432,7 +432,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
 
   it.skipIf(!!process.env.CI)('should handle combined filters correctly', async () => {
     console.log('\n🔍 Testing combined filters:')
-    
+
     // Тестируем комбинацию фильтров
     const response = await epicService.list({
       status: 'In Progress',
@@ -445,20 +445,20 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
     expect(response).toBeDefined()
     expect(response.data).toBeDefined()
     expect(Array.isArray(response.data)).toBe(true)
-    
+
     console.log(`   Critical "In Progress" epics: ${response.data.length}`)
-    
+
     // Проверяем что все эпики соответствуют фильтрам
     response.data.forEach((epic: Epic) => {
       expect(epic.status).toBe('In Progress')
       expect(epic.priority).toBe(1)
     })
-    
+
     // Проверяем что включенные данные присутствуют
     if (response.data.length > 0) {
       const firstEpic = response.data[0]
       console.log(`   Example: ${firstEpic.reference_id} - "${firstEpic.title}"`)
-      
+
       if (firstEpic.creator) {
         console.log(`     Creator: ${firstEpic.creator.username}`)
       }
@@ -470,19 +470,19 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
 
   it.skipIf(!!process.env.CI)('should validate real API response structure', async () => {
     console.log('\n🔍 Validating real API response structure:')
-    
+
     const response = await epicService.list({
       limit: 3,
       include: 'creator,assignee'
     }) as unknown as EpicListResponse
-    
+
     expect(response).toHaveProperty('data')
     expect(response).toHaveProperty('total_count')
     expect(response).toHaveProperty('limit')
     expect(response).toHaveProperty('offset')
-    
+
     console.log('   ✅ Adapted structure matches expected ListResponse<Epic>')
-    
+
     // Проверяем структуру каждого эпика
     response.data.forEach((epic: Epic, index: number) => {
       // Обязательные поля
@@ -494,7 +494,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
       expect(epic).toHaveProperty('creator_id')
       expect(epic).toHaveProperty('created_at')
       expect(epic).toHaveProperty('last_modified')
-      
+
       // Типы данных
       expect(typeof epic.id).toBe('string')
       expect(typeof epic.reference_id).toBe('string')
@@ -502,17 +502,17 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
       expect(typeof epic.creator_id).toBe('string')
       expect(typeof epic.created_at).toBe('string')
       expect(typeof epic.last_modified).toBe('string')
-      
+
       // Валидация enum значений
       expect(['Backlog', 'Draft', 'In Progress', 'Done', 'Cancelled']).toContain(epic.status)
       expect([1, 2, 3, 4]).toContain(epic.priority)
-      
+
       // Валидация дат
       expect(new Date(epic.created_at)).toBeInstanceOf(Date)
       expect(new Date(epic.last_modified)).toBeInstanceOf(Date)
       expect(new Date(epic.created_at).getTime()).not.toBeNaN()
       expect(new Date(epic.last_modified).getTime()).not.toBeNaN()
-      
+
       // Включенные связанные данные
       if (epic.creator) {
         expect(epic.creator).toHaveProperty('id')
@@ -524,7 +524,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
           expect(['Administrator', 'User', 'Commenter']).toContain(epic.creator.role)
         }
       }
-      
+
       if (epic.assignee) {
         expect(epic.assignee).toHaveProperty('id')
         expect(epic.assignee).toHaveProperty('username')
@@ -535,12 +535,12 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
           expect(['Administrator', 'User', 'Commenter']).toContain(epic.assignee.role)
         }
       }
-      
+
       if (index === 0) {
         console.log(`   ✅ Epic ${epic.reference_id} structure validated`)
       }
     })
-    
+
     console.log(`   ✅ All ${response.data.length} epics have valid structure`)
   })
 })
