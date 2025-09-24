@@ -156,6 +156,10 @@ class HttpClient {
     localStorage.removeItem('auth')
   }
 
+  getAuthToken(): string | null {
+    return this.getStoredToken()
+  }
+
   getBaseUrl(): string {
     return this.config.baseUrl
   }

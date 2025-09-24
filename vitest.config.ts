@@ -16,5 +16,7 @@ export default defineConfig({
     typecheck: {
       tsconfig: './tsconfig.test.json'
     }
-  }
+  },
+  envDir: './',
+  envPrefix: ['VITE_', 'SERVER_URL', 'ADMIN_USER', 'ADMIN_PASSWORD']
 })
