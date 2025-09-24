@@ -11,7 +11,6 @@ import type {
   Epic
 } from '@/types'
 import { SchemaValidator } from '@/test/utils/api-response-validator'
-import { adaptResponse } from '@/test/utils/response-adapters'
 
 // Authentication utility for integration tests
 class TestAuthManager {
@@ -258,12 +257,11 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
 
   describe('GET /api/v1/user-stories - List User Stories', () => {
     it.skipIf(!!process.env.CI)('should fetch user stories with pagination', async () => {
-      const rawResponse = await userStoryService.list({
+      const response = await userStoryService.list({
         limit: 10,
         offset: 0,
         order_by: 'created_at'
       })
-      const response = adaptResponse<UserStory>(rawResponse, 'user_stories', 10, 0)
 
       // Validate response structure
       expect(response).toBeDefined()
@@ -296,11 +294,10 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
         return
       }
 
-      const rawResponse = await userStoryService.list({
+      const response = await userStoryService.list({
         epic_id: testEpic.id,
         limit: 20
       })
-      const response = adaptResponse<UserStory>(rawResponse, 'user_stories', 20, 0)
 
       expect(response).toBeDefined()
       expect(response.data).toBeDefined()
@@ -320,11 +317,10 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
       console.log('\n🔍 Testing user story status filtering:')
 
       for (const status of statuses) {
-        const rawResponse = await userStoryService.list({
+        const response = await userStoryService.list({
           status,
           limit: 10
         })
-        const response = adaptResponse<UserStory>(rawResponse, 'user_stories', 10, 0)
 
         expect(response).toBeDefined()
         expect(response.data).toBeDefined()
@@ -345,11 +341,10 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
       console.log('\n🔢 Testing user story priority filtering:')
 
       for (const priority of priorities) {
-        const rawResponse = await userStoryService.list({
+        const response = await userStoryService.list({
           priority,
           limit: 10
         })
-        const response = adaptResponse<UserStory>(rawResponse, 'user_stories', 10, 0)
 
         expect(response).toBeDefined()
         expect(response.data).toBeDefined()
@@ -366,11 +361,10 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
     })
 
     it.skipIf(!!process.env.CI)('should include related data when requested', async () => {
-      const rawResponse = await userStoryService.list({
+      const response = await userStoryService.list({
         limit: 5,
         include: 'epic,creator,assignee,acceptance_criteria,requirements'
       })
-      const response = adaptResponse<UserStory>(rawResponse, 'user_stories', 5, 0)
 
       expect(response).toBeDefined()
       expect(response.data).toBeDefined()
@@ -419,7 +413,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
 
       console.log('\n🔍 Testing combined filters for user stories:')
 
-      const rawResponse = await userStoryService.list({
+      const response = await userStoryService.list({
         epic_id: testEpic.id,
         status: 'Draft',
         priority: 3,
@@ -427,7 +421,6 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
         order_by: 'created_at',
         include: 'creator,assignee'
       })
-      const response = adaptResponse<UserStory>(rawResponse, 'user_stories', 10, 0)
 
       expect(response).toBeDefined()
       expect(response.data).toBeDefined()
@@ -447,8 +440,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
   describe('GET /api/v1/user-stories/:id - Get Individual User Story', () => {
     it.skipIf(!!process.env.CI)('should get user story by ID with included data', async () => {
       // Get an existing user story to test with
-      const rawListResponse = await userStoryService.list({ limit: 1 })
-      const listResponse = adaptResponse<UserStory>(rawListResponse, 'user_stories', 1, 0)
+      const listResponse = await userStoryService.list({ limit: 1 })
 
       if (listResponse.data.length === 0) {
         console.log('⏭️ Skipping test: No user stories available')
@@ -482,8 +474,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
 
     it.skipIf(!!process.env.CI)('should validate individual user story schema', async () => {
       // Get the first available user story
-      const rawListResponse = await userStoryService.list({ limit: 1 })
-      const listResponse = adaptResponse<UserStory>(rawListResponse, 'user_stories', 1, 0)
+      const listResponse = await userStoryService.list({ limit: 1 })
 
       if (listResponse.data.length > 0) {
         const userStoryId = listResponse.data[0].id
@@ -521,8 +512,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
   describe('PUT /api/v1/user-stories/:id - Update User Story', () => {
     it.skipIf(!!process.env.CI)('should test user story update endpoint (requires existing user story)', async () => {
       // Get an existing user story to test with
-      const rawListResponse = await userStoryService.list({ limit: 1 })
-      const listResponse = adaptResponse<UserStory>(rawListResponse, 'user_stories', 1, 0)
+      const listResponse = await userStoryService.list({ limit: 1 })
 
       if (listResponse.data.length === 0) {
         console.log('⏭️ Skipping test: No user stories available for update testing')
@@ -574,8 +564,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
 
     it.skipIf(!!process.env.CI)('should test partial user story update', async () => {
       // Get an existing user story to test with
-      const rawListResponse = await userStoryService.list({ limit: 1 })
-      const listResponse = adaptResponse<UserStory>(rawListResponse, 'user_stories', 1, 0)
+      const listResponse = await userStoryService.list({ limit: 1 })
 
       if (listResponse.data.length === 0) {
         console.log('⏭️ Skipping test: No user stories available for partial update testing')
@@ -657,11 +646,10 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
     it.skipIf(!!process.env.CI)('should validate complete list response structure', async () => {
       console.log('\n🔍 Validating user story list response structure:')
 
-      const rawResponse = await userStoryService.list({
+      const response = await userStoryService.list({
         limit: 3,
         include: 'epic,creator,assignee'
       })
-      const response = adaptResponse<UserStory>(rawResponse, 'user_stories', 3, 0)
 
       // Validate list response structure
       expect(response).toHaveProperty('data')
