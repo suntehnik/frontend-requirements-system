@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
 import { epicService } from '@/services/epic-service'
 import { authService } from '@/services/auth-service'
 import type { Epic, EpicStatus, Priority, CreateEpicRequest, EpicListResponse } from '@/types'
-import { ApiResponseValidator, SchemaValidator, HttpStatusValidator } from '@/test/utils/api-response-validator'
+
 
 // Authentication utility for integration tests
 class TestAuthManager {
@@ -50,7 +50,7 @@ class TestAuthManager {
       })
       
       // Update the mocked localStorage
-      const localStorageMock = (window as any).localStorage
+      const localStorageMock = (window as unknown as { localStorage: Storage }).localStorage
       localStorageMock.getItem.mockImplementation((key: string) => {
         if (key === 'auth') {
           return authData
@@ -71,7 +71,7 @@ class TestAuthManager {
     this.expiresAt = null
     
     // Clear localStorage mock
-    const localStorageMock = (window as any).localStorage
+    const localStorageMock = (window as unknown as { localStorage: Storage }).localStorage
     localStorageMock.getItem.mockReturnValue(null)
   }
 }

@@ -10,7 +10,7 @@ import { authService } from '@/services/auth-service'
 import { httpClient } from '@/services/http-client'
 import { loadIntegrationTestConfig, shouldSkipIntegrationTests } from '@/test/utils/test-environment'
 import { checkBackendAvailability } from '@/test/utils/backend-validator'
-import type { LoginRequest, LoginResponse, User, UserRole } from '@/types'
+import type { LoginRequest, LoginResponse, UserRole } from '@/types'
 
 describe('Authentication Backend Integration', () => {
   let testConfig: ReturnType<typeof loadIntegrationTestConfig>
@@ -136,7 +136,7 @@ describe('Authentication Backend Integration', () => {
     console.log(`   ✅ Token has 3 parts: ${tokenParts.map(part => part.length).join('.')} characters`)
 
     // Validate each part is base64-encoded (basic check)
-    tokenParts.forEach((part, index) => {
+    tokenParts.forEach((part) => {
       expect(part.length).toBeGreaterThan(0)
       // Basic base64 character validation (allows URL-safe base64)
       expect(part).toMatch(/^[A-Za-z0-9_-]+$/)

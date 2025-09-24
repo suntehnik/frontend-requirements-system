@@ -8,9 +8,7 @@ import type {
   Priority,
   CreateUserStoryRequest,
   UpdateUserStoryRequest,
-  UserStoryListResponse,
-  Epic,
-  CreateEpicRequest
+  Epic
 } from '@/types'
 import { SchemaValidator } from '@/test/utils/api-response-validator'
 import { adaptResponse } from '@/test/utils/response-adapters'
@@ -61,7 +59,7 @@ class TestAuthManager {
       })
 
       // Update the mocked localStorage
-      const localStorageMock = (window as any).localStorage
+      const localStorageMock = (window as unknown as { localStorage: Storage }).localStorage
       localStorageMock.getItem.mockImplementation((key: string) => {
         if (key === 'auth') {
           return authData
@@ -82,7 +80,7 @@ class TestAuthManager {
     this.expiresAt = null
 
     // Clear localStorage mock
-    const localStorageMock = (window as any).localStorage
+    const localStorageMock = (window as unknown as { localStorage: Storage }).localStorage
     localStorageMock.getItem.mockReturnValue(null)
   }
 }
