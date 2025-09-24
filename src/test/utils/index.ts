@@ -25,18 +25,6 @@ export {
 } from './test-data-manager'
 
 export {
-  ListResponseAdapter,
-  EpicListResponseAdapter,
-  UserStoryListResponseAdapter,
-  AcceptanceCriteriaListResponseAdapter,
-  RequirementListResponseAdapter,
-  SearchResponseAdapter,
-  HierarchyResponseAdapter,
-  ResponseAdapterFactory,
-  adaptResponse
-} from './response-adapters'
-
-export {
   HttpStatusValidator,
   DataTypeValidator,
   SchemaValidator,
@@ -46,15 +34,6 @@ export {
 export type {
   IntegrationTestConfig
 } from './test-environment'
-
-export type {
-  RealApiEpicListResponse,
-  RealApiUserStoryListResponse,
-  RealApiAcceptanceCriteriaListResponse,
-  RealApiRequirementListResponse,
-  RealApiSearchResponse,
-  RealApiHierarchyResponse
-} from './response-adapters'
 
 export type {
   ValidationResult,
