@@ -40,7 +40,10 @@ export class CommentService extends BaseApiService {
     return await this.apiGet<Comment[]>(`${this.entityPath}/${commentId}/replies`)
   }
 
-  async createReply(commentId: string, request: Omit<CreateCommentRequest, 'author_id'> & { author_id?: string }): Promise<Comment> {
+  async createReply(
+    commentId: string,
+    request: Omit<CreateCommentRequest, 'author_id'> & { author_id?: string },
+  ): Promise<Comment> {
     // Get current user if author_id not provided
     let author_id = request.author_id
     if (!author_id) {
@@ -49,12 +52,12 @@ export class CommentService extends BaseApiService {
       const currentUser = await authService.getCurrentUser()
       author_id = currentUser.id
     }
-    
+
     const fullRequest: CreateCommentRequest = {
       ...request,
-      author_id
+      author_id,
     }
-    
+
     return await this.apiPost<Comment>(`${this.entityPath}/${commentId}/replies`, fullRequest)
   }
 
@@ -77,12 +80,12 @@ export class CommentService extends BaseApiService {
       const currentUser = await authService.getCurrentUser()
       author_id = currentUser.id
     }
-    
+
     const fullRequest: CreateCommentRequest = {
       ...request,
-      author_id
+      author_id,
     }
-    
+
     const entityPath = this.getEntityPath(entityType)
     return await this.apiPost<Comment>(`/${entityPath}/${entityId}/comments`, fullRequest)
   }

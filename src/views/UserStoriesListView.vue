@@ -4,13 +4,13 @@
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center mb-4">
           <h1 class="text-h4">Пользовательские истории</h1>
-          <v-btn 
-            color="primary" 
+          <v-btn
+            color="primary"
             prepend-icon="mdi-plus"
             @click="createUserStory"
             :disabled="loading"
-          > 
-            Создать историю 
+          >
+            Создать историю
           </v-btn>
         </div>
       </v-col>
@@ -111,9 +111,9 @@
             class="elevation-1"
           >
             <template v-slot:[`item.epic`]="{ item }">
-              <router-link 
-                v-if="item.epic" 
-                :to="`/epics/${item.epic_id}`" 
+              <router-link
+                v-if="item.epic"
+                :to="`/epics/${item.epic_id}`"
                 class="text-decoration-none"
               >
                 {{ item.epic.reference_id }}: {{ item.epic.title }}
@@ -143,24 +143,24 @@
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
-              <v-btn 
-                icon="mdi-eye" 
-                size="small" 
-                variant="text" 
+              <v-btn
+                icon="mdi-eye"
+                size="small"
+                variant="text"
                 :to="`/user-stories/${item.id}`"
                 title="Просмотр"
               />
-              <v-btn 
-                icon="mdi-pencil" 
-                size="small" 
+              <v-btn
+                icon="mdi-pencil"
+                size="small"
                 variant="text"
                 @click="editUserStory(item.id)"
                 title="Редактировать"
               />
-              <v-btn 
-                icon="mdi-delete" 
-                size="small" 
-                variant="text" 
+              <v-btn
+                icon="mdi-delete"
+                size="small"
+                variant="text"
                 color="error"
                 @click="deleteUserStory(item)"
                 title="Удалить"
@@ -234,7 +234,7 @@ const priorityOptions = [
 
 // Computed
 const epicOptions = computed(() => {
-  return epics.value.map(epic => ({
+  return epics.value.map((epic) => ({
     title: `${epic.reference_id}: ${epic.title}`,
     value: epic.id,
   }))
@@ -248,7 +248,7 @@ const loadUserStories = async () => {
 
     // Start with no parameters to test basic API
     let params: UserStoryListParams | undefined = undefined
-    
+
     // If no filters are applied, try without any parameters
     if (!selectedEpic.value && !selectedStatus.value && !selectedPriority.value) {
       console.log('Trying API call without parameters first')
@@ -270,19 +270,33 @@ const loadUserStories = async () => {
     console.log('Loading user stories with params:', params)
     const response = await userStoryService.list(params)
     console.log('Raw API response:', response)
-    
+
     // Handle different response formats
     if (response && response.data && Array.isArray(response.data)) {
       // Standard format: {data: Array, total_count: number}
       userStories.value = response.data
       totalCount.value = response.total_count || response.data.length
-      console.log('Loaded user stories (standard format):', response.data.length, 'total:', totalCount.value)
-    } else if (response && 'user_stories' in response && Array.isArray((response as { user_stories: UserStory[] }).user_stories)) {
+      console.log(
+        'Loaded user stories (standard format):',
+        response.data.length,
+        'total:',
+        totalCount.value,
+      )
+    } else if (
+      response &&
+      'user_stories' in response &&
+      Array.isArray((response as { user_stories: UserStory[] }).user_stories)
+    ) {
       // Alternative format: {user_stories: Array, count: number}
       const altResponse = response as { user_stories: UserStory[]; count?: number }
       userStories.value = altResponse.user_stories
       totalCount.value = altResponse.count || altResponse.user_stories.length
-      console.log('Loaded user stories (alternative format):', altResponse.user_stories.length, 'total:', totalCount.value)
+      console.log(
+        'Loaded user stories (alternative format):',
+        altResponse.user_stories.length,
+        'total:',
+        totalCount.value,
+      )
     } else if (Array.isArray(response)) {
       // Direct array response
       userStories.value = response
@@ -295,7 +309,8 @@ const loadUserStories = async () => {
     }
   } catch (err) {
     console.error('Failed to load user stories:', err)
-    error.value = err instanceof Error ? err.message : 'Не удалось загрузить пользовательские истории'
+    error.value =
+      err instanceof Error ? err.message : 'Не удалось загрузить пользовательские истории'
   } finally {
     loading.value = false
   }
@@ -304,14 +319,14 @@ const loadUserStories = async () => {
 const loadEpics = async () => {
   try {
     epicsLoading.value = true
-    
+
     // Try without parameters first
     const params = undefined
-    
+
     console.log('Loading epics with params:', params)
     const response = await epicService.list(params)
     console.log('Raw epics response:', response)
-    
+
     // Handle different response formats
     if (response && response.data && Array.isArray(response.data)) {
       epics.value = response.data
@@ -382,7 +397,11 @@ const editUserStory = (id: string) => {
 }
 
 const deleteUserStory = async (userStory: UserStory) => {
-  if (confirm(`Вы уверены, что хотите удалить историю "${userStory.reference_id}: ${userStory.title}"?`)) {
+  if (
+    confirm(
+      `Вы уверены, что хотите удалить историю "${userStory.reference_id}: ${userStory.title}"?`,
+    )
+  ) {
     try {
       await userStoryService.delete(userStory.id)
       await loadUserStories()

@@ -20,12 +20,12 @@ export class AcceptanceCriteriaService extends BaseApiService {
   }): Promise<AcceptanceCriteriaListResponse> {
     const queryParams = params
       ? this.buildQueryParams({
-        user_story_id: params.user_story_id,
-        author_id: params.author_id,
-        limit: params.limit,
-        offset: params.offset,
-        include: this.buildIncludeParam(params.include),
-      })
+          user_story_id: params.user_story_id,
+          author_id: params.author_id,
+          limit: params.limit,
+          offset: params.offset,
+          include: this.buildIncludeParam(params.include),
+        })
       : {}
 
     return await this.apiGet<AcceptanceCriteriaListResponse>(this.entityPath, queryParams)

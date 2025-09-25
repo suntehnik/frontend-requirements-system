@@ -17,7 +17,6 @@ import type {
   CreateEpicRequest,
   CreateUserStoryRequest,
   CreateRequirementRequest,
-
   UpdateEpicRequest,
   UpdateUserStoryRequest,
   UpdateRequirementRequest,
@@ -46,11 +45,15 @@ export const useEntitiesStore = defineStore('entities', () => {
     const epicsCount = epics.value.size
     const userStoriesCount = userStories.value.size
     const requirementsCount = requirements.value.size
-    
+
     // Count active tasks (In Progress status)
-    const activeEpics = epicsList.value.filter(epic => epic.status === 'In Progress').length
-    const activeUserStories = userStoriesList.value.filter(story => story.status === 'In Progress').length
-    const activeRequirements = requirementsList.value.filter(req => req.status === 'Active').length
+    const activeEpics = epicsList.value.filter((epic) => epic.status === 'In Progress').length
+    const activeUserStories = userStoriesList.value.filter(
+      (story) => story.status === 'In Progress',
+    ).length
+    const activeRequirements = requirementsList.value.filter(
+      (req) => req.status === 'Active',
+    ).length
     const activeTasks = activeEpics + activeUserStories + activeRequirements
 
     return {
@@ -70,7 +73,7 @@ export const useEntitiesStore = defineStore('entities', () => {
     }> = []
 
     // Add epics
-    epicsList.value.forEach(epic => {
+    epicsList.value.forEach((epic) => {
       allEntities.push({
         type: 'epic',
         entity: epic,
@@ -79,7 +82,7 @@ export const useEntitiesStore = defineStore('entities', () => {
     })
 
     // Add user stories
-    userStoriesList.value.forEach(story => {
+    userStoriesList.value.forEach((story) => {
       allEntities.push({
         type: 'user_story',
         entity: story,
@@ -88,7 +91,7 @@ export const useEntitiesStore = defineStore('entities', () => {
     })
 
     // Add requirements
-    requirementsList.value.forEach(req => {
+    requirementsList.value.forEach((req) => {
       allEntities.push({
         type: 'requirement',
         entity: req,
@@ -123,19 +126,19 @@ export const useEntitiesStore = defineStore('entities', () => {
 
     try {
       const response = await epicService.list(params)
-      
+
       // Debug logging
       console.log('Epics response:', response)
-      
+
       // Check if response has the expected structure
       if (response && Array.isArray(response.data)) {
         // Update the map with fetched epics
-        response.data.forEach(epic => {
+        response.data.forEach((epic) => {
           epics.value.set(epic.id, epic)
         })
       } else if (Array.isArray(response)) {
         // Handle case where response is directly an array
-        response.forEach(epic => {
+        response.forEach((epic) => {
           epics.value.set(epic.id, epic)
         })
       } else {
@@ -232,19 +235,19 @@ export const useEntitiesStore = defineStore('entities', () => {
 
     try {
       const response = await userStoryService.list(params)
-      
+
       // Debug logging
       console.log('User stories response:', response)
-      
+
       // Check if response has the expected structure
       if (response && Array.isArray(response.data)) {
         // Update the map with fetched user stories
-        response.data.forEach(story => {
+        response.data.forEach((story) => {
           userStories.value.set(story.id, story)
         })
       } else if (Array.isArray(response)) {
         // Handle case where response is directly an array
-        response.forEach(story => {
+        response.forEach((story) => {
           userStories.value.set(story.id, story)
         })
       } else {
@@ -341,19 +344,19 @@ export const useEntitiesStore = defineStore('entities', () => {
 
     try {
       const response = await requirementService.list(params)
-      
+
       // Debug logging
       console.log('Requirements response:', response)
-      
+
       // Check if response has the expected structure
       if (response && Array.isArray(response.data)) {
         // Update the map with fetched requirements
-        response.data.forEach(req => {
+        response.data.forEach((req) => {
           requirements.value.set(req.id, req)
         })
       } else if (Array.isArray(response)) {
         // Handle case where response is directly an array
-        response.forEach(req => {
+        response.forEach((req) => {
           requirements.value.set(req.id, req)
         })
       } else {
@@ -450,15 +453,16 @@ export const useEntitiesStore = defineStore('entities', () => {
 
     try {
       const criteria = await acceptanceCriteriaService.list()
-      
+
       // Update the map with fetched acceptance criteria
-      criteria.data.forEach(ac => {
+      criteria.data.forEach((ac) => {
         acceptanceCriteria.value.set(ac.id, ac)
       })
 
       return criteria
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch acceptance criteria'
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to fetch acceptance criteria'
       setError(key, errorMessage)
       throw error
     } finally {
@@ -476,7 +480,8 @@ export const useEntitiesStore = defineStore('entities', () => {
       acceptanceCriteria.value.set(criterion.id, criterion)
       return criterion
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch acceptance criterion'
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to fetch acceptance criterion'
       setError(key, errorMessage)
       throw error
     } finally {
@@ -494,7 +499,8 @@ export const useEntitiesStore = defineStore('entities', () => {
       acceptanceCriteria.value.set(criterion.id, criterion)
       return criterion
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update acceptance criterion'
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to update acceptance criterion'
       setError(key, errorMessage)
       throw error
     } finally {
@@ -511,7 +517,8 @@ export const useEntitiesStore = defineStore('entities', () => {
       await acceptanceCriteriaService.delete(id)
       acceptanceCriteria.value.delete(id)
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to delete acceptance criterion'
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to delete acceptance criterion'
       setError(key, errorMessage)
       throw error
     } finally {
@@ -534,10 +541,10 @@ export const useEntitiesStore = defineStore('entities', () => {
       ])
     } catch (error) {
       console.warn('Failed to load real data, using mock data for development:', error)
-      
+
       // Load mock data for development when API is not available
       loadMockData()
-      
+
       const errorMessage = 'API недоступен, используются тестовые данные'
       setError(key, errorMessage)
     } finally {
@@ -597,7 +604,8 @@ export const useEntitiesStore = defineStore('entities', () => {
         id: '2',
         reference_id: 'US-002',
         title: 'Создание требований',
-        description: 'Как аналитик, я хочу создавать требования, чтобы документировать функциональность',
+        description:
+          'Как аналитик, я хочу создавать требования, чтобы документировать функциональность',
         status: 'Draft',
         priority: 2,
         epic_id: '2',
@@ -639,9 +647,9 @@ export const useEntitiesStore = defineStore('entities', () => {
     ]
 
     // Load mock data into stores
-    mockEpics.forEach(epic => epics.value.set(epic.id, epic))
-    mockUserStories.forEach(story => userStories.value.set(story.id, story))
-    mockRequirements.forEach(req => requirements.value.set(req.id, req))
+    mockEpics.forEach((epic) => epics.value.set(epic.id, epic))
+    mockUserStories.forEach((story) => userStories.value.set(story.id, story))
+    mockRequirements.forEach((req) => requirements.value.set(req.id, req))
   }
 
   return {

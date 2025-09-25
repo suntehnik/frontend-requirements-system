@@ -105,7 +105,9 @@ describe('EpicDetailView Integration', () => {
     vi.mocked(epicService.get).mockRejectedValue(new Error(errorMessage))
 
     // Call the service method
-    await expect(epicService.get('1', 'creator,assignee,user_stories')).rejects.toThrow(errorMessage)
+    await expect(epicService.get('1', 'creator,assignee,user_stories')).rejects.toThrow(
+      errorMessage,
+    )
 
     // Verify the error was thrown
     expect(epicService.get).toHaveBeenCalledWith('1', 'creator,assignee,user_stories')
@@ -149,10 +151,10 @@ describe('EpicDetailView Integration', () => {
   it('should provide correct user story statistics', () => {
     // Test statistics calculation logic that would be used in the component
     const userStories = mockEpic.user_stories || []
-    
+
     const totalStories = userStories.length
-    const completedStories = userStories.filter(s => s.status === 'Done').length
-    const inProgressStories = userStories.filter(s => s.status === 'In Progress').length
+    const completedStories = userStories.filter((s) => s.status === 'Done').length
+    const inProgressStories = userStories.filter((s) => s.status === 'In Progress').length
 
     expect(totalStories).toBe(2)
     expect(completedStories).toBe(1)
@@ -215,7 +217,7 @@ describe('EpicDetailView Integration', () => {
     expect(mockEpic).toHaveProperty('creator')
     expect(mockEpic).toHaveProperty('assignee')
     expect(mockEpic).toHaveProperty('user_stories')
-    
+
     // Validate user stories structure
     expect(mockEpic.user_stories).toBeInstanceOf(Array)
     if (mockEpic.user_stories && mockEpic.user_stories.length > 0) {

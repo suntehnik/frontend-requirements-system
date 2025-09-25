@@ -119,30 +119,30 @@ describe('EpicsListView Integration', () => {
 
   it('should filter epics by status', () => {
     // Setup store with mock data
-    mockEpics.forEach(epic => entitiesStore.epics.set(epic.id, epic))
+    mockEpics.forEach((epic) => entitiesStore.epics.set(epic.id, epic))
 
     // Test filtering logic (this would be used in the component)
-    const inProgressEpics = entitiesStore.epicsList.filter(epic => epic.status === 'In Progress')
-    const draftEpics = entitiesStore.epicsList.filter(epic => epic.status === 'Draft')
+    const inProgressEpics = entitiesStore.epicsList.filter((epic) => epic.status === 'In Progress')
+    const draftEpics = entitiesStore.epicsList.filter((epic) => epic.status === 'Draft')
 
     expect(inProgressEpics).toHaveLength(1)
     expect(inProgressEpics[0].reference_id).toBe('EP-001')
-    
+
     expect(draftEpics).toHaveLength(1)
     expect(draftEpics[0].reference_id).toBe('EP-002')
   })
 
   it('should filter epics by priority', () => {
     // Setup store with mock data
-    mockEpics.forEach(epic => entitiesStore.epics.set(epic.id, epic))
+    mockEpics.forEach((epic) => entitiesStore.epics.set(epic.id, epic))
 
     // Test filtering logic
-    const criticalEpics = entitiesStore.epicsList.filter(epic => epic.priority === 1)
-    const highEpics = entitiesStore.epicsList.filter(epic => epic.priority === 2)
+    const criticalEpics = entitiesStore.epicsList.filter((epic) => epic.priority === 1)
+    const highEpics = entitiesStore.epicsList.filter((epic) => epic.priority === 2)
 
     expect(criticalEpics).toHaveLength(1)
     expect(criticalEpics[0].reference_id).toBe('EP-001')
-    
+
     expect(highEpics).toHaveLength(1)
     expect(highEpics[0].reference_id).toBe('EP-002')
   })

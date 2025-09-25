@@ -1,6 +1,6 @@
 /**
  * Test Data Management Utilities
- * 
+ *
  * Manages creation and cleanup of test data for integration tests.
  * Provides comprehensive test data creation, tracking, and cleanup functionality
  * with rollback mechanisms for failed tests.
@@ -25,8 +25,6 @@ interface TestDataManagerOptions {
   testRunId?: string // Unique identifier for this test run
   enableRollback?: boolean // Enable automatic rollback on failures
 }
-
-
 
 interface BulkCreationResult<T> {
   entities: T[]
@@ -71,10 +69,10 @@ export class TestDataManager {
         user_story: 0,
         acceptance_criteria: 0,
         requirement: 0,
-        comment: 0
+        comment: 0,
       },
       testRunId: this.testRunId,
-      startTime: new Date()
+      startTime: new Date(),
     }
   }
 
@@ -106,17 +104,17 @@ export class TestDataManager {
   private async executeApiRequest<T>(
     endpoint: string,
     method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-    body?: unknown
+    body?: unknown,
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
     const headers: Record<string, string> = {
-      'Authorization': `Bearer ${this.token}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${this.token}`,
+      'Content-Type': 'application/json',
     }
 
     const config: RequestInit = {
       method,
-      headers
+      headers,
     }
 
     if (body && method !== 'GET') {
@@ -127,7 +125,9 @@ export class TestDataManager {
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'Unknown error')
-      throw new Error(`API request failed: ${method} ${endpoint} - HTTP ${response.status} - ${errorText}`)
+      throw new Error(
+        `API request failed: ${method} ${endpoint} - HTTP ${response.status} - ${errorText}`,
+      )
     }
 
     if (method === 'DELETE') {
@@ -140,12 +140,14 @@ export class TestDataManager {
   /**
    * Creates a test epic with unique identifier
    */
-  async createTestEpic(overrides: Partial<{
-    title: string
-    description: string
-    priority: 1 | 2 | 3 | 4
-    assignee_id: string
-  }> = {}): Promise<Epic> {
+  async createTestEpic(
+    overrides: Partial<{
+      title: string
+      description: string
+      priority: 1 | 2 | 3 | 4
+      assignee_id: string
+    }> = {},
+  ): Promise<Epic> {
     const timestamp = Date.now()
     const uniqueId = Math.random().toString(36).substring(2, 8)
 
@@ -163,7 +165,7 @@ export class TestDataManager {
       description: `Test epic created for integration testing at ${new Date().toISOString()} (Test Run: ${this.testRunId})`,
       priority: 3 as const,
       creator_id,
-      ...overrides
+      ...overrides,
     }
 
     try {
@@ -174,7 +176,7 @@ export class TestDataManager {
         type: 'epic',
         reference_id: epic.reference_id,
         created_at: new Date(),
-        test_run_id: this.testRunId
+        test_run_id: this.testRunId,
       })
 
       console.log(`📝 Created test epic: ${epic.reference_id} - "${epic.title}"`)
@@ -191,12 +193,15 @@ export class TestDataManager {
   /**
    * Creates multiple test epics
    */
-  async createTestEpics(count: number, overrides: Partial<{
-    title: string
-    description: string
-    priority: 1 | 2 | 3 | 4
-    assignee_id: string
-  }> = {}): Promise<BulkCreationResult<Epic>> {
+  async createTestEpics(
+    count: number,
+    overrides: Partial<{
+      title: string
+      description: string
+      priority: 1 | 2 | 3 | 4
+      assignee_id: string
+    }> = {},
+  ): Promise<BulkCreationResult<Epic>> {
     const results: Epic[] = []
     const errors: string[] = []
     let successCount = 0
@@ -207,7 +212,7 @@ export class TestDataManager {
       try {
         const epic = await this.createTestEpic({
           ...overrides,
-          title: overrides.title ? `${overrides.title} ${i + 1}` : undefined
+          title: overrides.title ? `${overrides.title} ${i + 1}` : undefined,
         })
         results.push(epic)
         successCount++
@@ -221,19 +226,22 @@ export class TestDataManager {
       entities: results,
       successCount,
       failureCount: count - successCount,
-      errors
+      errors,
     }
   }
 
   /**
    * Creates a test user story within an epic
    */
-  async createTestUserStory(epicId: string, overrides: Partial<{
-    title: string
-    description: string
-    priority: 1 | 2 | 3 | 4
-    assignee_id: string
-  }> = {}): Promise<UserStory> {
+  async createTestUserStory(
+    epicId: string,
+    overrides: Partial<{
+      title: string
+      description: string
+      priority: 1 | 2 | 3 | 4
+      assignee_id: string
+    }> = {},
+  ): Promise<UserStory> {
     const timestamp = Date.now()
     const uniqueId = Math.random().toString(36).substring(2, 8)
 
@@ -252,11 +260,15 @@ export class TestDataManager {
       priority: 3 as const,
       epic_id: epicId,
       creator_id,
-      ...overrides
+      ...overrides,
     }
 
     try {
-      const userStory = await this.executeApiRequest<UserStory>('/api/v1/user-stories', 'POST', userStoryData)
+      const userStory = await this.executeApiRequest<UserStory>(
+        '/api/v1/user-stories',
+        'POST',
+        userStoryData,
+      )
 
       this.trackEntity({
         id: userStory.id,
@@ -264,7 +276,7 @@ export class TestDataManager {
         reference_id: userStory.reference_id,
         created_at: new Date(),
         parent_id: epicId,
-        test_run_id: this.testRunId
+        test_run_id: this.testRunId,
       })
 
       console.log(`📝 Created test user story: ${userStory.reference_id} - "${userStory.title}"`)
@@ -281,12 +293,16 @@ export class TestDataManager {
   /**
    * Creates multiple test user stories for an epic
    */
-  async createTestUserStories(epicId: string, count: number, overrides: Partial<{
-    title: string
-    description: string
-    priority: 1 | 2 | 3 | 4
-    assignee_id: string
-  }> = {}): Promise<BulkCreationResult<UserStory>> {
+  async createTestUserStories(
+    epicId: string,
+    count: number,
+    overrides: Partial<{
+      title: string
+      description: string
+      priority: 1 | 2 | 3 | 4
+      assignee_id: string
+    }> = {},
+  ): Promise<BulkCreationResult<UserStory>> {
     const results: UserStory[] = []
     const errors: string[] = []
     let successCount = 0
@@ -297,7 +313,7 @@ export class TestDataManager {
       try {
         const userStory = await this.createTestUserStory(epicId, {
           ...overrides,
-          title: overrides.title ? `${overrides.title} ${i + 1}` : undefined
+          title: overrides.title ? `${overrides.title} ${i + 1}` : undefined,
         })
         results.push(userStory)
         successCount++
@@ -311,16 +327,19 @@ export class TestDataManager {
       entities: results,
       successCount,
       failureCount: count - successCount,
-      errors
+      errors,
     }
   }
 
   /**
    * Creates test acceptance criteria for a user story
    */
-  async createTestAcceptanceCriteria(userStoryId: string, overrides: Partial<{
-    description: string
-  }> = {}): Promise<AcceptanceCriteria> {
+  async createTestAcceptanceCriteria(
+    userStoryId: string,
+    overrides: Partial<{
+      description: string
+    }> = {},
+  ): Promise<AcceptanceCriteria> {
     const timestamp = Date.now()
     const uniqueId = Math.random().toString(36).substring(2, 8)
 
@@ -337,11 +356,15 @@ export class TestDataManager {
       description: `Test acceptance criteria ${timestamp}-${uniqueId} created for integration testing at ${new Date().toISOString()} (Test Run: ${this.testRunId})`,
       user_story_id: userStoryId,
       author_id,
-      ...overrides
+      ...overrides,
     }
 
     try {
-      const criteria = await this.executeApiRequest<AcceptanceCriteria>('/api/v1/acceptance-criteria', 'POST', criteriaData)
+      const criteria = await this.executeApiRequest<AcceptanceCriteria>(
+        '/api/v1/acceptance-criteria',
+        'POST',
+        criteriaData,
+      )
 
       this.trackEntity({
         id: criteria.id,
@@ -349,7 +372,7 @@ export class TestDataManager {
         reference_id: criteria.reference_id,
         created_at: new Date(),
         parent_id: userStoryId,
-        test_run_id: this.testRunId
+        test_run_id: this.testRunId,
       })
 
       console.log(`📝 Created test acceptance criteria: ${criteria.reference_id}`)
@@ -366,9 +389,13 @@ export class TestDataManager {
   /**
    * Creates multiple test acceptance criteria for a user story
    */
-  async createTestAcceptanceCriteriaList(userStoryId: string, count: number, overrides: Partial<{
-    description: string
-  }> = {}): Promise<BulkCreationResult<AcceptanceCriteria>> {
+  async createTestAcceptanceCriteriaList(
+    userStoryId: string,
+    count: number,
+    overrides: Partial<{
+      description: string
+    }> = {},
+  ): Promise<BulkCreationResult<AcceptanceCriteria>> {
     const results: AcceptanceCriteria[] = []
     const errors: string[] = []
     let successCount = 0
@@ -379,7 +406,7 @@ export class TestDataManager {
       try {
         const criteria = await this.createTestAcceptanceCriteria(userStoryId, {
           ...overrides,
-          description: overrides.description ? `${overrides.description} ${i + 1}` : undefined
+          description: overrides.description ? `${overrides.description} ${i + 1}` : undefined,
         })
         results.push(criteria)
         successCount++
@@ -393,20 +420,24 @@ export class TestDataManager {
       entities: results,
       successCount,
       failureCount: count - successCount,
-      errors
+      errors,
     }
   }
 
   /**
    * Creates a test requirement
    */
-  async createTestRequirement(userStoryId: string, typeId: string, overrides: Partial<{
-    title: string
-    description: string
-    priority: 1 | 2 | 3 | 4
-    acceptance_criteria_id: string
-    assignee_id: string
-  }> = {}): Promise<Requirement> {
+  async createTestRequirement(
+    userStoryId: string,
+    typeId: string,
+    overrides: Partial<{
+      title: string
+      description: string
+      priority: 1 | 2 | 3 | 4
+      acceptance_criteria_id: string
+      assignee_id: string
+    }> = {},
+  ): Promise<Requirement> {
     const timestamp = Date.now()
     const uniqueId = Math.random().toString(36).substring(2, 8)
 
@@ -426,11 +457,15 @@ export class TestDataManager {
       user_story_id: userStoryId,
       type_id: typeId,
       creator_id,
-      ...overrides
+      ...overrides,
     }
 
     try {
-      const requirement = await this.executeApiRequest<Requirement>('/api/v1/requirements', 'POST', requirementData)
+      const requirement = await this.executeApiRequest<Requirement>(
+        '/api/v1/requirements',
+        'POST',
+        requirementData,
+      )
 
       this.trackEntity({
         id: requirement.id,
@@ -438,10 +473,12 @@ export class TestDataManager {
         reference_id: requirement.reference_id,
         created_at: new Date(),
         parent_id: userStoryId,
-        test_run_id: this.testRunId
+        test_run_id: this.testRunId,
       })
 
-      console.log(`📝 Created test requirement: ${requirement.reference_id} - "${requirement.title}"`)
+      console.log(
+        `📝 Created test requirement: ${requirement.reference_id} - "${requirement.title}"`,
+      )
       return requirement
     } catch (error) {
       console.error(`❌ Failed to create test requirement:`, error)
@@ -455,13 +492,18 @@ export class TestDataManager {
   /**
    * Creates multiple test requirements for a user story
    */
-  async createTestRequirements(userStoryId: string, typeId: string, count: number, overrides: Partial<{
-    title: string
-    description: string
-    priority: 1 | 2 | 3 | 4
-    acceptance_criteria_id: string
-    assignee_id: string
-  }> = {}): Promise<BulkCreationResult<Requirement>> {
+  async createTestRequirements(
+    userStoryId: string,
+    typeId: string,
+    count: number,
+    overrides: Partial<{
+      title: string
+      description: string
+      priority: 1 | 2 | 3 | 4
+      acceptance_criteria_id: string
+      assignee_id: string
+    }> = {},
+  ): Promise<BulkCreationResult<Requirement>> {
     const results: Requirement[] = []
     const errors: string[] = []
     let successCount = 0
@@ -472,7 +514,7 @@ export class TestDataManager {
       try {
         const requirement = await this.createTestRequirement(userStoryId, typeId, {
           ...overrides,
-          title: overrides.title ? `${overrides.title} ${i + 1}` : undefined
+          title: overrides.title ? `${overrides.title} ${i + 1}` : undefined,
         })
         results.push(requirement)
         successCount++
@@ -486,18 +528,22 @@ export class TestDataManager {
       entities: results,
       successCount,
       failureCount: count - successCount,
-      errors
+      errors,
     }
   }
 
   /**
    * Creates a test comment for an entity
    */
-  async createTestComment(entityType: 'epic' | 'user_story' | 'acceptance_criteria' | 'requirement', entityId: string, overrides: Partial<{
-    content: string
-    parent_comment_id: string
-    author_id: string
-  }> = {}): Promise<Comment> {
+  async createTestComment(
+    entityType: 'epic' | 'user_story' | 'acceptance_criteria' | 'requirement',
+    entityId: string,
+    overrides: Partial<{
+      content: string
+      parent_comment_id: string
+      author_id: string
+    }> = {},
+  ): Promise<Comment> {
     const timestamp = Date.now()
     const uniqueId = Math.random().toString(36).substring(2, 8)
 
@@ -515,11 +561,15 @@ export class TestDataManager {
     const commentData = {
       content: `Test comment ${timestamp}-${uniqueId} created for integration testing at ${new Date().toISOString()} (Test Run: ${this.testRunId})`,
       author_id,
-      ...overrides
+      ...overrides,
     }
 
     try {
-      const comment = await this.executeApiRequest<Comment>(`/api/v1/${entityType}s/${entityId}/comments`, 'POST', commentData)
+      const comment = await this.executeApiRequest<Comment>(
+        `/api/v1/${entityType}s/${entityId}/comments`,
+        'POST',
+        commentData,
+      )
 
       this.trackEntity({
         id: comment.id,
@@ -527,7 +577,7 @@ export class TestDataManager {
         reference_id: `comment-${comment.id}`,
         created_at: new Date(),
         parent_id: entityId,
-        test_run_id: this.testRunId
+        test_run_id: this.testRunId,
       })
 
       console.log(`📝 Created test comment for ${entityType} ${entityId}`)
@@ -554,7 +604,7 @@ export class TestDataManager {
   getStats(): TestDataStats {
     return {
       ...this.stats,
-      endTime: new Date()
+      endTime: new Date(),
     }
   }
 
@@ -572,7 +622,7 @@ export class TestDataManager {
     for (const entity of toRollback) {
       try {
         await this.deleteEntity(entity)
-        this.createdEntities = this.createdEntities.filter(e => e.id !== entity.id)
+        this.createdEntities = this.createdEntities.filter((e) => e.id !== entity.id)
         console.log(`   ↩️ Rolled back ${entity.type}: ${entity.reference_id}`)
       } catch (error) {
         console.log(`   ❌ Failed to rollback ${entity.type}: ${entity.reference_id} - ${error}`)
@@ -590,10 +640,7 @@ export class TestDataManager {
   /**
    * Create test data with automatic rollback on failure
    */
-  async createWithRollback<T>(
-    createFn: () => Promise<T>,
-    rollbackCount: number = 1
-  ): Promise<T> {
+  async createWithRollback<T>(createFn: () => Promise<T>, rollbackCount: number = 1): Promise<T> {
     try {
       return await createFn()
     } catch (error) {
@@ -619,7 +666,9 @@ export class TestDataManager {
       return
     }
 
-    console.log(`🧹 Cleaning up ${this.createdEntities.length} test entities for test run ${this.testRunId}...`)
+    console.log(
+      `🧹 Cleaning up ${this.createdEntities.length} test entities for test run ${this.testRunId}...`,
+    )
 
     // Sort entities by dependency order (comments -> requirements -> acceptance criteria -> user stories -> epics)
     const sortedEntities = [...this.createdEntities].sort((a, b) => {
@@ -651,7 +700,7 @@ export class TestDataManager {
    * Cleans up test entities by type
    */
   async cleanupByType(entityType: TestEntity['type']): Promise<void> {
-    const entitiesToClean = this.createdEntities.filter(e => e.type === entityType)
+    const entitiesToClean = this.createdEntities.filter((e) => e.type === entityType)
 
     if (entitiesToClean.length === 0) {
       console.log(`🧹 No ${entityType} entities to clean up`)
@@ -666,8 +715,8 @@ export class TestDataManager {
     for (const entity of entitiesToClean) {
       try {
         await this.deleteEntity(entity)
-        this.createdEntities = this.createdEntities.filter(e => e.id !== entity.id)
-        this.rollbackStack = this.rollbackStack.filter(e => e.id !== entity.id)
+        this.createdEntities = this.createdEntities.filter((e) => e.id !== entity.id)
+        this.rollbackStack = this.rollbackStack.filter((e) => e.id !== entity.id)
         cleanedCount++
         this.stats.totalCleaned++
         console.log(`   ✅ Deleted ${entity.type}: ${entity.reference_id}`)
@@ -725,12 +774,15 @@ export class TestDataManager {
   /**
    * Creates a complete test hierarchy (epic -> user story -> acceptance criteria -> requirement)
    */
-  async createTestHierarchy(requirementTypeId: string, overrides: {
-    epic?: Partial<Parameters<TestDataManager['createTestEpic']>[0]>
-    userStory?: Partial<Parameters<TestDataManager['createTestUserStory']>[1]>
-    acceptanceCriteria?: Partial<Parameters<TestDataManager['createTestAcceptanceCriteria']>[1]>
-    requirement?: Partial<Parameters<TestDataManager['createTestRequirement']>[2]>
-  } = {}): Promise<{
+  async createTestHierarchy(
+    requirementTypeId: string,
+    overrides: {
+      epic?: Partial<Parameters<TestDataManager['createTestEpic']>[0]>
+      userStory?: Partial<Parameters<TestDataManager['createTestUserStory']>[1]>
+      acceptanceCriteria?: Partial<Parameters<TestDataManager['createTestAcceptanceCriteria']>[1]>
+      requirement?: Partial<Parameters<TestDataManager['createTestRequirement']>[2]>
+    } = {},
+  ): Promise<{
     epic: Epic
     userStory: UserStory
     acceptanceCriteria: AcceptanceCriteria
@@ -741,15 +793,14 @@ export class TestDataManager {
     try {
       const epic = await this.createTestEpic(overrides.epic)
       const userStory = await this.createTestUserStory(epic.id, overrides.userStory)
-      const acceptanceCriteria = await this.createTestAcceptanceCriteria(userStory.id, overrides.acceptanceCriteria)
-      const requirement = await this.createTestRequirement(
+      const acceptanceCriteria = await this.createTestAcceptanceCriteria(
         userStory.id,
-        requirementTypeId,
-        {
-          acceptance_criteria_id: acceptanceCriteria.id,
-          ...overrides.requirement
-        }
+        overrides.acceptanceCriteria,
       )
+      const requirement = await this.createTestRequirement(userStory.id, requirementTypeId, {
+        acceptance_criteria_id: acceptanceCriteria.id,
+        ...overrides.requirement,
+      })
 
       console.log('🏗️ Test hierarchy created successfully')
       return { epic, userStory, acceptanceCriteria, requirement }
@@ -765,17 +816,23 @@ export class TestDataManager {
   /**
    * Creates multiple complete test hierarchies
    */
-  async createTestHierarchies(count: number, requirementTypeId: string, overrides: {
-    epic?: Partial<Parameters<TestDataManager['createTestEpic']>[0]>
-    userStory?: Partial<Parameters<TestDataManager['createTestUserStory']>[1]>
-    acceptanceCriteria?: Partial<Parameters<TestDataManager['createTestAcceptanceCriteria']>[1]>
-    requirement?: Partial<Parameters<TestDataManager['createTestRequirement']>[2]>
-  } = {}): Promise<BulkCreationResult<{
-    epic: Epic
-    userStory: UserStory
-    acceptanceCriteria: AcceptanceCriteria
-    requirement: Requirement
-  }>> {
+  async createTestHierarchies(
+    count: number,
+    requirementTypeId: string,
+    overrides: {
+      epic?: Partial<Parameters<TestDataManager['createTestEpic']>[0]>
+      userStory?: Partial<Parameters<TestDataManager['createTestUserStory']>[1]>
+      acceptanceCriteria?: Partial<Parameters<TestDataManager['createTestAcceptanceCriteria']>[1]>
+      requirement?: Partial<Parameters<TestDataManager['createTestRequirement']>[2]>
+    } = {},
+  ): Promise<
+    BulkCreationResult<{
+      epic: Epic
+      userStory: UserStory
+      acceptanceCriteria: AcceptanceCriteria
+      requirement: Requirement
+    }>
+  > {
     const results: Array<{
       epic: Epic
       userStory: UserStory
@@ -792,20 +849,24 @@ export class TestDataManager {
         const hierarchy = await this.createTestHierarchy(requirementTypeId, {
           epic: {
             ...overrides.epic,
-            title: overrides.epic?.title ? `${overrides.epic.title} ${i + 1}` : undefined
+            title: overrides.epic?.title ? `${overrides.epic.title} ${i + 1}` : undefined,
           },
           userStory: {
             ...overrides.userStory,
-            title: overrides.userStory?.title ? `${overrides.userStory.title} ${i + 1}` : undefined
+            title: overrides.userStory?.title ? `${overrides.userStory.title} ${i + 1}` : undefined,
           },
           acceptanceCriteria: {
             ...overrides.acceptanceCriteria,
-            description: overrides.acceptanceCriteria?.description ? `${overrides.acceptanceCriteria.description} ${i + 1}` : undefined
+            description: overrides.acceptanceCriteria?.description
+              ? `${overrides.acceptanceCriteria.description} ${i + 1}`
+              : undefined,
           },
           requirement: {
             ...overrides.requirement,
-            title: overrides.requirement?.title ? `${overrides.requirement.title} ${i + 1}` : undefined
-          }
+            title: overrides.requirement?.title
+              ? `${overrides.requirement.title} ${i + 1}`
+              : undefined,
+          },
         })
         results.push(hierarchy)
         successCount++
@@ -819,7 +880,7 @@ export class TestDataManager {
       entities: results,
       successCount,
       failureCount: count - successCount,
-      errors
+      errors,
     }
   }
 
@@ -828,14 +889,16 @@ export class TestDataManager {
    */
   async cleanupOldTestData(maxAgeMinutes: number = 60): Promise<void> {
     const cutoffTime = new Date(Date.now() - maxAgeMinutes * 60 * 1000)
-    const oldEntities = this.createdEntities.filter(entity => entity.created_at < cutoffTime)
+    const oldEntities = this.createdEntities.filter((entity) => entity.created_at < cutoffTime)
 
     if (oldEntities.length === 0) {
       console.log('🧹 No old test data to clean up')
       return
     }
 
-    console.log(`🧹 Cleaning up ${oldEntities.length} old test entities (older than ${maxAgeMinutes} minutes)...`)
+    console.log(
+      `🧹 Cleaning up ${oldEntities.length} old test entities (older than ${maxAgeMinutes} minutes)...`,
+    )
 
     // Sort by dependency order for safe deletion
     const sortedOldEntities = oldEntities.sort((a, b) => {
@@ -846,8 +909,8 @@ export class TestDataManager {
     for (const entity of sortedOldEntities) {
       try {
         await this.deleteEntity(entity)
-        this.createdEntities = this.createdEntities.filter(e => e.id !== entity.id)
-        this.rollbackStack = this.rollbackStack.filter(e => e.id !== entity.id)
+        this.createdEntities = this.createdEntities.filter((e) => e.id !== entity.id)
+        this.rollbackStack = this.rollbackStack.filter((e) => e.id !== entity.id)
         this.stats.totalCleaned++
         console.log(`   ✅ Deleted old ${entity.type}: ${entity.reference_id}`)
       } catch (error) {
@@ -860,7 +923,7 @@ export class TestDataManager {
    * Cleans up test entities by test run ID (useful for cleaning up failed test runs)
    */
   async cleanupByTestRunId(testRunId: string): Promise<void> {
-    const entitiesToClean = this.createdEntities.filter(e => e.test_run_id === testRunId)
+    const entitiesToClean = this.createdEntities.filter((e) => e.test_run_id === testRunId)
 
     if (entitiesToClean.length === 0) {
       console.log(`🧹 No entities found for test run ${testRunId}`)
@@ -881,8 +944,8 @@ export class TestDataManager {
     for (const entity of sortedEntities) {
       try {
         await this.deleteEntity(entity)
-        this.createdEntities = this.createdEntities.filter(e => e.id !== entity.id)
-        this.rollbackStack = this.rollbackStack.filter(e => e.id !== entity.id)
+        this.createdEntities = this.createdEntities.filter((e) => e.id !== entity.id)
+        this.rollbackStack = this.rollbackStack.filter((e) => e.id !== entity.id)
         cleanedCount++
         this.stats.totalCleaned++
         console.log(`   ✅ Deleted ${entity.type}: ${entity.reference_id}`)
@@ -892,14 +955,16 @@ export class TestDataManager {
       }
     }
 
-    console.log(`🧹 Test run ${testRunId} cleanup complete: ${cleanedCount} deleted, ${errorCount} errors`)
+    console.log(
+      `🧹 Test run ${testRunId} cleanup complete: ${cleanedCount} deleted, ${errorCount} errors`,
+    )
   }
 
   /**
    * Get entities created in the current test run
    */
   getCurrentTestRunEntities(): TestEntity[] {
-    return this.createdEntities.filter(e => e.test_run_id === this.testRunId)
+    return this.createdEntities.filter((e) => e.test_run_id === this.testRunId)
   }
 
   /**
@@ -907,7 +972,7 @@ export class TestDataManager {
    */
   validateTestDataIsolation(): boolean {
     const currentRunEntities = this.getCurrentTestRunEntities()
-    const otherRunEntities = this.createdEntities.filter(e => e.test_run_id !== this.testRunId)
+    const otherRunEntities = this.createdEntities.filter((e) => e.test_run_id !== this.testRunId)
 
     console.log(`🔍 Test data isolation check:`)
     console.log(`   Current run (${this.testRunId}): ${currentRunEntities.length} entities`)

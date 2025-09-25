@@ -7,14 +7,14 @@ import {
   HttpStatusValidator,
   DataTypeValidator,
   SchemaValidator,
-  ApiResponseValidator
+  ApiResponseValidator,
 } from '../api-response-validator'
 
 describe('API Response Validator', () => {
   describe('HttpStatusValidator', () => {
     it('should validate correct status codes', () => {
       const result = HttpStatusValidator.validate(200, 200, 'OK')
-      
+
       expect(result.isValid).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.expectedStatus).toBe(200)
@@ -23,7 +23,7 @@ describe('API Response Validator', () => {
 
     it('should detect incorrect status codes', () => {
       const result = HttpStatusValidator.validate(404, 200, 'Not Found')
-      
+
       expect(result.isValid).toBe(false)
       expect(result.errors).toHaveLength(1)
       expect(result.errors[0]).toContain('Expected HTTP status 200, got 404')
@@ -31,14 +31,14 @@ describe('API Response Validator', () => {
 
     it('should validate success status codes', () => {
       const result = HttpStatusValidator.validateSuccess(201, 'Created')
-      
+
       expect(result.isValid).toBe(true)
       expect(result.errors).toHaveLength(0)
     })
 
     it('should detect invalid success status codes', () => {
       const result = HttpStatusValidator.validateSuccess(404, 'Not Found')
-      
+
       expect(result.isValid).toBe(false)
       expect(result.errors).toHaveLength(1)
     })
@@ -47,7 +47,7 @@ describe('API Response Validator', () => {
   describe('DataTypeValidator', () => {
     it('should validate string fields', () => {
       const result = DataTypeValidator.validateField('test', 'string', 'title')
-      
+
       expect(result.isValid).toBe(true)
       expect(result.field).toBe('title')
       expect(result.expectedType).toBe('string')
@@ -56,27 +56,35 @@ describe('API Response Validator', () => {
 
     it('should detect type mismatches', () => {
       const result = DataTypeValidator.validateField(123, 'string', 'title')
-      
+
       expect(result.isValid).toBe(false)
       expect(result.message).toContain('Expected string, got number')
     })
 
     it('should validate optional fields', () => {
       const result = DataTypeValidator.validateField(undefined, 'string', 'description', true)
-      
+
       expect(result.isValid).toBe(true)
       expect(result.message).toContain('Optional field is undefined/null')
     })
 
     it('should validate enum values', () => {
-      const result = DataTypeValidator.validateEnum('Draft', ['Draft', 'Active', 'Obsolete'], 'status')
-      
+      const result = DataTypeValidator.validateEnum(
+        'Draft',
+        ['Draft', 'Active', 'Obsolete'],
+        'status',
+      )
+
       expect(result.isValid).toBe(true)
     })
 
     it('should detect invalid enum values', () => {
-      const result = DataTypeValidator.validateEnum('Invalid', ['Draft', 'Active', 'Obsolete'], 'status')
-      
+      const result = DataTypeValidator.validateEnum(
+        'Invalid',
+        ['Draft', 'Active', 'Obsolete'],
+        'status',
+      )
+
       expect(result.isValid).toBe(false)
       expect(result.message).toContain('Expected one of [Draft, Active, Obsolete]')
     })
@@ -90,23 +98,23 @@ describe('API Response Validator', () => {
         email: 'test@example.com',
         role: 'User',
         created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z'
+        updated_at: '2023-01-01T00:00:00Z',
       }
 
       const result = SchemaValidator.validateUser(validUser)
-      
+
       expect(result.isValid).toBe(true)
       expect(result.errors).toHaveLength(0)
     })
 
     it('should detect missing required fields', () => {
       const invalidUser = {
-        username: 'testuser'
+        username: 'testuser',
         // missing required fields
       }
 
       const result = SchemaValidator.validateUser(invalidUser)
-      
+
       expect(result.isValid).toBe(false)
       expect(result.missingFields.length).toBeGreaterThan(0)
       expect(result.errors.length).toBeGreaterThan(0)
@@ -116,15 +124,15 @@ describe('API Response Validator', () => {
       const validListResponse = {
         data: [
           { id: '1', title: 'Test Item 1' },
-          { id: '2', title: 'Test Item 2' }
+          { id: '2', title: 'Test Item 2' },
         ],
         total_count: 2,
         limit: 50,
-        offset: 0
+        offset: 0,
       }
 
       const result = SchemaValidator.validateListResponse(validListResponse)
-      
+
       expect(result.isValid).toBe(true)
       expect(result.errors).toHaveLength(0)
     })
@@ -139,16 +147,16 @@ describe('API Response Validator', () => {
           data: [],
           total_count: 0,
           limit: 50,
-          offset: 0
-        }
+          offset: 0,
+        },
       }
 
       const result = ApiResponseValidator.validateResponse(
         response,
         200,
-        SchemaValidator.validateListResponse
+        SchemaValidator.validateListResponse,
       )
-      
+
       expect(result.overallValid).toBe(true)
       expect(result.httpValidation.isValid).toBe(true)
       expect(result.schemaValidation?.isValid).toBe(true)
@@ -158,11 +166,11 @@ describe('API Response Validator', () => {
       const response = {
         status: 404,
         statusText: 'Not Found',
-        data: null
+        data: null,
       }
 
       const result = ApiResponseValidator.validateResponse(response, 200)
-      
+
       expect(result.overallValid).toBe(false)
       expect(result.httpValidation.isValid).toBe(false)
     })

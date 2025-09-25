@@ -22,239 +22,244 @@
               <h1 class="text-h4">{{ userStory.reference_id }}: {{ userStory.title }}</h1>
               <div class="text-subtitle-1 text-grey-darken-1 mt-1">
                 Эпик:
-                <router-link 
-                  :to="`/epics/${userStory.epic_id}`" 
-                  class="text-decoration-none"
-                >
+                <router-link :to="`/epics/${userStory.epic_id}`" class="text-decoration-none">
                   {{ userStory.epic?.reference_id }}: {{ userStory.epic?.title }}
                 </router-link>
               </div>
               <div class="text-subtitle-1 text-grey-darken-1">
-                Создана {{ formatDate(userStory.created_at) }} • Обновлена {{ formatDate(userStory.last_modified) }}
+                Создана {{ formatDate(userStory.created_at) }} • Обновлена
+                {{ formatDate(userStory.last_modified) }}
               </div>
             </div>
             <div>
-              <v-btn 
-                color="primary" 
-                prepend-icon="mdi-pencil" 
+              <v-btn
+                color="primary"
+                prepend-icon="mdi-pencil"
                 class="mr-2"
                 @click="editUserStory"
                 :disabled="actionLoading"
-              > 
-                Редактировать 
+              >
+                Редактировать
               </v-btn>
-              <v-btn 
-                color="success" 
+              <v-btn
+                color="success"
                 prepend-icon="mdi-plus"
                 @click="addRequirement"
                 :disabled="actionLoading"
-              > 
-                Добавить требование 
+              >
+                Добавить требование
               </v-btn>
             </div>
           </div>
         </v-col>
       </v-row>
 
-    <v-row>
-      <!-- Main Content -->
-      <v-col cols="12" md="8">
-        <!-- User Story Details -->
-        <v-card class="mb-4">
-          <v-card-title>Описание истории</v-card-title>
-          <v-card-text>
-            <div class="mb-4">
-              <strong>Статус:</strong>
-              <v-chip :color="getStatusColor(userStory.status)" size="small" class="ml-2">
-                {{ userStory.status }}
-              </v-chip>
-            </div>
+      <v-row>
+        <!-- Main Content -->
+        <v-col cols="12" md="8">
+          <!-- User Story Details -->
+          <v-card class="mb-4">
+            <v-card-title>Описание истории</v-card-title>
+            <v-card-text>
+              <div class="mb-4">
+                <strong>Статус:</strong>
+                <v-chip :color="getStatusColor(userStory.status)" size="small" class="ml-2">
+                  {{ userStory.status }}
+                </v-chip>
+              </div>
 
-            <div class="mb-4">
-              <strong>Приоритет:</strong>
-              <v-chip :color="getPriorityColor(userStory.priority)" size="small" class="ml-2">
-                {{ getPriorityText(userStory.priority) }}
-              </v-chip>
-            </div>
+              <div class="mb-4">
+                <strong>Приоритет:</strong>
+                <v-chip :color="getPriorityColor(userStory.priority)" size="small" class="ml-2">
+                  {{ getPriorityText(userStory.priority) }}
+                </v-chip>
+              </div>
 
-            <div class="mb-4">
-              <strong>Ответственный:</strong>
-              {{ userStory.assignee?.username || 'Не назначен' }}
-            </div>
+              <div class="mb-4">
+                <strong>Ответственный:</strong>
+                {{ userStory.assignee?.username || 'Не назначен' }}
+              </div>
 
-            <div v-if="userStory.description">
-              <strong>Описание:</strong>
-              <div class="mt-2" v-html="userStory.description"></div>
-            </div>
-          </v-card-text>
-        </v-card>
+              <div v-if="userStory.description">
+                <strong>Описание:</strong>
+                <div class="mt-2" v-html="userStory.description"></div>
+              </div>
+            </v-card-text>
+          </v-card>
 
-        <!-- Acceptance Criteria -->
-        <v-card class="mb-4">
-          <v-card-title>
-            Критерии приемки
-            <v-spacer />
-            <v-btn 
-              color="primary" 
-              size="small" 
-              prepend-icon="mdi-plus"
-              @click="addAcceptanceCriteria"
-              :disabled="actionLoading"
-            > 
-              Добавить критерий 
-            </v-btn>
-          </v-card-title>
-          <v-card-text>
-            <div v-if="acceptanceCriteriaLoading" class="text-center py-4">
-              <v-progress-circular indeterminate size="32" color="primary" />
-            </div>
-            <v-list v-else-if="acceptanceCriteria && acceptanceCriteria.length > 0">
-              <v-list-item v-for="criteria in acceptanceCriteria" :key="criteria.id">
-                <template v-slot:prepend>
-                  <v-icon>mdi-check-circle-outline</v-icon>
-                </template>
-                <v-list-item-title>{{ criteria.reference_id }}</v-list-item-title>
-                <v-list-item-subtitle>{{ criteria.description }}</v-list-item-subtitle>
-                <template v-slot:append>
-                  <v-btn 
-                    icon="mdi-pencil" 
-                    size="small" 
-                    variant="text"
-                    @click="editAcceptanceCriteria(criteria.id)"
-                  />
-                  <v-btn 
-                    icon="mdi-delete" 
-                    size="small" 
-                    variant="text" 
-                    color="error"
-                    @click="deleteAcceptanceCriteria(criteria.id)"
-                  />
-                </template>
-              </v-list-item>
-            </v-list>
-            <div v-else class="text-center text-grey-darken-1 py-4">
-              Критерии приемки не найдены
-            </div>
-          </v-card-text>
-        </v-card>
-
-        <!-- Requirements -->
-        <v-card>
-          <v-card-title>
-            Требования
-            <v-spacer />
-            <v-btn 
-              color="primary" 
-              size="small" 
-              prepend-icon="mdi-plus"
-              @click="addRequirement"
-              :disabled="actionLoading"
-            >
-              Добавить требование
-            </v-btn>
-          </v-card-title>
-          <v-card-text>
-            <div v-if="requirementsLoading" class="text-center py-4">
-              <v-progress-circular indeterminate size="32" color="primary" />
-            </div>
-            <v-list v-else-if="requirements && requirements.length > 0">
-              <v-list-item
-                v-for="requirement in requirements"
-                :key="requirement.id"
-                :to="`/requirements/${requirement.id}`"
+          <!-- Acceptance Criteria -->
+          <v-card class="mb-4">
+            <v-card-title>
+              Критерии приемки
+              <v-spacer />
+              <v-btn
+                color="primary"
+                size="small"
+                prepend-icon="mdi-plus"
+                @click="addAcceptanceCriteria"
+                :disabled="actionLoading"
               >
-                <template v-slot:prepend>
-                  <v-icon>mdi-file-document</v-icon>
-                </template>
-                <v-list-item-title>
-                  {{ requirement.reference_id }}: {{ requirement.title }}
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ requirement.type?.name || 'Неизвестный тип' }} • 
-                  Создано {{ formatDate(requirement.created_at) }}
-                  <span v-if="requirement.assignee"> • {{ requirement.assignee.username }}</span>
-                </v-list-item-subtitle>
-                <template v-slot:append>
-                  <v-chip :color="getStatusColor(requirement.status)" size="small">
-                    {{ requirement.status }}
-                  </v-chip>
-                </template>
-              </v-list-item>
-            </v-list>
-            <div v-else class="text-center text-grey-darken-1 py-4">Требования не найдены</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
+                Добавить критерий
+              </v-btn>
+            </v-card-title>
+            <v-card-text>
+              <div v-if="acceptanceCriteriaLoading" class="text-center py-4">
+                <v-progress-circular indeterminate size="32" color="primary" />
+              </div>
+              <v-list v-else-if="acceptanceCriteria && acceptanceCriteria.length > 0">
+                <v-list-item v-for="criteria in acceptanceCriteria" :key="criteria.id">
+                  <template v-slot:prepend>
+                    <v-icon>mdi-check-circle-outline</v-icon>
+                  </template>
+                  <v-list-item-title>{{ criteria.reference_id }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ criteria.description }}</v-list-item-subtitle>
+                  <template v-slot:append>
+                    <v-btn
+                      icon="mdi-pencil"
+                      size="small"
+                      variant="text"
+                      @click="editAcceptanceCriteria(criteria.id)"
+                    />
+                    <v-btn
+                      icon="mdi-delete"
+                      size="small"
+                      variant="text"
+                      color="error"
+                      @click="deleteAcceptanceCriteria(criteria.id)"
+                    />
+                  </template>
+                </v-list-item>
+              </v-list>
+              <div v-else class="text-center text-grey-darken-1 py-4">
+                Критерии приемки не найдены
+              </div>
+            </v-card-text>
+          </v-card>
 
-      <!-- Sidebar -->
-      <v-col cols="12" md="4">
-        <!-- Actions -->
-        <v-card class="mb-4">
-          <v-card-title>Действия</v-card-title>
-          <v-card-text>
-            <v-btn 
-              block 
-              color="primary" 
-              class="mb-2" 
-              prepend-icon="mdi-pencil"
-              @click="editUserStory"
-              :disabled="actionLoading"
-            >
-              Редактировать историю
-            </v-btn>
-            <v-btn 
-              block 
-              color="success" 
-              class="mb-2" 
-              prepend-icon="mdi-plus"
-              @click="addAcceptanceCriteria"
-              :disabled="actionLoading"
-            >
-              Добавить критерий
-            </v-btn>
-            <v-btn 
-              block 
-              color="info" 
-              class="mb-2" 
-              prepend-icon="mdi-plus"
-              @click="addRequirement"
-              :disabled="actionLoading"
-            >
-              Добавить требование
-            </v-btn>
-            <v-btn 
-              block 
-              color="warning" 
-              class="mb-2" 
-              prepend-icon="mdi-swap-horizontal"
-              @click="changeStatus"
-              :disabled="actionLoading"
-            >
-              Изменить статус
-            </v-btn>
-          </v-card-text>
-        </v-card>
+          <!-- Requirements -->
+          <v-card>
+            <v-card-title>
+              Требования
+              <v-spacer />
+              <v-btn
+                color="primary"
+                size="small"
+                prepend-icon="mdi-plus"
+                @click="addRequirement"
+                :disabled="actionLoading"
+              >
+                Добавить требование
+              </v-btn>
+            </v-card-title>
+            <v-card-text>
+              <div v-if="requirementsLoading" class="text-center py-4">
+                <v-progress-circular indeterminate size="32" color="primary" />
+              </div>
+              <v-list v-else-if="requirements && requirements.length > 0">
+                <v-list-item
+                  v-for="requirement in requirements"
+                  :key="requirement.id"
+                  :to="`/requirements/${requirement.id}`"
+                >
+                  <template v-slot:prepend>
+                    <v-icon>mdi-file-document</v-icon>
+                  </template>
+                  <v-list-item-title>
+                    {{ requirement.reference_id }}: {{ requirement.title }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ requirement.type?.name || 'Неизвестный тип' }} • Создано
+                    {{ formatDate(requirement.created_at) }}
+                    <span v-if="requirement.assignee"> • {{ requirement.assignee.username }}</span>
+                  </v-list-item-subtitle>
+                  <template v-slot:append>
+                    <v-chip :color="getStatusColor(requirement.status)" size="small">
+                      {{ requirement.status }}
+                    </v-chip>
+                  </template>
+                </v-list-item>
+              </v-list>
+              <div v-else class="text-center text-grey-darken-1 py-4">Требования не найдены</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-        <!-- Statistics -->
-        <v-card>
-          <v-card-title>Статистика</v-card-title>
-          <v-card-text>
-            <div class="d-flex justify-space-between mb-2">
-              <span>Критериев приемки:</span>
-              <strong>{{ Array.isArray(acceptanceCriteria) ? acceptanceCriteria.length : 0 }}</strong>
-            </div>
-            <div class="d-flex justify-space-between mb-2">
-              <span>Требований:</span>
-              <strong>{{ Array.isArray(requirements) ? requirements.length : 0 }}</strong>
-            </div>
-            <div class="d-flex justify-space-between">
-              <span>Активных требований:</span>
-              <strong>{{ (Array.isArray(requirements) ? requirements.filter((r) => r.status === 'Active') : []).length }}</strong>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+        <!-- Sidebar -->
+        <v-col cols="12" md="4">
+          <!-- Actions -->
+          <v-card class="mb-4">
+            <v-card-title>Действия</v-card-title>
+            <v-card-text>
+              <v-btn
+                block
+                color="primary"
+                class="mb-2"
+                prepend-icon="mdi-pencil"
+                @click="editUserStory"
+                :disabled="actionLoading"
+              >
+                Редактировать историю
+              </v-btn>
+              <v-btn
+                block
+                color="success"
+                class="mb-2"
+                prepend-icon="mdi-plus"
+                @click="addAcceptanceCriteria"
+                :disabled="actionLoading"
+              >
+                Добавить критерий
+              </v-btn>
+              <v-btn
+                block
+                color="info"
+                class="mb-2"
+                prepend-icon="mdi-plus"
+                @click="addRequirement"
+                :disabled="actionLoading"
+              >
+                Добавить требование
+              </v-btn>
+              <v-btn
+                block
+                color="warning"
+                class="mb-2"
+                prepend-icon="mdi-swap-horizontal"
+                @click="changeStatus"
+                :disabled="actionLoading"
+              >
+                Изменить статус
+              </v-btn>
+            </v-card-text>
+          </v-card>
+
+          <!-- Statistics -->
+          <v-card>
+            <v-card-title>Статистика</v-card-title>
+            <v-card-text>
+              <div class="d-flex justify-space-between mb-2">
+                <span>Критериев приемки:</span>
+                <strong>{{
+                  Array.isArray(acceptanceCriteria) ? acceptanceCriteria.length : 0
+                }}</strong>
+              </div>
+              <div class="d-flex justify-space-between mb-2">
+                <span>Требований:</span>
+                <strong>{{ Array.isArray(requirements) ? requirements.length : 0 }}</strong>
+              </div>
+              <div class="d-flex justify-space-between">
+                <span>Активных требований:</span>
+                <strong>{{
+                  (Array.isArray(requirements)
+                    ? requirements.filter((r) => r.status === 'Active')
+                    : []
+                  ).length
+                }}</strong>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </div>
 
     <!-- Not Found State -->
@@ -294,18 +299,21 @@ const loadUserStory = async () => {
   try {
     loading.value = true
     error.value = null
-    
+
     // Load user story with related data
-    const userStoryData = await userStoryService.get(userStoryId.value, 'epic,creator,assignee,acceptance_criteria,requirements')
+    const userStoryData = await userStoryService.get(
+      userStoryId.value,
+      'epic,creator,assignee,acceptance_criteria,requirements',
+    )
     userStory.value = userStoryData
-    
+
     // Extract acceptance criteria and requirements from user story data or load separately
     if (userStoryData.acceptance_criteria) {
       acceptanceCriteria.value = userStoryData.acceptance_criteria as AcceptanceCriteria[]
     } else {
       await loadAcceptanceCriteria()
     }
-    
+
     if (userStoryData.requirements) {
       requirements.value = userStoryData.requirements as Requirement[]
     } else {
@@ -313,7 +321,8 @@ const loadUserStory = async () => {
     }
   } catch (err) {
     console.error('Failed to load user story:', err)
-    error.value = err instanceof Error ? err.message : 'Не удалось загрузить пользовательскую историю'
+    error.value =
+      err instanceof Error ? err.message : 'Не удалось загрузить пользовательскую историю'
   } finally {
     loading.value = false
   }

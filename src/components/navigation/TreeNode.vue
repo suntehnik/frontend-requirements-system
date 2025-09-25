@@ -32,7 +32,7 @@
           <span class="reference-id">{{ node.reference_id }}</span>
           <span class="title-text">{{ node.title }}</span>
         </div>
-        
+
         <!-- Status Badge -->
         <v-chip
           :color="hierarchyStore.getStatusColor(node.status)"
@@ -45,13 +45,7 @@
       </div>
 
       <!-- Loading indicator for async operations -->
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        size="16"
-        width="2"
-        class="ml-2"
-      />
+      <v-progress-circular v-if="loading" indeterminate size="16" width="2" class="ml-2" />
     </div>
 
     <!-- Children Nodes -->
@@ -113,18 +107,18 @@ const isSelected = computed(() => {
 const isActive = computed(() => {
   // Check if this node or any of its children is active in the current route
   if (isSelected.value) return true
-  
+
   // Check if any child is selected
   function checkChildrenActive(node: HierarchyNode): boolean {
     if (!node.children) return false
-    
+
     for (const child of node.children) {
       if (child.entity_id === route.params.id) return true
       if (checkChildrenActive(child)) return true
     }
     return false
   }
-  
+
   return checkChildrenActive(props.node)
 })
 
@@ -134,15 +128,15 @@ const nodeClasses = computed(() => {
     {
       'tree-node-selected': isSelected.value,
       'tree-node-active': isActive.value,
-      'tree-node-hover': true
-    }
+      'tree-node-hover': true,
+    },
   ]
 })
 
 const iconColor = computed(() => {
   if (isSelected.value) return 'primary'
   if (isActive.value) return 'primary'
-  
+
   // Color based on entity type
   switch (props.node.entity_type) {
     case 'epic':
@@ -171,7 +165,7 @@ function handleContextMenu(event: MouseEvent) {
   emit('context-menu', {
     node: props.node,
     x: event.clientX,
-    y: event.clientY
+    y: event.clientY,
   })
 }
 
@@ -283,16 +277,16 @@ if (isActive.value && !isExpanded.value) {
   .tree-node-content {
     padding: 6px 4px;
   }
-  
+
   .node-title {
     gap: 4px;
   }
-  
+
   .reference-id {
     font-size: 0.7rem;
     padding: 1px 4px;
   }
-  
+
   .title-text {
     font-size: 0.8rem;
   }
@@ -303,12 +297,12 @@ if (isActive.value && !isExpanded.value) {
   .tree-node-content:hover {
     background-color: rgba(255, 255, 255, 0.08);
   }
-  
+
   .reference-id {
     background-color: rgba(255, 255, 255, 0.12);
     color: rgba(255, 255, 255, 0.7);
   }
-  
+
   .children-container {
     border-left-color: rgba(255, 255, 255, 0.12);
   }

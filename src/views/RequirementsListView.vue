@@ -68,22 +68,22 @@
             @update:options="handleTableOptionsUpdate"
           >
             <template v-slot:[`item.title`]="{ item }">
-              <div class="text-truncate" style="max-width: 230px;" :title="item.title">
+              <div class="text-truncate" style="max-width: 230px" :title="item.title">
                 {{ item.title }}
               </div>
             </template>
             <template v-slot:[`item.user_story`]="{ item }">
-              <div class="text-truncate" style="max-width: 180px;">
-                <router-link 
+              <div class="text-truncate" style="max-width: 180px">
+                <router-link
                   v-if="item.user_story"
-                  :to="`/user-stories/${item.user_story_id}`" 
+                  :to="`/user-stories/${item.user_story_id}`"
                   class="text-decoration-none"
                   :title="`${item.user_story.reference_id}: ${item.user_story.title}`"
                 >
                   {{ item.user_story.reference_id }}
                 </router-link>
                 <span v-else-if="getUserStoryById(item.user_story_id)" class="text-decoration-none">
-                  <router-link 
+                  <router-link
                     :to="`/user-stories/${item.user_story_id}`"
                     class="text-decoration-none"
                     :title="getUserStoryById(item.user_story_id)?.title"
@@ -96,9 +96,12 @@
             </template>
 
             <template v-slot:[`item.type`]="{ item }">
-              <div class="text-truncate" style="max-width: 100px;">
+              <div class="text-truncate" style="max-width: 100px">
                 <span v-if="item.type" :title="item.type.name">{{ item.type.name }}</span>
-                <span v-else-if="getRequirementTypeById(item.type_id)" :title="getRequirementTypeById(item.type_id)?.name">
+                <span
+                  v-else-if="getRequirementTypeById(item.type_id)"
+                  :title="getRequirementTypeById(item.type_id)?.name"
+                >
                   {{ getRequirementTypeById(item.type_id)?.name }}
                 </span>
                 <span v-else class="text-grey" :title="item.type_id">-</span>
@@ -118,8 +121,10 @@
             </template>
 
             <template v-slot:[`item.assignee`]="{ item }">
-              <div class="text-truncate" style="max-width: 120px;">
-                <span v-if="item.assignee" :title="item.assignee.username">{{ item.assignee.username }}</span>
+              <div class="text-truncate" style="max-width: 120px">
+                <span v-if="item.assignee" :title="item.assignee.username">{{
+                  item.assignee.username
+                }}</span>
                 <span v-else class="text-grey">Не назначен</span>
               </div>
             </template>
@@ -129,24 +134,24 @@
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
-              <v-btn 
-                icon="mdi-eye" 
-                size="small" 
-                variant="text" 
+              <v-btn
+                icon="mdi-eye"
+                size="small"
+                variant="text"
                 :to="`/requirements/${item.id}`"
                 title="Просмотр"
               />
-              <v-btn 
-                icon="mdi-pencil" 
-                size="small" 
+              <v-btn
+                icon="mdi-pencil"
+                size="small"
                 variant="text"
                 @click="handleEditRequirement(item)"
                 title="Редактировать"
               />
-              <v-btn 
-                icon="mdi-delete" 
-                size="small" 
-                variant="text" 
+              <v-btn
+                icon="mdi-delete"
+                size="small"
+                variant="text"
                 color="error"
                 @click="handleDeleteRequirement(item)"
                 title="Удалить"
@@ -158,13 +163,7 @@
     </v-row>
 
     <!-- Error Alert -->
-    <v-alert
-      v-if="error"
-      type="error"
-      dismissible
-      @click:close="error = ''"
-      class="mt-4"
-    >
+    <v-alert v-if="error" type="error" dismissible @click:close="error = ''" class="mt-4">
       {{ error }}
     </v-alert>
   </div>
@@ -175,12 +174,12 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useEntitiesStore } from '@/stores/entities'
 import { configService } from '@/services'
-import type { 
-  Requirement, 
-  RequirementListParams, 
-  RequirementType, 
+import type {
+  Requirement,
+  RequirementListParams,
+  RequirementType,
   UserStory,
-  RequirementStatus 
+  RequirementStatus,
 } from '@/types'
 
 const router = useRouter()
@@ -220,14 +219,14 @@ const displayRequirements = computed(() => {
 })
 
 const userStoryOptions = computed(() => {
-  return userStories.value.map(story => ({
+  return userStories.value.map((story) => ({
     title: `${story.reference_id}: ${story.title}`,
     value: story.id,
   }))
 })
 
 const typeOptions = computed(() => {
-  return requirementTypes.value.map(type => ({
+  return requirementTypes.value.map((type) => ({
     title: type.name,
     value: type.id,
   }))
@@ -263,10 +262,10 @@ const loadRequirements = async () => {
     }
 
     const response = await entitiesStore.fetchRequirements(params)
-    
+
     if (response && typeof response === 'object' && 'total_count' in response) {
       totalCount.value = response.total_count
-    } 
+    }
   } catch (err) {
     console.error('Error loading requirements:', err)
     error.value = err instanceof Error ? err.message : 'Ошибка загрузки требований'
@@ -291,11 +290,11 @@ const loadConfigData = async () => {
   try {
     // Load user stories for filter
     loadingUserStories.value = true
-    const storiesResponse = await entitiesStore.fetchUserStories({ 
+    const storiesResponse = await entitiesStore.fetchUserStories({
       limit: 100,
-      include: 'epic'
+      include: 'epic',
     })
-    
+
     if (storiesResponse && Array.isArray(storiesResponse.data)) {
       userStories.value = storiesResponse.data
     } else if (Array.isArray(storiesResponse)) {
@@ -396,11 +395,11 @@ const formatDate = (dateString: string) => {
 
 // Helper functions to find related data
 const getUserStoryById = (id: string) => {
-  return userStories.value.find(story => story.id === id)
+  return userStories.value.find((story) => story.id === id)
 }
 
 const getRequirementTypeById = (id: string) => {
-  return requirementTypes.value.find(type => type.id === id)
+  return requirementTypes.value.find((type) => type.id === id)
 }
 
 // Lifecycle

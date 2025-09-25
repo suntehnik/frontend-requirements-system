@@ -1,6 +1,6 @@
 /**
  * Test Utilities Index
- * 
+ *
  * Exports all test utilities for integration testing
  */
 
@@ -9,7 +9,7 @@ export {
   validateEnvironmentSetup,
   getTestConfig,
   shouldSkipIntegrationTests,
-  logEnvironmentInfo
+  logEnvironmentInfo,
 } from './test-environment'
 
 export {
@@ -17,27 +17,23 @@ export {
   checkAuthentication,
   validateBackend,
   waitForBackend,
-  validateApiEndpoints
+  validateApiEndpoints,
 } from './backend-validator'
 
-export {
-  TestDataManager
-} from './test-data-manager'
+export { TestDataManager } from './test-data-manager'
 
 export {
   HttpStatusValidator,
   DataTypeValidator,
   SchemaValidator,
-  ApiResponseValidator
+  ApiResponseValidator,
 } from './api-response-validator'
 
-export type {
-  IntegrationTestConfig
-} from './test-environment'
+export type { IntegrationTestConfig } from './test-environment'
 
 export type {
   ValidationResult,
   FieldValidationResult,
   SchemaValidationResult,
-  HttpStatusValidationResult
+  HttpStatusValidationResult,
 } from './api-response-validator'

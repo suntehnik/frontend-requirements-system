@@ -162,10 +162,16 @@ describe('UserStoryDetailView Integration', () => {
     vi.mocked(userStoryService.get).mockResolvedValue(mockUserStory)
 
     // Call the service method that the component uses
-    const result = await userStoryService.get('1', 'epic,creator,assignee,acceptance_criteria,requirements')
+    const result = await userStoryService.get(
+      '1',
+      'epic,creator,assignee,acceptance_criteria,requirements',
+    )
 
     // Verify API was called with correct parameters
-    expect(userStoryService.get).toHaveBeenCalledWith('1', 'epic,creator,assignee,acceptance_criteria,requirements')
+    expect(userStoryService.get).toHaveBeenCalledWith(
+      '1',
+      'epic,creator,assignee,acceptance_criteria,requirements',
+    )
 
     // Verify the returned data structure
     expect(result.id).toBe('1')
@@ -183,10 +189,15 @@ describe('UserStoryDetailView Integration', () => {
     vi.mocked(userStoryService.get).mockRejectedValue(new Error(errorMessage))
 
     // Call the service method
-    await expect(userStoryService.get('1', 'epic,creator,assignee,acceptance_criteria,requirements')).rejects.toThrow(errorMessage)
+    await expect(
+      userStoryService.get('1', 'epic,creator,assignee,acceptance_criteria,requirements'),
+    ).rejects.toThrow(errorMessage)
 
     // Verify the error was thrown
-    expect(userStoryService.get).toHaveBeenCalledWith('1', 'epic,creator,assignee,acceptance_criteria,requirements')
+    expect(userStoryService.get).toHaveBeenCalledWith(
+      '1',
+      'epic,creator,assignee,acceptance_criteria,requirements',
+    )
   })
 
   it('should load acceptance criteria separately when not included in user story data', async () => {
@@ -196,7 +207,10 @@ describe('UserStoryDetailView Integration', () => {
     vi.mocked(userStoryService.getAcceptanceCriteria).mockResolvedValue(mockAcceptanceCriteria)
 
     // First call to get user story
-    const userStory = await userStoryService.get('1', 'epic,creator,assignee,acceptance_criteria,requirements')
+    const userStory = await userStoryService.get(
+      '1',
+      'epic,creator,assignee,acceptance_criteria,requirements',
+    )
     expect(userStory.acceptance_criteria).toBeUndefined()
 
     // Second call to get acceptance criteria
@@ -204,7 +218,10 @@ describe('UserStoryDetailView Integration', () => {
     expect(criteria).toHaveLength(2)
 
     // Verify both API methods were called
-    expect(userStoryService.get).toHaveBeenCalledWith('1', 'epic,creator,assignee,acceptance_criteria,requirements')
+    expect(userStoryService.get).toHaveBeenCalledWith(
+      '1',
+      'epic,creator,assignee,acceptance_criteria,requirements',
+    )
     expect(userStoryService.getAcceptanceCriteria).toHaveBeenCalledWith('1')
   })
 
@@ -215,7 +232,10 @@ describe('UserStoryDetailView Integration', () => {
     vi.mocked(userStoryService.getRequirements).mockResolvedValue(mockRequirements)
 
     // First call to get user story
-    const userStory = await userStoryService.get('1', 'epic,creator,assignee,acceptance_criteria,requirements')
+    const userStory = await userStoryService.get(
+      '1',
+      'epic,creator,assignee,acceptance_criteria,requirements',
+    )
     expect(userStory.requirements).toBeUndefined()
 
     // Second call to get requirements
@@ -223,7 +243,10 @@ describe('UserStoryDetailView Integration', () => {
     expect(requirements).toHaveLength(2)
 
     // Verify both API methods were called
-    expect(userStoryService.get).toHaveBeenCalledWith('1', 'epic,creator,assignee,acceptance_criteria,requirements')
+    expect(userStoryService.get).toHaveBeenCalledWith(
+      '1',
+      'epic,creator,assignee,acceptance_criteria,requirements',
+    )
     expect(userStoryService.getRequirements).toHaveBeenCalledWith('1')
   })
 
@@ -232,7 +255,10 @@ describe('UserStoryDetailView Integration', () => {
     const userStoryWithoutCriteria = { ...mockUserStory, acceptance_criteria: [] }
     vi.mocked(userStoryService.get).mockResolvedValue(userStoryWithoutCriteria)
 
-    const result = await userStoryService.get('1', 'epic,creator,assignee,acceptance_criteria,requirements')
+    const result = await userStoryService.get(
+      '1',
+      'epic,creator,assignee,acceptance_criteria,requirements',
+    )
 
     // Verify empty acceptance criteria array
     expect(result.acceptance_criteria).toHaveLength(0)
@@ -245,7 +271,10 @@ describe('UserStoryDetailView Integration', () => {
     const userStoryWithoutRequirements = { ...mockUserStory, requirements: [] }
     vi.mocked(userStoryService.get).mockResolvedValue(userStoryWithoutRequirements)
 
-    const result = await userStoryService.get('1', 'epic,creator,assignee,acceptance_criteria,requirements')
+    const result = await userStoryService.get(
+      '1',
+      'epic,creator,assignee,acceptance_criteria,requirements',
+    )
 
     // Verify empty requirements array
     expect(result.requirements).toHaveLength(0)
@@ -257,10 +286,10 @@ describe('UserStoryDetailView Integration', () => {
     // Test statistics calculation logic that would be used in the component
     const acceptanceCriteria = mockUserStory.acceptance_criteria || []
     const requirements = mockUserStory.requirements || []
-    
+
     const totalCriteria = acceptanceCriteria.length
     const totalRequirements = requirements.length
-    const activeRequirements = requirements.filter(r => r.status === 'Active').length
+    const activeRequirements = requirements.filter((r) => r.status === 'Active').length
 
     expect(totalCriteria).toBe(2)
     expect(totalRequirements).toBe(2)
@@ -329,7 +358,7 @@ describe('UserStoryDetailView Integration', () => {
     expect(mockUserStory).toHaveProperty('assignee')
     expect(mockUserStory).toHaveProperty('acceptance_criteria')
     expect(mockUserStory).toHaveProperty('requirements')
-    
+
     // Validate acceptance criteria structure
     expect(mockUserStory.acceptance_criteria).toBeInstanceOf(Array)
     if (mockUserStory.acceptance_criteria && mockUserStory.acceptance_criteria.length > 0) {

@@ -73,7 +73,7 @@
             <v-list-item v-bind="props" prepend-icon="mdi-folder-multiple" title="Эпики" />
           </template>
           <v-list-item to="/epics" prepend-icon="mdi-format-list-bulleted" title="Все эпики" />
-          
+
           <!-- Recent Epics -->
           <template v-if="recentEpics.length > 0">
             <v-divider class="my-1" />

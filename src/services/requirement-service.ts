@@ -37,8 +37,6 @@ export class RequirementService extends BaseApiService {
     return await this.apiGet<RequirementListResponse>(this.entityPath, queryParams)
   }
 
-
-
   async get(id: string, include?: string): Promise<Requirement> {
     const params = include ? { include: this.buildIncludeParam(include) } : {}
     return await this.apiGet<Requirement>(`${this.entityPath}/${id}`, params)

@@ -230,7 +230,7 @@ describe('UserStoriesListView Integration', () => {
 
   it('should filter user stories by epic', async () => {
     // Mock the API response with epic filter
-    const filteredStories = mockUserStories.filter(story => story.epic_id === 'epic1')
+    const filteredStories = mockUserStories.filter((story) => story.epic_id === 'epic1')
     const mockResponse: UserStoryListResponse = {
       data: filteredStories,
       total_count: 2,
@@ -259,12 +259,12 @@ describe('UserStoriesListView Integration', () => {
 
     // Verify filtered results
     expect(result.data).toHaveLength(2)
-    expect(result.data.every(story => story.epic_id === 'epic1')).toBe(true)
+    expect(result.data.every((story) => story.epic_id === 'epic1')).toBe(true)
   })
 
   it('should filter user stories by status', async () => {
     // Mock the API response with status filter
-    const filteredStories = mockUserStories.filter(story => story.status === 'In Progress')
+    const filteredStories = mockUserStories.filter((story) => story.status === 'In Progress')
     const mockResponse: UserStoryListResponse = {
       data: filteredStories,
       total_count: 1,
@@ -298,7 +298,7 @@ describe('UserStoriesListView Integration', () => {
 
   it('should filter user stories by priority', async () => {
     // Mock the API response with priority filter
-    const filteredStories = mockUserStories.filter(story => story.priority === 1)
+    const filteredStories = mockUserStories.filter((story) => story.priority === 1)
     const mockResponse: UserStoryListResponse = {
       data: filteredStories,
       total_count: 1,
@@ -365,8 +365,8 @@ describe('UserStoriesListView Integration', () => {
 
   it('should handle sorting correctly', async () => {
     // Mock the API response with sorting
-    const sortedStories = [...mockUserStories].sort((a, b) => 
-      a.reference_id.localeCompare(b.reference_id)
+    const sortedStories = [...mockUserStories].sort((a, b) =>
+      a.reference_id.localeCompare(b.reference_id),
     )
     const mockResponse: UserStoryListResponse = {
       data: sortedStories,
@@ -458,7 +458,7 @@ describe('UserStoriesListView Integration', () => {
   it('should validate user story data structure', () => {
     // Test that the mock user stories have the expected structure
     const userStory = mockUserStories[0]
-    
+
     expect(userStory).toHaveProperty('id')
     expect(userStory).toHaveProperty('reference_id')
     expect(userStory).toHaveProperty('title')
@@ -468,7 +468,7 @@ describe('UserStoriesListView Integration', () => {
     expect(userStory).toHaveProperty('creator_id')
     expect(userStory).toHaveProperty('created_at')
     expect(userStory).toHaveProperty('last_modified')
-    
+
     // Validate populated fields
     expect(userStory.epic).toHaveProperty('reference_id')
     expect(userStory.creator).toHaveProperty('username')
@@ -477,10 +477,9 @@ describe('UserStoriesListView Integration', () => {
 
   it('should handle multiple filters simultaneously', async () => {
     // Mock the API response with multiple filters
-    const filteredStories = mockUserStories.filter(story => 
-      story.epic_id === 'epic1' && 
-      story.status === 'In Progress' && 
-      story.priority === 1
+    const filteredStories = mockUserStories.filter(
+      (story) =>
+        story.epic_id === 'epic1' && story.status === 'In Progress' && story.priority === 1,
     )
     const mockResponse: UserStoryListResponse = {
       data: filteredStories,

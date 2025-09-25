@@ -9,27 +9,13 @@
 
     <v-card-text class="pa-0">
       <div v-if="loading" class="text-center py-8">
-        <v-progress-circular
-          indeterminate
-          color="primary"
-          size="48"
-        />
-        <div class="text-body-2 text-medium-emphasis mt-2">
-          Загрузка активности...
-        </div>
+        <v-progress-circular indeterminate color="primary" size="48" />
+        <div class="text-body-2 text-medium-emphasis mt-2">Загрузка активности...</div>
       </div>
 
       <div v-else-if="recentActivity.length === 0" class="text-center py-8">
-        <v-icon
-          size="64"
-          color="grey-lighten-1"
-          class="mb-2"
-        >
-          mdi-history
-        </v-icon>
-        <div class="text-body-1 text-medium-emphasis">
-          Нет недавней активности
-        </div>
+        <v-icon size="64" color="grey-lighten-1" class="mb-2"> mdi-history </v-icon>
+        <div class="text-body-1 text-medium-emphasis">Нет недавней активности</div>
         <div class="text-body-2 text-disabled">
           Создайте эпик, историю или требование, чтобы увидеть активность
         </div>
@@ -40,21 +26,10 @@
           v-for="(activity, index) in recentActivity"
           :key="`${activity.type}-${activity.entity.id}`"
         >
-          <v-list-item
-            :to="getEntityRoute(activity)"
-            class="activity-item"
-          >
+          <v-list-item :to="getEntityRoute(activity)" class="activity-item">
             <template #prepend>
-              <v-avatar
-                :color="getEntityColor(activity.type)"
-                size="40"
-                class="me-3"
-              >
-                <v-icon
-                  :icon="getEntityIcon(activity.type)"
-                  color="white"
-                  size="20"
-                />
+              <v-avatar :color="getEntityColor(activity.type)" size="40" class="me-3">
+                <v-icon :icon="getEntityIcon(activity.type)" color="white" size="20" />
               </v-avatar>
             </template>
 
@@ -77,19 +52,11 @@
             </v-list-item-subtitle>
 
             <template #append>
-              <v-icon
-                color="grey-lighten-1"
-                size="16"
-              >
-                mdi-chevron-right
-              </v-icon>
+              <v-icon color="grey-lighten-1" size="16"> mdi-chevron-right </v-icon>
             </template>
           </v-list-item>
 
-          <v-divider
-            v-if="index < recentActivity.length - 1"
-            :key="`divider-${index}`"
-          />
+          <v-divider v-if="index < recentActivity.length - 1" :key="`divider-${index}`" />
         </template>
       </v-list>
     </v-card-text>
@@ -98,11 +65,7 @@
 
     <v-card-actions>
       <v-spacer />
-      <v-btn
-        variant="text"
-        color="primary"
-        to="/search"
-      >
+      <v-btn variant="text" color="primary" to="/search">
         Посмотреть все
         <v-icon end>mdi-arrow-right</v-icon>
       </v-btn>
@@ -170,10 +133,13 @@ function getEntityRoute(activity: { type: string; entity: Epic | UserStory | Req
   }
 }
 
-function getActivityTitle(activity: { type: string; entity: Epic | UserStory | Requirement }): string {
+function getActivityTitle(activity: {
+  type: string
+  entity: Epic | UserStory | Requirement
+}): string {
   const entity = activity.entity
   const typeLabel = getEntityTypeLabel(activity.type)
-  
+
   return `${typeLabel} "${entity.title}"`
 }
 

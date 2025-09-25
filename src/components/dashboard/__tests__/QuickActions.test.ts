@@ -30,7 +30,7 @@ const router = createRouter({
 describe('QuickActions', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    
+
     // Mock the auth store with User role by default
     const mockAuthStore = {
       user: ref(null),
@@ -56,7 +56,9 @@ describe('QuickActions', () => {
       $onAction: vi.fn(),
       $id: 'auth',
     }
-    vi.mocked(useAuthStore).mockReturnValue(mockAuthStore as unknown as ReturnType<typeof useAuthStore>)
+    vi.mocked(useAuthStore).mockReturnValue(
+      mockAuthStore as unknown as ReturnType<typeof useAuthStore>,
+    )
   })
 
   it('should render quick action buttons for users', () => {
@@ -102,7 +104,9 @@ describe('QuickActions', () => {
       $onAction: vi.fn(),
       $id: 'auth',
     }
-    vi.mocked(useAuthStore).mockReturnValue(mockAdminAuthStore as unknown as ReturnType<typeof useAuthStore>)
+    vi.mocked(useAuthStore).mockReturnValue(
+      mockAdminAuthStore as unknown as ReturnType<typeof useAuthStore>,
+    )
 
     const wrapper = mount(QuickActions, {
       global: {
@@ -155,7 +159,9 @@ describe('QuickActions', () => {
       $onAction: vi.fn(),
       $id: 'auth',
     }
-    vi.mocked(useAuthStore).mockReturnValue(mockCommenterAuthStore as unknown as ReturnType<typeof useAuthStore>)
+    vi.mocked(useAuthStore).mockReturnValue(
+      mockCommenterAuthStore as unknown as ReturnType<typeof useAuthStore>,
+    )
 
     const wrapper = mount(QuickActions, {
       global: {
@@ -164,11 +170,11 @@ describe('QuickActions', () => {
     })
 
     // Create buttons should be disabled
-    const createButtons = wrapper.findAll('button').filter(button => 
-      button.text().includes('Создать')
-    )
-    
-    createButtons.forEach(button => {
+    const createButtons = wrapper
+      .findAll('button')
+      .filter((button) => button.text().includes('Создать'))
+
+    createButtons.forEach((button) => {
       expect(button.attributes('disabled')).toBeDefined()
     })
   })
@@ -182,8 +188,8 @@ describe('QuickActions', () => {
 
     // Check for router-link elements
     const links = wrapper.findAll('[to]')
-    const linkTargets = links.map(link => link.attributes('to'))
-    
+    const linkTargets = links.map((link) => link.attributes('to'))
+
     expect(linkTargets).toContain('/search')
     expect(linkTargets).toContain('/epics')
     expect(linkTargets).toContain('/user-stories')

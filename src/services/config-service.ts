@@ -25,7 +25,9 @@ export class ConfigService extends BaseApiService {
   }
 
   async getRequirementTypes(): Promise<RequirementTypeListResponse> {
-    const response = await this.apiGet<{ requirement_types: RequirementType[]; count: number }>(`${this.configPath}/requirement-types`)
+    const response = await this.apiGet<{ requirement_types: RequirementType[]; count: number }>(
+      `${this.configPath}/requirement-types`,
+    )
     return response
   }
 
@@ -53,7 +55,9 @@ export class ConfigService extends BaseApiService {
   }
 
   async getRelationshipTypes(): Promise<RelationshipTypeListResponse> {
-    const response = await this.apiGet<{ relationship_types: RelationshipType[]; count: number }>(`${this.configPath}/relationship-types`)
+    const response = await this.apiGet<{ relationship_types: RelationshipType[]; count: number }>(
+      `${this.configPath}/relationship-types`,
+    )
     return response
   }
 
@@ -83,7 +87,9 @@ export class ConfigService extends BaseApiService {
   }
 
   async getStatusModels(): Promise<StatusModelListResponse> {
-    const response = await this.apiGet<{ status_models: StatusModel[]; count: number }>(`${this.configPath}/status-models`)
+    const response = await this.apiGet<{ status_models: StatusModel[]; count: number }>(
+      `${this.configPath}/status-models`,
+    )
     return response
   }
 

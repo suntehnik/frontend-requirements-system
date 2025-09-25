@@ -29,9 +29,7 @@ export const useUIStore = defineStore('ui', () => {
 
   // Computed
   const hasNotifications = computed(() => notifications.value.length > 0)
-  const unreadNotifications = computed(() => 
-    notifications.value.filter(n => !n.persistent)
-  )
+  const unreadNotifications = computed(() => notifications.value.filter((n) => !n.persistent))
 
   // Sidebar actions
   function toggleSidebar() {
@@ -106,7 +104,7 @@ export const useUIStore = defineStore('ui', () => {
   }
 
   function removeNotification(id: string) {
-    const index = notifications.value.findIndex(n => n.id === id)
+    const index = notifications.value.findIndex((n) => n.id === id)
     if (index > -1) {
       notifications.value.splice(index, 1)
     }
