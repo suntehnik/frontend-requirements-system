@@ -25,6 +25,7 @@ export interface Comment {
 
 export interface CreateCommentRequest {
   content: string
+  author_id: string
   parent_comment_id?: string
 }
 

@@ -15,12 +15,12 @@ export interface IntegrationTestConfig {
 }
 
 interface EnvironmentVariables {
-  SERVER_URL?: string
-  ADMIN_USER?: string
-  ADMIN_PASSWORD?: string
-  TEST_TIMEOUT?: string
-  TEST_RETRY_ATTEMPTS?: string
-  CLEANUP_AFTER_TESTS?: string
+  VITE_SERVER_URL?: string
+  VITE_ADMIN_USER?: string
+  VITE_ADMIN_PASSWORD?: string
+  VITE_TEST_TIMEOUT?: string
+  VITE_TEST_RETRY_ATTEMPTS?: string
+  VITE_CLEANUP_AFTER_TESTS?: string
 }
 
 /**
@@ -30,16 +30,16 @@ interface EnvironmentVariables {
 export function loadIntegrationTestConfig(): IntegrationTestConfig {
   // Get environment variables (should be loaded from .env.integration.local)
   const env: EnvironmentVariables = {
-    SERVER_URL: process.env.SERVER_URL,
-    ADMIN_USER: process.env.ADMIN_USER,
-    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
-    TEST_TIMEOUT: process.env.TEST_TIMEOUT,
-    TEST_RETRY_ATTEMPTS: process.env.TEST_RETRY_ATTEMPTS,
-    CLEANUP_AFTER_TESTS: process.env.CLEANUP_AFTER_TESTS
+    VITE_SERVER_URL: import.meta.env.VITE_SERVER_URL,
+    VITE_ADMIN_USER: import.meta.env.VITE_ADMIN_USER,
+    VITE_ADMIN_PASSWORD: import.meta.env.VITE_ADMIN_PASSWORD,
+    VITE_TEST_TIMEOUT: import.meta.env.VITE_TEST_TIMEOUT,
+    VITE_TEST_RETRY_ATTEMPTS: import.meta.env.VITE_TEST_RETRY_ATTEMPTS,
+    VITE_CLEANUP_AFTER_TESTS: import.meta.env.VITE_CLEANUP_AFTER_TESTS
   }
 
   // Validate required environment variables
-  const requiredVars = ['SERVER_URL', 'ADMIN_USER', 'ADMIN_PASSWORD']
+  const requiredVars = ['VITE_SERVER_URL', 'VITE_ADMIN_USER', 'VITE_ADMIN_PASSWORD']
   const missingVars = requiredVars.filter(varName => !env[varName as keyof EnvironmentVariables])
   
   if (missingVars.length > 0) {
@@ -51,12 +51,12 @@ export function loadIntegrationTestConfig(): IntegrationTestConfig {
 
   // Parse and validate configuration
   const config: IntegrationTestConfig = {
-    serverUrl: env.SERVER_URL!,
-    adminUser: env.ADMIN_USER!,
-    adminPassword: env.ADMIN_PASSWORD!,
-    timeout: parseInt(env.TEST_TIMEOUT || '30000', 10),
-    retryAttempts: parseInt(env.TEST_RETRY_ATTEMPTS || '3', 10),
-    cleanupAfterTests: env.CLEANUP_AFTER_TESTS?.toLowerCase() !== 'false'
+    serverUrl: env.VITE_SERVER_URL!,
+    adminUser: env.VITE_ADMIN_USER!,
+    adminPassword: env.VITE_ADMIN_PASSWORD!,
+    timeout: parseInt(env.VITE_TEST_TIMEOUT || '30000', 10),
+    retryAttempts: parseInt(env.VITE_TEST_RETRY_ATTEMPTS || '3', 10),
+    cleanupAfterTests: env.VITE_CLEANUP_AFTER_TESTS?.toLowerCase() !== 'false'
   }
 
   // Validate server URL format
@@ -104,7 +104,7 @@ export function getTestConfig(): IntegrationTestConfig {
  */
 export function shouldSkipIntegrationTests(): boolean {
   // Skip in CI environment unless explicitly enabled
-  if (process.env.CI && !process.env.RUN_INTEGRATION_TESTS) {
+  if (process.env.CI && !import.meta.env.VITE_RUN_INTEGRATION_TESTS) {
     return true
   }
 
