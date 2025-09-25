@@ -40,8 +40,22 @@ export class CommentService extends BaseApiService {
     return await this.apiGet<Comment[]>(`${this.entityPath}/${commentId}/replies`)
   }
 
-  async createReply(commentId: string, request: CreateCommentRequest): Promise<Comment> {
-    return await this.apiPost<Comment>(`${this.entityPath}/${commentId}/replies`, request)
+  async createReply(commentId: string, request: Omit<CreateCommentRequest, 'author_id'> & { author_id?: string }): Promise<Comment> {
+    // Get current user if author_id not provided
+    let author_id = request.author_id
+    if (!author_id) {
+      // Use the auth service to get current user (it uses the correct endpoint)
+      const { authService } = await import('./auth-service')
+      const currentUser = await authService.getCurrentUser()
+      author_id = currentUser.id
+    }
+    
+    const fullRequest: CreateCommentRequest = {
+      ...request,
+      author_id
+    }
+    
+    return await this.apiPost<Comment>(`${this.entityPath}/${commentId}/replies`, fullRequest)
   }
 
   // Entity-specific comment operations
@@ -53,10 +67,24 @@ export class CommentService extends BaseApiService {
   async createEntityComment(
     entityType: EntityType,
     entityId: string,
-    request: CreateCommentRequest,
+    request: Omit<CreateCommentRequest, 'author_id'> & { author_id?: string },
   ): Promise<Comment> {
+    // Get current user if author_id not provided
+    let author_id = request.author_id
+    if (!author_id) {
+      // Use the auth service to get current user (it uses the correct endpoint)
+      const { authService } = await import('./auth-service')
+      const currentUser = await authService.getCurrentUser()
+      author_id = currentUser.id
+    }
+    
+    const fullRequest: CreateCommentRequest = {
+      ...request,
+      author_id
+    }
+    
     const entityPath = this.getEntityPath(entityType)
-    return await this.apiPost<Comment>(`/${entityPath}/${entityId}/comments`, request)
+    return await this.apiPost<Comment>(`/${entityPath}/${entityId}/comments`, fullRequest)
   }
 
   // Inline comment operations
