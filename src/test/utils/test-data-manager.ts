@@ -148,11 +148,21 @@ export class TestDataManager {
   }> = {}): Promise<Epic> {
     const timestamp = Date.now()
     const uniqueId = Math.random().toString(36).substring(2, 8)
-    
+
+    // Get current user to use as creator_id
+    let creator_id: string
+    try {
+      const currentUser = await this.executeApiRequest<{ id: string }>('/auth/profile', 'GET')
+      creator_id = currentUser.id
+    } catch (error) {
+      throw new Error(`Failed to get current user for epic creation: ${error}`)
+    }
+
     const epicData = {
       title: `Test Epic ${timestamp}-${uniqueId} [${this.testRunId}]`,
       description: `Test epic created for integration testing at ${new Date().toISOString()} (Test Run: ${this.testRunId})`,
       priority: 3 as const,
+      creator_id,
       ...overrides
     }
 
@@ -226,12 +236,22 @@ export class TestDataManager {
   }> = {}): Promise<UserStory> {
     const timestamp = Date.now()
     const uniqueId = Math.random().toString(36).substring(2, 8)
-    
+
+    // Get current user to use as creator_id
+    let creator_id: string
+    try {
+      const currentUser = await this.executeApiRequest<{ id: string }>('/auth/profile', 'GET')
+      creator_id = currentUser.id
+    } catch (error) {
+      throw new Error(`Failed to get current user for user story creation: ${error}`)
+    }
+
     const userStoryData = {
       title: `Test User Story ${timestamp}-${uniqueId} [${this.testRunId}]`,
-      description: `Test user story created for integration testing at ${new Date().toISOString()} (Test Run: ${this.testRunId})`,
+      description: `As a test user, I want to create test data for integration testing, so that I can verify comment functionality (Test Run: ${this.testRunId})`,
       priority: 3 as const,
       epic_id: epicId,
+      creator_id,
       ...overrides
     }
 
@@ -303,10 +323,20 @@ export class TestDataManager {
   }> = {}): Promise<AcceptanceCriteria> {
     const timestamp = Date.now()
     const uniqueId = Math.random().toString(36).substring(2, 8)
-    
+
+    // Get current user to use as author_id
+    let author_id: string
+    try {
+      const currentUser = await this.executeApiRequest<{ id: string }>('/auth/profile', 'GET')
+      author_id = currentUser.id
+    } catch (error) {
+      throw new Error(`Failed to get current user for acceptance criteria creation: ${error}`)
+    }
+
     const criteriaData = {
       description: `Test acceptance criteria ${timestamp}-${uniqueId} created for integration testing at ${new Date().toISOString()} (Test Run: ${this.testRunId})`,
       user_story_id: userStoryId,
+      author_id,
       ...overrides
     }
 
@@ -379,13 +409,23 @@ export class TestDataManager {
   }> = {}): Promise<Requirement> {
     const timestamp = Date.now()
     const uniqueId = Math.random().toString(36).substring(2, 8)
-    
+
+    // Get current user to use as creator_id
+    let creator_id: string
+    try {
+      const currentUser = await this.executeApiRequest<{ id: string }>('/auth/profile', 'GET')
+      creator_id = currentUser.id
+    } catch (error) {
+      throw new Error(`Failed to get current user for requirement creation: ${error}`)
+    }
+
     const requirementData = {
       title: `Test Requirement ${timestamp}-${uniqueId} [${this.testRunId}]`,
       description: `Test requirement created for integration testing at ${new Date().toISOString()} (Test Run: ${this.testRunId})`,
       priority: 3 as const,
       user_story_id: userStoryId,
       type_id: typeId,
+      creator_id,
       ...overrides
     }
 
@@ -456,12 +496,25 @@ export class TestDataManager {
   async createTestComment(entityType: 'epic' | 'user_story' | 'acceptance_criteria' | 'requirement', entityId: string, overrides: Partial<{
     content: string
     parent_comment_id: string
+    author_id: string
   }> = {}): Promise<Comment> {
     const timestamp = Date.now()
     const uniqueId = Math.random().toString(36).substring(2, 8)
-    
+
+    // Get current user to use as author_id if not provided
+    let author_id = overrides.author_id
+    if (!author_id) {
+      try {
+        const currentUser = await this.executeApiRequest<{ id: string }>('/auth/profile', 'GET')
+        author_id = currentUser.id
+      } catch (error) {
+        throw new Error(`Failed to get current user for comment creation: ${error}`)
+      }
+    }
+
     const commentData = {
       content: `Test comment ${timestamp}-${uniqueId} created for integration testing at ${new Date().toISOString()} (Test Run: ${this.testRunId})`,
+      author_id,
       ...overrides
     }
 
@@ -599,7 +652,7 @@ export class TestDataManager {
    */
   async cleanupByType(entityType: TestEntity['type']): Promise<void> {
     const entitiesToClean = this.createdEntities.filter(e => e.type === entityType)
-    
+
     if (entitiesToClean.length === 0) {
       console.log(`🧹 No ${entityType} entities to clean up`)
       return
@@ -632,7 +685,7 @@ export class TestDataManager {
    */
   private async deleteEntity(entity: TestEntity): Promise<void> {
     const endpoint = this.getEntityEndpoint(entity.type)
-    
+
     try {
       if (entity.type === 'comment') {
         // Comments use a different deletion endpoint
@@ -690,11 +743,11 @@ export class TestDataManager {
       const userStory = await this.createTestUserStory(epic.id, overrides.userStory)
       const acceptanceCriteria = await this.createTestAcceptanceCriteria(userStory.id, overrides.acceptanceCriteria)
       const requirement = await this.createTestRequirement(
-        userStory.id, 
-        requirementTypeId, 
-        { 
+        userStory.id,
+        requirementTypeId,
+        {
           acceptance_criteria_id: acceptanceCriteria.id,
-          ...overrides.requirement 
+          ...overrides.requirement
         }
       )
 
@@ -808,7 +861,7 @@ export class TestDataManager {
    */
   async cleanupByTestRunId(testRunId: string): Promise<void> {
     const entitiesToClean = this.createdEntities.filter(e => e.test_run_id === testRunId)
-    
+
     if (entitiesToClean.length === 0) {
       console.log(`🧹 No entities found for test run ${testRunId}`)
       return
@@ -855,11 +908,11 @@ export class TestDataManager {
   validateTestDataIsolation(): boolean {
     const currentRunEntities = this.getCurrentTestRunEntities()
     const otherRunEntities = this.createdEntities.filter(e => e.test_run_id !== this.testRunId)
-    
+
     console.log(`🔍 Test data isolation check:`)
     console.log(`   Current run (${this.testRunId}): ${currentRunEntities.length} entities`)
     console.log(`   Other runs: ${otherRunEntities.length} entities`)
-    
+
     return currentRunEntities.length === this.createdEntities.length
   }
 }
