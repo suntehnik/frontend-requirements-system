@@ -266,10 +266,7 @@ const loadRequirements = async () => {
     
     if (response && typeof response === 'object' && 'total_count' in response) {
       totalCount.value = response.total_count
-    } else if (response && Array.isArray(response)) {
-      // Fallback if response is just an array
-      totalCount.value = response.length
-    }
+    } 
   } catch (err) {
     console.error('Error loading requirements:', err)
     error.value = err instanceof Error ? err.message : 'Ошибка загрузки требований'
