@@ -1,6 +1,6 @@
 /**
  * Example Integration Test using Test Infrastructure
- * 
+ *
  * This test demonstrates how to use the test infrastructure components
  * for backend integration testing
  */
@@ -10,7 +10,7 @@ import {
   shouldSkipIntegrationTests,
   logEnvironmentInfo,
   validateBackend,
-  TestDataManager
+  TestDataManager,
 } from '../utils'
 
 describe('Infrastructure Usage Example', () => {
@@ -29,20 +29,20 @@ describe('Infrastructure Usage Example', () => {
 
     // Validate backend availability and get authentication token
     const validation = await validateBackend()
-    
+
     if (!validation.healthy || !validation.authCheck.token) {
       console.log('❌ Backend not available - skipping tests')
       return
     }
 
     authToken = validation.authCheck.token
-    
+
     // Initialize test data manager
-    const config = await import('../utils/test-environment').then(m => m.getTestConfig())
+    const config = await import('../utils/test-environment').then((m) => m.getTestConfig())
     testDataManager = new TestDataManager({
       token: authToken,
       baseUrl: config.serverUrl,
-      trackCreatedEntities: true
+      trackCreatedEntities: true,
     })
 
     console.log('✅ Test infrastructure initialized successfully')
@@ -55,41 +55,49 @@ describe('Infrastructure Usage Example', () => {
     }
   })
 
-  it.skipIf(shouldSkipIntegrationTests())('should demonstrate test data creation and cleanup', async () => {
-    if (!testDataManager || !authToken) {
-      console.log('⏭️ Backend not available - demonstrating offline functionality')
-      
-      // Verify that the infrastructure properly handles unavailable backend
-      expect(testDataManager).toBeNull()
-      expect(authToken).toBeNull()
-      
-      console.log('✅ Infrastructure correctly detected unavailable backend')
-      console.log('💡 To see full functionality, ensure backend is running on http://localhost:8080')
-      return
-    }
+  it.skipIf(shouldSkipIntegrationTests())(
+    'should demonstrate test data creation and cleanup',
+    async () => {
+      if (!testDataManager || !authToken) {
+        console.log('⏭️ Backend not available - demonstrating offline functionality')
 
-    console.log('🧪 Demonstrating test data management...')
+        // Verify that the infrastructure properly handles unavailable backend
+        expect(testDataManager).toBeNull()
+        expect(authToken).toBeNull()
 
-    // This test would create test data if the backend was available
-    // For now, just verify the manager is initialized
-    expect(testDataManager).toBeDefined()
-    expect(testDataManager.getCreatedEntities()).toEqual([])
+        console.log('✅ Infrastructure correctly detected unavailable backend')
+        console.log(
+          '💡 To see full functionality, ensure backend is running on http://localhost:8080',
+        )
+        return
+      }
 
-    console.log('✅ Test data manager is ready for use')
-  })
+      console.log('🧪 Demonstrating test data management...')
 
-  it.skipIf(shouldSkipIntegrationTests())('should demonstrate environment configuration usage', async () => {
-    const { getTestConfig } = await import('../utils/test-environment')
-    
-    const config = getTestConfig()
-    
-    expect(config.serverUrl).toBe('http://localhost:8080')
-    expect(config.adminUser).toBe('admin')
-    expect(config.adminPassword).toBeDefined()
-    expect(config.timeout).toBe(30000)
-    expect(config.retryAttempts).toBe(3)
-    expect(config.cleanupAfterTests).toBe(true)
+      // This test would create test data if the backend was available
+      // For now, just verify the manager is initialized
+      expect(testDataManager).toBeDefined()
+      expect(testDataManager.getCreatedEntities()).toEqual([])
 
-    console.log('✅ Environment configuration is properly loaded')
-  })
+      console.log('✅ Test data manager is ready for use')
+    },
+  )
+
+  it.skipIf(shouldSkipIntegrationTests())(
+    'should demonstrate environment configuration usage',
+    async () => {
+      const { getTestConfig } = await import('../utils/test-environment')
+
+      const config = getTestConfig()
+
+      expect(config.serverUrl).toBe('http://localhost:8080')
+      expect(config.adminUser).toBe('admin')
+      expect(config.adminPassword).toBeDefined()
+      expect(config.timeout).toBe(30000)
+      expect(config.retryAttempts).toBe(3)
+      expect(config.cleanupAfterTests).toBe(true)
+
+      console.log('✅ Environment configuration is properly loaded')
+    },
+  )
 })

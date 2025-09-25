@@ -9,16 +9,19 @@ This directory contains utilities for backend integration testing, implementing 
 Loads and validates environment configuration from `.env.integration.local` file.
 
 **Required Environment Variables:**
+
 - `SERVER_URL` - Backend server URL (e.g., `http://localhost:8080`)
 - `ADMIN_USER` - Administrator username for authentication
 - `ADMIN_PASSWORD` - Administrator password for authentication
 
 **Optional Environment Variables:**
+
 - `TEST_TIMEOUT` - Request timeout in milliseconds (default: 30000)
 - `TEST_RETRY_ATTEMPTS` - Number of retry attempts (default: 3)
 - `CLEANUP_AFTER_TESTS` - Whether to cleanup test data (default: true)
 
 **Usage:**
+
 ```typescript
 import { getTestConfig, shouldSkipIntegrationTests } from '../utils'
 
@@ -37,12 +40,14 @@ console.log(`Testing against: ${config.serverUrl}`)
 Validates that the backend API is available and responding correctly before running tests.
 
 **Features:**
+
 - Health check with fallback to root endpoint
 - Authentication validation
 - API endpoint accessibility validation
 - Retry logic with exponential backoff
 
 **Usage:**
+
 ```typescript
 import { validateBackend, waitForBackend } from '../utils'
 
@@ -61,6 +66,7 @@ const isAvailable = await waitForBackend()
 Manages creation and cleanup of test data for integration tests.
 
 **Features:**
+
 - Creates test entities with unique identifiers
 - Tracks created entities for cleanup
 - Automatic cleanup after tests
@@ -68,19 +74,20 @@ Manages creation and cleanup of test data for integration tests.
 - Cleanup of old test data
 
 **Usage:**
+
 ```typescript
 import { TestDataManager } from '../utils'
 
 const testDataManager = new TestDataManager({
   token: authToken,
   baseUrl: config.serverUrl,
-  trackCreatedEntities: true
+  trackCreatedEntities: true,
 })
 
 // Create test data
 const epic = await testDataManager.createTestEpic({
   title: 'My Test Epic',
-  priority: 1
+  priority: 1,
 })
 
 // Create complete hierarchy
@@ -118,7 +125,7 @@ import {
   shouldSkipIntegrationTests,
   logEnvironmentInfo,
   validateBackend,
-  TestDataManager
+  TestDataManager,
 } from '../utils'
 
 describe('My Integration Tests', () => {
@@ -143,7 +150,7 @@ describe('My Integration Tests', () => {
     const config = getTestConfig()
     testDataManager = new TestDataManager({
       token: authToken,
-      baseUrl: config.serverUrl
+      baseUrl: config.serverUrl,
     })
   })
 

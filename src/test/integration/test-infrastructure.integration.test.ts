@@ -1,6 +1,6 @@
 /**
  * Test Infrastructure Validation
- * 
+ *
  * Tests the test environment infrastructure components
  */
 
@@ -11,7 +11,7 @@ import {
   shouldSkipIntegrationTests,
   logEnvironmentInfo,
   validateBackend,
-  TestDataManager
+  TestDataManager,
 } from '../utils'
 
 describe('Test Infrastructure', () => {
@@ -27,7 +27,7 @@ describe('Test Infrastructure', () => {
 
   it.skipIf(shouldSkipIntegrationTests())('should load integration test configuration', () => {
     const config = loadIntegrationTestConfig()
-    
+
     expect(config).toBeDefined()
     expect(config.serverUrl).toBeDefined()
     expect(config.adminUser).toBeDefined()
@@ -45,25 +45,29 @@ describe('Test Infrastructure', () => {
     console.log('✅ Environment setup is valid')
   })
 
-  it.skipIf(shouldSkipIntegrationTests())('should validate backend availability and authentication', async () => {
-    const validation = await validateBackend()
-    
-    expect(validation).toBeDefined()
-    expect(validation.healthCheck).toBeDefined()
-    expect(validation.authCheck).toBeDefined()
-    
-    // Backend should be healthy for integration tests to run
-    expect(validation.healthy).toBe(true)
-    expect(validation.healthCheck.available).toBe(true)
-    expect(validation.authCheck.successful).toBe(true)
-    expect(validation.authCheck.token).toBeDefined()
+  it.skipIf(shouldSkipIntegrationTests())(
+    'should validate backend availability and authentication',
+    async () => {
+      const validation = await validateBackend()
 
-    console.log('✅ Backend validation successful')
-  }, 30000) // 30 second timeout for backend validation
+      expect(validation).toBeDefined()
+      expect(validation.healthCheck).toBeDefined()
+      expect(validation.authCheck).toBeDefined()
+
+      // Backend should be healthy for integration tests to run
+      expect(validation.healthy).toBe(true)
+      expect(validation.healthCheck.available).toBe(true)
+      expect(validation.authCheck.successful).toBe(true)
+      expect(validation.authCheck.token).toBeDefined()
+
+      console.log('✅ Backend validation successful')
+    },
+    30000,
+  ) // 30 second timeout for backend validation
 
   it.skipIf(shouldSkipIntegrationTests())('should initialize test data manager', async () => {
     const validation = await validateBackend()
-    
+
     if (!validation.healthy || !validation.authCheck.token) {
       throw new Error('Backend validation failed - cannot test data manager')
     }
@@ -72,7 +76,7 @@ describe('Test Infrastructure', () => {
     const testDataManager = new TestDataManager({
       token: validation.authCheck.token,
       baseUrl: config.serverUrl,
-      trackCreatedEntities: true
+      trackCreatedEntities: true,
     })
 
     expect(testDataManager).toBeDefined()

@@ -110,13 +110,13 @@
     <!-- Admin Actions (only for administrators) -->
     <template v-if="isAdmin">
       <v-divider />
-      
+
       <v-card-text class="pa-4">
         <div class="text-subtitle-2 text-medium-emphasis mb-3">
           <v-icon start size="16">mdi-shield-account</v-icon>
           Администрирование
         </div>
-        
+
         <div class="d-flex flex-column ga-2">
           <v-btn
             color="orange"
@@ -183,7 +183,9 @@ function handleCreateRequirement() {
 
 <style scoped>
 .quick-action-btn {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
   text-transform: none;
   font-weight: 500;
 }

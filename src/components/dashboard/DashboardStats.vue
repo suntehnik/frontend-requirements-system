@@ -1,19 +1,9 @@
 <template>
   <v-row class="dashboard-stats-row">
     <v-col cols="12" sm="6" md="3">
-      <v-card
-        :loading="loading"
-        class="dashboard-stat-card h-100"
-        elevation="2"
-      >
+      <v-card :loading="loading" class="dashboard-stat-card h-100" elevation="2">
         <v-card-text class="text-center d-flex flex-column justify-center h-100">
-          <v-icon
-            size="48"
-            color="primary"
-            class="mb-2"
-          >
-            mdi-folder-multiple
-          </v-icon>
+          <v-icon size="48" color="primary" class="mb-2"> mdi-folder-multiple </v-icon>
           <div class="text-h6 text-medium-emphasis mb-1">Эпики</div>
           <div class="text-h3 text-primary font-weight-bold">
             {{ stats.epics }}
@@ -23,19 +13,9 @@
     </v-col>
 
     <v-col cols="12" sm="6" md="3">
-      <v-card
-        :loading="loading"
-        class="dashboard-stat-card h-100"
-        elevation="2"
-      >
+      <v-card :loading="loading" class="dashboard-stat-card h-100" elevation="2">
         <v-card-text class="text-center d-flex flex-column justify-center h-100">
-          <v-icon
-            size="48"
-            color="success"
-            class="mb-2"
-          >
-            mdi-book-open-page-variant
-          </v-icon>
+          <v-icon size="48" color="success" class="mb-2"> mdi-book-open-page-variant </v-icon>
           <div class="text-h6 text-medium-emphasis mb-1">Пользовательские истории</div>
           <div class="text-h3 text-success font-weight-bold">
             {{ stats.userStories }}
@@ -45,19 +25,9 @@
     </v-col>
 
     <v-col cols="12" sm="6" md="3">
-      <v-card
-        :loading="loading"
-        class="dashboard-stat-card h-100"
-        elevation="2"
-      >
+      <v-card :loading="loading" class="dashboard-stat-card h-100" elevation="2">
         <v-card-text class="text-center d-flex flex-column justify-center h-100">
-          <v-icon
-            size="48"
-            color="info"
-            class="mb-2"
-          >
-            mdi-file-document-multiple
-          </v-icon>
+          <v-icon size="48" color="info" class="mb-2"> mdi-file-document-multiple </v-icon>
           <div class="text-h6 text-medium-emphasis mb-1">Требования</div>
           <div class="text-h3 text-info font-weight-bold">
             {{ stats.requirements }}
@@ -67,19 +37,9 @@
     </v-col>
 
     <v-col cols="12" sm="6" md="3">
-      <v-card
-        :loading="loading"
-        class="dashboard-stat-card h-100"
-        elevation="2"
-      >
+      <v-card :loading="loading" class="dashboard-stat-card h-100" elevation="2">
         <v-card-text class="text-center d-flex flex-column justify-center h-100">
-          <v-icon
-            size="48"
-            color="warning"
-            class="mb-2"
-          >
-            mdi-clock-fast
-          </v-icon>
+          <v-icon size="48" color="warning" class="mb-2"> mdi-clock-fast </v-icon>
           <div class="text-h6 text-medium-emphasis mb-1">Активные задачи</div>
           <div class="text-h3 text-warning font-weight-bold">
             {{ stats.activeTasks }}
@@ -116,7 +76,9 @@ const stats = computed(() => entitiesStore.stats)
 }
 
 .dashboard-stat-card {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
   height: 100%;
 }
 

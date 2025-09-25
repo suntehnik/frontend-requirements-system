@@ -137,10 +137,12 @@
               <v-chip
                 v-for="suggestion in searchSuggestions"
                 :key="suggestion"
-                @click="() => {
-                  searchQuery = suggestion
-                  performSearch()
-                }"
+                @click="
+                  () => {
+                    searchQuery = suggestion
+                    performSearch()
+                  }
+                "
               >
                 {{ suggestion }}
               </v-chip>

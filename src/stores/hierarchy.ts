@@ -11,8 +11,6 @@ export const useHierarchyStore = defineStore('hierarchy', () => {
   const error = ref<string | null>(null)
   const expandedNodes = ref<Set<string>>(new Set())
 
-
-
   // Computed
   const flattenedNodes = computed(() => {
     const flattened: HierarchyNode[] = []
@@ -89,7 +87,7 @@ export const useHierarchyStore = defineStore('hierarchy', () => {
   }
 
   function expandAll() {
-    const allNodeIds = flattenedNodes.value.map(node => node.entity_id)
+    const allNodeIds = flattenedNodes.value.map((node) => node.entity_id)
     expandedNodes.value = new Set(allNodeIds)
     localStorage.setItem('hierarchy-expanded-nodes', JSON.stringify([...expandedNodes.value]))
   }
@@ -100,28 +98,34 @@ export const useHierarchyStore = defineStore('hierarchy', () => {
   }
 
   function findNode(entityId: string): HierarchyNode | null {
-    return flattenedNodes.value.find(node => node.entity_id === entityId) || null
+    return flattenedNodes.value.find((node) => node.entity_id === entityId) || null
   }
 
   function findNodeByReference(referenceId: string): HierarchyNode | null {
-    return flattenedNodes.value.find(node => node.reference_id === referenceId) || null
+    return flattenedNodes.value.find((node) => node.reference_id === referenceId) || null
   }
 
   function getNodePath(entityId: string): EntityPath[] {
     const path: EntityPath[] = []
 
-    function findPath(nodes: HierarchyNode[], targetId: string, currentPath: HierarchyNode[]): boolean {
+    function findPath(
+      nodes: HierarchyNode[],
+      targetId: string,
+      currentPath: HierarchyNode[],
+    ): boolean {
       for (const node of nodes) {
         const newPath = [...currentPath, node]
 
         if (node.entity_id === targetId) {
           // Found the target, build the path
-          path.push(...newPath.map(n => ({
-            entity_type: n.entity_type,
-            entity_id: n.entity_id,
-            reference_id: n.reference_id,
-            title: n.title
-          })))
+          path.push(
+            ...newPath.map((n) => ({
+              entity_type: n.entity_type,
+              entity_id: n.entity_id,
+              reference_id: n.reference_id,
+              title: n.title,
+            })),
+          )
           return true
         }
 

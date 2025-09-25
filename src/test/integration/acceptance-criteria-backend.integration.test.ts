@@ -10,7 +10,7 @@ import type {
   UserStory,
   Epic,
   CreateEpicRequest,
-  CreateUserStoryRequest
+  CreateUserStoryRequest,
 } from '@/types'
 import { SchemaValidator } from '@/test/utils/api-response-validator'
 
@@ -34,7 +34,7 @@ class TestAuthManager {
 
       const loginResponse = await authService.login({
         username,
-        password
+        password,
       })
 
       // Store token information
@@ -56,11 +56,17 @@ class TestAuthManager {
     if (this.authToken && this.expiresAt) {
       const authData = JSON.stringify({
         token: this.authToken,
-        expires_at: this.expiresAt
+        expires_at: this.expiresAt,
       })
 
       // Update the mocked localStorage
-      const localStorageMock = (window as unknown as { localStorage: { getItem: { mockImplementation: (fn: (key: string) => string | null) => void } } }).localStorage
+      const localStorageMock = (
+        window as unknown as {
+          localStorage: {
+            getItem: { mockImplementation: (fn: (key: string) => string | null) => void }
+          }
+        }
+      ).localStorage
       localStorageMock.getItem.mockImplementation((key: string) => {
         if (key === 'auth') {
           return authData
@@ -81,7 +87,13 @@ class TestAuthManager {
     this.expiresAt = null
 
     // Clear localStorage mock
-    const localStorageMock = (window as unknown as { localStorage: { getItem: { mockImplementation: (fn: (key: string) => string | null) => void } } }).localStorage
+    const localStorageMock = (
+      window as unknown as {
+        localStorage: {
+          getItem: { mockImplementation: (fn: (key: string) => string | null) => void }
+        }
+      }
+    ).localStorage
     localStorageMock.getItem.mockImplementation(() => null)
   }
 }
@@ -97,7 +109,7 @@ class AcceptanceCriteriaTestDataManager {
       title: `Test Epic for AC ${Date.now()}`,
       description: 'Test epic for acceptance criteria integration testing',
       priority: 3,
-      ...overrides
+      ...overrides,
     }
 
     const epic = await epicService.create(testEpic)
@@ -105,13 +117,16 @@ class AcceptanceCriteriaTestDataManager {
     return epic
   }
 
-  async createTestUserStory(epicId: string, overrides?: Partial<CreateUserStoryRequest>): Promise<UserStory> {
+  async createTestUserStory(
+    epicId: string,
+    overrides?: Partial<CreateUserStoryRequest>,
+  ): Promise<UserStory> {
     const testUserStory: CreateUserStoryRequest = {
       title: `Test User Story for AC ${Date.now()}`,
       description: 'Test user story for acceptance criteria integration testing',
       priority: 3,
       epic_id: epicId,
-      ...overrides
+      ...overrides,
     }
 
     const userStory = await userStoryService.create(testUserStory)
@@ -119,11 +134,14 @@ class AcceptanceCriteriaTestDataManager {
     return userStory
   }
 
-  async createTestAcceptanceCriteria(userStoryId: string, overrides?: Partial<CreateAcceptanceCriteriaRequest>): Promise<AcceptanceCriteria> {
+  async createTestAcceptanceCriteria(
+    userStoryId: string,
+    overrides?: Partial<CreateAcceptanceCriteriaRequest>,
+  ): Promise<AcceptanceCriteria> {
     const testCriteria: CreateAcceptanceCriteriaRequest = {
       description: `Test acceptance criteria ${Date.now()} for integration testing`,
       user_story_id: userStoryId,
-      ...overrides
+      ...overrides,
     }
 
     const criteria = await acceptanceCriteriaService.create(testCriteria)
@@ -218,8 +236,9 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
       }
 
       const createRequest: CreateAcceptanceCriteriaRequest = {
-        description: 'GIVEN a user is logged in WHEN they view the dashboard THEN they should see their profile information',
-        user_story_id: testUserStory.id
+        description:
+          'GIVEN a user is logged in WHEN they view the dashboard THEN they should see their profile information',
+        user_story_id: testUserStory.id,
       }
 
       try {
@@ -251,7 +270,9 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
         expect(new Date(criteria.created_at).getTime()).not.toBeNaN()
         expect(new Date(criteria.last_modified).getTime()).not.toBeNaN()
 
-        console.log(`✅ Created acceptance criteria: ${criteria.reference_id} - "${criteria.description.substring(0, 50)}..."`)
+        console.log(
+          `✅ Created acceptance criteria: ${criteria.reference_id} - "${criteria.description.substring(0, 50)}..."`,
+        )
       } catch (error) {
         console.log(`⚠️ Acceptance criteria creation failed: ${error}`)
         // For now, we expect this might fail due to API validation requirements
@@ -259,26 +280,29 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
       }
     })
 
-    it.skipIf(!!process.env.CI)('should validate acceptance criteria creation request format', async () => {
-      if (!testUserStory) {
-        console.log('⏭️ Skipping test: No test user story available')
-        return
-      }
+    it.skipIf(!!process.env.CI)(
+      'should validate acceptance criteria creation request format',
+      async () => {
+        if (!testUserStory) {
+          console.log('⏭️ Skipping test: No test user story available')
+          return
+        }
 
-      const createRequest: CreateAcceptanceCriteriaRequest = {
-        description: 'WHEN the user clicks submit THEN the form should be validated',
-        user_story_id: testUserStory.id
-      }
+        const createRequest: CreateAcceptanceCriteriaRequest = {
+          description: 'WHEN the user clicks submit THEN the form should be validated',
+          user_story_id: testUserStory.id,
+        }
 
-      // Validate that our request object has the expected structure
-      expect(createRequest).toHaveProperty('description')
-      expect(createRequest).toHaveProperty('user_story_id')
-      expect(typeof createRequest.description).toBe('string')
-      expect(typeof createRequest.user_story_id).toBe('string')
-      expect(createRequest.description.length).toBeGreaterThan(0)
+        // Validate that our request object has the expected structure
+        expect(createRequest).toHaveProperty('description')
+        expect(createRequest).toHaveProperty('user_story_id')
+        expect(typeof createRequest.description).toBe('string')
+        expect(typeof createRequest.user_story_id).toBe('string')
+        expect(createRequest.description.length).toBeGreaterThan(0)
 
-      console.log('✅ Acceptance criteria creation request format is valid')
-    })
+        console.log('✅ Acceptance criteria creation request format is valid')
+      },
+    )
 
     it.skipIf(!!process.env.CI)('should handle long acceptance criteria descriptions', async () => {
       if (!testUserStory) {
@@ -286,7 +310,8 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
         return
       }
 
-      const longDescription = 'GIVEN a user is on the requirements management system ' +
+      const longDescription =
+        'GIVEN a user is on the requirements management system ' +
         'AND they have appropriate permissions to create acceptance criteria ' +
         'WHEN they navigate to a user story detail page ' +
         'AND they click on the "Add Acceptance Criteria" button ' +
@@ -299,7 +324,7 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
 
       const createRequest: CreateAcceptanceCriteriaRequest = {
         description: longDescription,
-        user_story_id: testUserStory.id
+        user_story_id: testUserStory.id,
       }
 
       try {
@@ -307,7 +332,9 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
         testDataManager.addForCleanup(criteria.id)
 
         expect(criteria.description).toBe(createRequest.description)
-        console.log(`✅ Created acceptance criteria with long description: ${criteria.reference_id}`)
+        console.log(
+          `✅ Created acceptance criteria with long description: ${criteria.reference_id}`,
+        )
       } catch (error) {
         console.log(`⚠️ Long description acceptance criteria creation failed: ${error}`)
         expect(error).toBeDefined()
@@ -319,7 +346,7 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
     it.skipIf(!!process.env.CI)('should fetch acceptance criteria with pagination', async () => {
       const response = await acceptanceCriteriaService.list({
         limit: 10,
-        offset: 0
+        offset: 0,
       })
 
       // Validate response structure
@@ -342,7 +369,9 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
         expect(firstCriteria.user_story_id).toBeDefined()
         expect(firstCriteria.author_id).toBeDefined()
 
-        console.log(`🎯 First acceptance criteria: ${firstCriteria.reference_id} - "${firstCriteria.description.substring(0, 50)}..."`)
+        console.log(
+          `🎯 First acceptance criteria: ${firstCriteria.reference_id} - "${firstCriteria.description.substring(0, 50)}..."`,
+        )
       }
     })
 
@@ -354,7 +383,7 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
 
       const response = await acceptanceCriteriaService.list({
         user_story_id: testUserStory.id,
-        limit: 20
+        limit: 20,
       })
       expect(response).toBeDefined()
       expect(response.data).toBeDefined()
@@ -365,13 +394,15 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
         expect(criteria.user_story_id).toBe(testUserStory.id)
       })
 
-      console.log(`🔍 Acceptance criteria in test user story ${testUserStory.reference_id}: ${response.data.length}`)
+      console.log(
+        `🔍 Acceptance criteria in test user story ${testUserStory.reference_id}: ${response.data.length}`,
+      )
     })
 
     it.skipIf(!!process.env.CI)('should include related data when requested', async () => {
       const response = await acceptanceCriteriaService.list({
         limit: 5,
-        include: 'user_story,author,requirements'
+        include: 'user_story,author,requirements',
       })
 
       expect(response).toBeDefined()
@@ -386,7 +417,9 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
           expect(criteriaWithIncludes.user_story.id).toBeDefined()
           expect(criteriaWithIncludes.user_story.reference_id).toBeDefined()
           expect(criteriaWithIncludes.user_story.title).toBeDefined()
-          console.log(`   📚 User Story: ${criteriaWithIncludes.user_story.reference_id} - "${criteriaWithIncludes.user_story.title}"`)
+          console.log(
+            `   📚 User Story: ${criteriaWithIncludes.user_story.reference_id} - "${criteriaWithIncludes.user_story.title}"`,
+          )
         }
 
         if (criteriaWithIncludes.author) {
@@ -408,7 +441,7 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
 
       const response = await acceptanceCriteriaService.list({
         user_story_id: nonExistentId,
-        limit: 10
+        limit: 10,
       })
 
       expect(response).toBeDefined()
@@ -422,72 +455,94 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
   })
 
   describe('GET /api/v1/acceptance-criteria/:id - Get Individual Acceptance Criteria', () => {
-    it.skipIf(!!process.env.CI)('should get acceptance criteria by ID with included data', async () => {
-      // Get an existing acceptance criteria to test with
-      const listResponse = await acceptanceCriteriaService.list({ limit: 1 })
+    it.skipIf(!!process.env.CI)(
+      'should get acceptance criteria by ID with included data',
+      async () => {
+        // Get an existing acceptance criteria to test with
+        const listResponse = await acceptanceCriteriaService.list({ limit: 1 })
 
-      if (listResponse.data.length === 0) {
-        console.log('⏭️ Skipping test: No acceptance criteria available')
-        return
-      }
-
-      const existingCriteriaId = listResponse.data[0].id
-
-      // Retrieve the acceptance criteria by ID
-      const criteria = await acceptanceCriteriaService.get(existingCriteriaId, 'user_story,author')
-
-      expect(criteria).toBeDefined()
-      expect(criteria.id).toBe(existingCriteriaId)
-      expect(criteria.reference_id).toBeDefined()
-      expect(criteria.description).toBeDefined()
-
-      console.log(`\n🎯 Retrieved acceptance criteria by ID: ${criteria.reference_id} - "${criteria.description.substring(0, 50)}..."`)
-
-      // Check included data
-      if (criteria.user_story) {
-        expect(criteria.user_story.id).toBeDefined()
-        expect(criteria.user_story.reference_id).toBeDefined()
-        console.log(`   📚 User Story: ${criteria.user_story.reference_id}`)
-      }
-
-      if (criteria.author) {
-        expect(criteria.author.username).toBeDefined()
-        console.log(`   👨‍💻 Author: ${criteria.author.username}`)
-      }
-    })
-
-    it.skipIf(!!process.env.CI)('should validate individual acceptance criteria schema', async () => {
-      // Get the first available acceptance criteria
-      const listResponse = await acceptanceCriteriaService.list({ limit: 1 })
-
-      if (listResponse.data.length > 0) {
-        const criteriaId = listResponse.data[0].id
-        const criteria = await acceptanceCriteriaService.get(criteriaId)
-
-        // Clean up empty related objects that the API returns as empty instead of null
-        if (criteria.author && criteria.author.id === '00000000-0000-0000-0000-000000000000') {
-          criteria.author = undefined
-        }
-        if (criteria.user_story && criteria.user_story.id === '00000000-0000-0000-0000-000000000000') {
-          criteria.user_story = undefined
+        if (listResponse.data.length === 0) {
+          console.log('⏭️ Skipping test: No acceptance criteria available')
+          return
         }
 
-        // Validate schema
-        const validation = SchemaValidator.validateAcceptanceCriteria(criteria)
+        const existingCriteriaId = listResponse.data[0].id
 
-        if (!validation.isValid) {
-          console.error('Individual acceptance criteria schema validation errors:', validation.errors)
-          console.error('Individual acceptance criteria schema validation warnings:', validation.warnings)
-          console.log('Cleaned acceptance criteria data:', JSON.stringify(criteria, null, 2))
+        // Retrieve the acceptance criteria by ID
+        const criteria = await acceptanceCriteriaService.get(
+          existingCriteriaId,
+          'user_story,author',
+        )
+
+        expect(criteria).toBeDefined()
+        expect(criteria.id).toBe(existingCriteriaId)
+        expect(criteria.reference_id).toBeDefined()
+        expect(criteria.description).toBeDefined()
+
+        console.log(
+          `\n🎯 Retrieved acceptance criteria by ID: ${criteria.reference_id} - "${criteria.description.substring(0, 50)}..."`,
+        )
+
+        // Check included data
+        if (criteria.user_story) {
+          expect(criteria.user_story.id).toBeDefined()
+          expect(criteria.user_story.reference_id).toBeDefined()
+          console.log(`   📚 User Story: ${criteria.user_story.reference_id}`)
         }
 
-        expect(validation.isValid).toBe(true)
+        if (criteria.author) {
+          expect(criteria.author.username).toBeDefined()
+          console.log(`   👨‍💻 Author: ${criteria.author.username}`)
+        }
+      },
+    )
 
-        console.log(`✅ Individual acceptance criteria schema validation passed: ${criteria.reference_id}`)
-      } else {
-        console.log('ℹ️ No acceptance criteria available for individual schema validation')
-      }
-    })
+    it.skipIf(!!process.env.CI)(
+      'should validate individual acceptance criteria schema',
+      async () => {
+        // Get the first available acceptance criteria
+        const listResponse = await acceptanceCriteriaService.list({ limit: 1 })
+
+        if (listResponse.data.length > 0) {
+          const criteriaId = listResponse.data[0].id
+          const criteria = await acceptanceCriteriaService.get(criteriaId)
+
+          // Clean up empty related objects that the API returns as empty instead of null
+          if (criteria.author && criteria.author.id === '00000000-0000-0000-0000-000000000000') {
+            criteria.author = undefined
+          }
+          if (
+            criteria.user_story &&
+            criteria.user_story.id === '00000000-0000-0000-0000-000000000000'
+          ) {
+            criteria.user_story = undefined
+          }
+
+          // Validate schema
+          const validation = SchemaValidator.validateAcceptanceCriteria(criteria)
+
+          if (!validation.isValid) {
+            console.error(
+              'Individual acceptance criteria schema validation errors:',
+              validation.errors,
+            )
+            console.error(
+              'Individual acceptance criteria schema validation warnings:',
+              validation.warnings,
+            )
+            console.log('Cleaned acceptance criteria data:', JSON.stringify(criteria, null, 2))
+          }
+
+          expect(validation.isValid).toBe(true)
+
+          console.log(
+            `✅ Individual acceptance criteria schema validation passed: ${criteria.reference_id}`,
+          )
+        } else {
+          console.log('ℹ️ No acceptance criteria available for individual schema validation')
+        }
+      },
+    )
 
     it.skipIf(!!process.env.CI)('should handle non-existent acceptance criteria ID', async () => {
       const nonExistentId = '00000000-0000-0000-0000-000000000000'
@@ -504,55 +559,62 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
   })
 
   describe('PUT /api/v1/acceptance-criteria/:id - Update Acceptance Criteria', () => {
-    it.skipIf(!!process.env.CI)('should test acceptance criteria update endpoint (requires existing criteria)', async () => {
-      // Get an existing acceptance criteria to test with
-      const listResponse = await acceptanceCriteriaService.list({ limit: 1 })
+    it.skipIf(!!process.env.CI)(
+      'should test acceptance criteria update endpoint (requires existing criteria)',
+      async () => {
+        // Get an existing acceptance criteria to test with
+        const listResponse = await acceptanceCriteriaService.list({ limit: 1 })
 
-      if (listResponse.data.length === 0) {
-        console.log('⏭️ Skipping test: No acceptance criteria available for update testing')
-        return
-      }
-
-      const existingCriteria = listResponse.data[0]
-      const originalDescription = existingCriteria.description
-
-      console.log(`📝 Testing update on existing acceptance criteria: ${existingCriteria.reference_id}`)
-      console.log(`   Original description: "${originalDescription.substring(0, 50)}..."`)
-
-      // For integration testing, we'll test the update endpoint structure
-      // but revert changes to avoid affecting the test data
-      const updateRequest: UpdateAcceptanceCriteriaRequest = {
-        description: `${originalDescription} [TEMP UPDATE - ${Date.now()}]`
-      }
-
-      try {
-        const updatedCriteria = await acceptanceCriteriaService.update(existingCriteria.id, updateRequest)
-
-        expect(updatedCriteria).toBeDefined()
-        expect(updatedCriteria.id).toBe(existingCriteria.id)
-        expect(updatedCriteria.description).toBe(updateRequest.description)
-
-        console.log(`✅ Update successful: ${updatedCriteria.reference_id}`)
-        console.log(`   New description: "${updatedCriteria.description.substring(0, 50)}..."`)
-
-        // Revert the changes
-        const revertRequest: UpdateAcceptanceCriteriaRequest = {
-          description: originalDescription
+        if (listResponse.data.length === 0) {
+          console.log('⏭️ Skipping test: No acceptance criteria available for update testing')
+          return
         }
 
-        await acceptanceCriteriaService.update(existingCriteria.id, revertRequest)
-        console.log(`🔄 Reverted changes to maintain test data integrity`)
+        const existingCriteria = listResponse.data[0]
+        const originalDescription = existingCriteria.description
 
-      } catch (error) {
-        console.log(`⚠️ Acceptance criteria update failed: ${error}`)
-        // Test passes if we can identify the error type
-        expect(error).toBeDefined()
-      }
-    })
+        console.log(
+          `📝 Testing update on existing acceptance criteria: ${existingCriteria.reference_id}`,
+        )
+        console.log(`   Original description: "${originalDescription.substring(0, 50)}..."`)
+
+        // For integration testing, we'll test the update endpoint structure
+        // but revert changes to avoid affecting the test data
+        const updateRequest: UpdateAcceptanceCriteriaRequest = {
+          description: `${originalDescription} [TEMP UPDATE - ${Date.now()}]`,
+        }
+
+        try {
+          const updatedCriteria = await acceptanceCriteriaService.update(
+            existingCriteria.id,
+            updateRequest,
+          )
+
+          expect(updatedCriteria).toBeDefined()
+          expect(updatedCriteria.id).toBe(existingCriteria.id)
+          expect(updatedCriteria.description).toBe(updateRequest.description)
+
+          console.log(`✅ Update successful: ${updatedCriteria.reference_id}`)
+          console.log(`   New description: "${updatedCriteria.description.substring(0, 50)}..."`)
+
+          // Revert the changes
+          const revertRequest: UpdateAcceptanceCriteriaRequest = {
+            description: originalDescription,
+          }
+
+          await acceptanceCriteriaService.update(existingCriteria.id, revertRequest)
+          console.log(`🔄 Reverted changes to maintain test data integrity`)
+        } catch (error) {
+          console.log(`⚠️ Acceptance criteria update failed: ${error}`)
+          // Test passes if we can identify the error type
+          expect(error).toBeDefined()
+        }
+      },
+    )
 
     it.skipIf(!!process.env.CI)('should validate update request format', async () => {
       const updateRequest: UpdateAcceptanceCriteriaRequest = {
-        description: 'GIVEN updated criteria WHEN validated THEN should pass'
+        description: 'GIVEN updated criteria WHEN validated THEN should pass',
       }
 
       // Validate that our request object has the expected structure
@@ -563,60 +625,69 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
       console.log('✅ Acceptance criteria update request format is valid')
     })
 
-    it.skipIf(!!process.env.CI)('should handle update of non-existent acceptance criteria', async () => {
-      const nonExistentId = '00000000-0000-0000-0000-000000000000'
-      const updateRequest: UpdateAcceptanceCriteriaRequest = {
-        description: 'This should fail'
-      }
+    it.skipIf(!!process.env.CI)(
+      'should handle update of non-existent acceptance criteria',
+      async () => {
+        const nonExistentId = '00000000-0000-0000-0000-000000000000'
+        const updateRequest: UpdateAcceptanceCriteriaRequest = {
+          description: 'This should fail',
+        }
 
-      try {
-        await acceptanceCriteriaService.update(nonExistentId, updateRequest)
-        throw new Error('Should have failed to update non-existent acceptance criteria')
-      } catch (error) {
-        // Expected to fail with 404 or similar error
-        expect(error).toBeDefined()
-        console.log('✅ Correctly handled update of non-existent acceptance criteria')
-      }
-    })
+        try {
+          await acceptanceCriteriaService.update(nonExistentId, updateRequest)
+          throw new Error('Should have failed to update non-existent acceptance criteria')
+        } catch (error) {
+          // Expected to fail with 404 or similar error
+          expect(error).toBeDefined()
+          console.log('✅ Correctly handled update of non-existent acceptance criteria')
+        }
+      },
+    )
   })
 
   describe('DELETE /api/v1/acceptance-criteria/:id - Delete Acceptance Criteria', () => {
-    it.skipIf(!!process.env.CI)('should test acceptance criteria deletion endpoint (skipped to preserve test data)', async () => {
-      // For integration testing, we'll test the deletion endpoint behavior
-      // without actually deleting existing acceptance criteria to preserve test data
+    it.skipIf(!!process.env.CI)(
+      'should test acceptance criteria deletion endpoint (skipped to preserve test data)',
+      async () => {
+        // For integration testing, we'll test the deletion endpoint behavior
+        // without actually deleting existing acceptance criteria to preserve test data
 
-      console.log('📝 Testing acceptance criteria deletion endpoint behavior')
-      console.log('⚠️ Actual deletion skipped to preserve test data integrity')
+        console.log('📝 Testing acceptance criteria deletion endpoint behavior')
+        console.log('⚠️ Actual deletion skipped to preserve test data integrity')
 
-      // Test deletion of non-existent acceptance criteria to verify error handling
-      const nonExistentId = '00000000-0000-0000-0000-000000000000'
+        // Test deletion of non-existent acceptance criteria to verify error handling
+        const nonExistentId = '00000000-0000-0000-0000-000000000000'
 
-      try {
-        await acceptanceCriteriaService.delete(nonExistentId)
-        throw new Error('Should have failed to delete non-existent acceptance criteria')
-      } catch (error) {
-        // Expected to fail with 404 or similar error
-        expect(error).toBeDefined()
-        console.log('✅ Correctly handled deletion of non-existent acceptance criteria')
-      }
+        try {
+          await acceptanceCriteriaService.delete(nonExistentId)
+          throw new Error('Should have failed to delete non-existent acceptance criteria')
+        } catch (error) {
+          // Expected to fail with 404 or similar error
+          expect(error).toBeDefined()
+          console.log('✅ Correctly handled deletion of non-existent acceptance criteria')
+        }
 
-      // If we had a test acceptance criteria, the deletion would work like this:
-      // await acceptanceCriteriaService.delete(testCriteria.id)
-      console.log('📋 Deletion endpoint structure validated')
-    })
+        // If we had a test acceptance criteria, the deletion would work like this:
+        // await acceptanceCriteriaService.delete(testCriteria.id)
+        console.log('📋 Deletion endpoint structure validated')
+      },
+    )
 
-    it.skipIf(!!process.env.CI)('should handle deletion of non-existent acceptance criteria', async () => {
-      const nonExistentId = '00000000-0000-0000-0000-000000000000'
+    it.skipIf(!!process.env.CI)(
+      'should handle deletion of non-existent acceptance criteria',
+      async () => {
+        const nonExistentId = '00000000-0000-0000-0000-000000000000'
 
-      try {
-        await acceptanceCriteriaService.delete(nonExistentId)
-        throw new Error('Should have failed to delete non-existent acceptance criteria')
-      } catch (error) {
-        // Expected to fail
-        expect(error).toBeDefined()
-        console.log('✅ Correctly handled deletion of non-existent acceptance criteria')
-      }
-    })
+        try {
+          await acceptanceCriteriaService.delete(nonExistentId)
+          throw new Error('Should have failed to delete non-existent acceptance criteria')
+        } catch (error) {
+          // Expected to fail
+          expect(error).toBeDefined()
+          console.log('✅ Correctly handled deletion of non-existent acceptance criteria')
+        }
+      },
+    )
 
     it.skipIf(!!process.env.CI)('should test deletion validation endpoint', async () => {
       // Get an existing acceptance criteria to test validation with
@@ -630,7 +701,9 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
       const existingCriteria = listResponse.data[0]
 
       try {
-        const validationResult = await acceptanceCriteriaService.validateDeletion(existingCriteria.id)
+        const validationResult = await acceptanceCriteriaService.validateDeletion(
+          existingCriteria.id,
+        )
 
         expect(validationResult).toBeDefined()
         expect(validationResult).toHaveProperty('can_delete')
@@ -644,7 +717,9 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
           expect(Array.isArray(validationResult.warnings)).toBe(true)
         }
 
-        console.log(`✅ Deletion validation for ${existingCriteria.reference_id}: can_delete=${validationResult.can_delete}`)
+        console.log(
+          `✅ Deletion validation for ${existingCriteria.reference_id}: can_delete=${validationResult.can_delete}`,
+        )
         if (validationResult.dependencies && validationResult.dependencies.length > 0) {
           console.log(`   Dependencies: ${validationResult.dependencies.length}`)
         }
@@ -661,7 +736,7 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
 
       const response = await acceptanceCriteriaService.list({
         limit: 3,
-        include: 'user_story,author'
+        include: 'user_story,author',
       })
 
       // Validate list response structure
@@ -723,41 +798,47 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
       console.log(`   ✅ All ${response.data.length} acceptance criteria have valid structure`)
     })
 
-    it.skipIf(!!process.env.CI)('should validate acceptance criteria schema compliance', async () => {
-      const response = await acceptanceCriteriaService.list({ limit: 5 })
+    it.skipIf(!!process.env.CI)(
+      'should validate acceptance criteria schema compliance',
+      async () => {
+        const response = await acceptanceCriteriaService.list({ limit: 5 })
 
-      if (response.data.length === 0) {
-        console.log('ℹ️ No acceptance criteria available for schema validation')
-        return
-      }
-
-      console.log('\n🔍 Validating acceptance criteria schema compliance:')
-
-      let validCount = 0
-      let invalidCount = 0
-
-      for (const criteria of response.data) {
-        // Clean up empty related objects that the API returns as empty instead of null
-        if (criteria.author && criteria.author.id === '00000000-0000-0000-0000-000000000000') {
-          criteria.author = undefined
-        }
-        if (criteria.user_story && criteria.user_story.id === '00000000-0000-0000-0000-000000000000') {
-          criteria.user_story = undefined
+        if (response.data.length === 0) {
+          console.log('ℹ️ No acceptance criteria available for schema validation')
+          return
         }
 
-        const validation = SchemaValidator.validateAcceptanceCriteria(criteria)
+        console.log('\n🔍 Validating acceptance criteria schema compliance:')
 
-        if (validation.isValid) {
-          validCount++
-        } else {
-          invalidCount++
-          console.log(`   ❌ Schema validation failed for ${criteria.reference_id}:`)
-          validation.errors.forEach(error => console.log(`      - ${error}`))
+        let validCount = 0
+        let invalidCount = 0
+
+        for (const criteria of response.data) {
+          // Clean up empty related objects that the API returns as empty instead of null
+          if (criteria.author && criteria.author.id === '00000000-0000-0000-0000-000000000000') {
+            criteria.author = undefined
+          }
+          if (
+            criteria.user_story &&
+            criteria.user_story.id === '00000000-0000-0000-0000-000000000000'
+          ) {
+            criteria.user_story = undefined
+          }
+
+          const validation = SchemaValidator.validateAcceptanceCriteria(criteria)
+
+          if (validation.isValid) {
+            validCount++
+          } else {
+            invalidCount++
+            console.log(`   ❌ Schema validation failed for ${criteria.reference_id}:`)
+            validation.errors.forEach((error) => console.log(`      - ${error}`))
+          }
         }
-      }
 
-      console.log(`   ✅ Schema validation results: ${validCount} valid, ${invalidCount} invalid`)
-      expect(validCount).toBeGreaterThan(0)
-    })
+        console.log(`   ✅ Schema validation results: ${validCount} valid, ${invalidCount} invalid`)
+        expect(validCount).toBeGreaterThan(0)
+      },
+    )
   })
 })

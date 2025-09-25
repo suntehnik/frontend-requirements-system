@@ -12,7 +12,7 @@ import type {
   UserStory,
   Epic,
   CreateEpicRequest,
-  CreateUserStoryRequest
+  CreateUserStoryRequest,
 } from '@/types'
 import { SchemaValidator } from '@/test/utils/api-response-validator'
 
@@ -36,7 +36,7 @@ class TestAuthManager {
 
       const loginResponse = await authService.login({
         username,
-        password
+        password,
       })
 
       // Store token information
@@ -58,11 +58,17 @@ class TestAuthManager {
     if (this.authToken && this.expiresAt) {
       const authData = JSON.stringify({
         token: this.authToken,
-        expires_at: this.expiresAt
+        expires_at: this.expiresAt,
       })
 
       // Update the mocked localStorage
-      const localStorageMock = (window as unknown as { localStorage: { getItem: { mockImplementation: (fn: (key: string) => string | null) => void } } }).localStorage
+      const localStorageMock = (
+        window as unknown as {
+          localStorage: {
+            getItem: { mockImplementation: (fn: (key: string) => string | null) => void }
+          }
+        }
+      ).localStorage
       localStorageMock.getItem.mockImplementation((key: string) => {
         if (key === 'auth') {
           return authData
@@ -83,7 +89,13 @@ class TestAuthManager {
     this.expiresAt = null
 
     // Clear localStorage mock
-    const localStorageMock = (window as unknown as { localStorage: { getItem: { mockImplementation: (fn: (key: string) => string | null) => void } } }).localStorage
+    const localStorageMock = (
+      window as unknown as {
+        localStorage: {
+          getItem: { mockImplementation: (fn: (key: string) => string | null) => void }
+        }
+      }
+    ).localStorage
     localStorageMock.getItem.mockImplementation(() => null)
   }
 }
@@ -99,7 +111,7 @@ class RequirementTestDataManager {
       title: `Test Epic for Requirements ${Date.now()}`,
       description: 'Test epic for requirement integration testing',
       priority: 3,
-      ...overrides
+      ...overrides,
     }
 
     const epic = await epicService.create(testEpic)
@@ -107,13 +119,16 @@ class RequirementTestDataManager {
     return epic
   }
 
-  async createTestUserStory(epicId: string, overrides?: Partial<CreateUserStoryRequest>): Promise<UserStory> {
+  async createTestUserStory(
+    epicId: string,
+    overrides?: Partial<CreateUserStoryRequest>,
+  ): Promise<UserStory> {
     const testUserStory: CreateUserStoryRequest = {
       title: `Test User Story for Requirements ${Date.now()}`,
       description: 'Test user story for requirement integration testing',
       priority: 3,
       epic_id: epicId,
-      ...overrides
+      ...overrides,
     }
 
     const userStory = await userStoryService.create(testUserStory)
@@ -121,14 +136,18 @@ class RequirementTestDataManager {
     return userStory
   }
 
-  async createTestRequirement(userStoryId: string, typeId: string, overrides?: Partial<CreateRequirementRequest>): Promise<Requirement> {
+  async createTestRequirement(
+    userStoryId: string,
+    typeId: string,
+    overrides?: Partial<CreateRequirementRequest>,
+  ): Promise<Requirement> {
     const testRequirement: CreateRequirementRequest = {
       title: `Test Requirement ${Date.now()}`,
       description: 'Test requirement for integration testing',
       priority: 3,
       user_story_id: userStoryId,
       type_id: typeId,
-      ...overrides
+      ...overrides,
     }
 
     const requirement = await requirementService.create(testRequirement)
@@ -195,7 +214,9 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         // Create test epic and user story for requirement tests
         const testEpic = await testDataManager.createTestEpic()
         testUserStory = await testDataManager.createTestUserStory(testEpic.id)
-        console.log(`📝 Created test user story for requirement tests: ${testUserStory.reference_id}`)
+        console.log(
+          `📝 Created test user story for requirement tests: ${testUserStory.reference_id}`,
+        )
 
         // Get a requirement type for testing (assuming at least one exists)
         // For now, we'll use a placeholder UUID - in real tests this would come from config
@@ -232,7 +253,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         description: 'The system shall validate user input before processing',
         priority: 2,
         user_story_id: testUserStory.id,
-        type_id: testRequirementTypeId
+        type_id: testRequirementTypeId,
       }
 
       try {
@@ -291,7 +312,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         description: 'The system shall respond within 2 seconds',
         priority: 1,
         user_story_id: testUserStory.id,
-        type_id: testRequirementTypeId
+        type_id: testRequirementTypeId,
       }
 
       // Validate that our request object has the expected structure
@@ -319,7 +340,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         title: 'Minimal Requirement',
         priority: 4,
         user_story_id: testUserStory.id,
-        type_id: testRequirementTypeId
+        type_id: testRequirementTypeId,
       }
 
       try {
@@ -344,7 +365,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
       const response = await requirementService.list({
         limit: 10,
         offset: 0,
-        order_by: 'created_at'
+        order_by: 'created_at',
       })
 
       // Validate response structure
@@ -369,7 +390,9 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         expect(firstRequirement.user_story_id).toBeDefined()
         expect(firstRequirement.type_id).toBeDefined()
 
-        console.log(`🎯 First requirement: ${firstRequirement.reference_id} - "${firstRequirement.title}"`)
+        console.log(
+          `🎯 First requirement: ${firstRequirement.reference_id} - "${firstRequirement.title}"`,
+        )
       }
     })
 
@@ -381,7 +404,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
 
       const response = await requirementService.list({
         user_story_id: testUserStory.id,
-        limit: 20
+        limit: 20,
       })
 
       expect(response).toBeDefined()
@@ -393,7 +416,9 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         expect(requirement.user_story_id).toBe(testUserStory.id)
       })
 
-      console.log(`🔍 Requirements in test user story ${testUserStory.reference_id}: ${response.data.length}`)
+      console.log(
+        `🔍 Requirements in test user story ${testUserStory.reference_id}: ${response.data.length}`,
+      )
     })
 
     it.skipIf(!!process.env.CI)('should filter requirements by status', async () => {
@@ -404,7 +429,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
       for (const status of statuses) {
         const response = await requirementService.list({
           status,
-          limit: 10
+          limit: 10,
         })
 
         expect(response).toBeDefined()
@@ -428,7 +453,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
       for (const priority of priorities) {
         const response = await requirementService.list({
           priority,
-          limit: 10
+          limit: 10,
         })
 
         expect(response).toBeDefined()
@@ -436,7 +461,9 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         expect(Array.isArray(response.data)).toBe(true)
 
         const priorityText = ['', 'Critical', 'High', 'Medium', 'Low'][priority]
-        console.log(`   Priority ${priority} (${priorityText}): ${response.data.length} requirements`)
+        console.log(
+          `   Priority ${priority} (${priorityText}): ${response.data.length} requirements`,
+        )
 
         // Verify all requirements have the correct priority
         response.data.forEach((requirement: Requirement) => {
@@ -448,7 +475,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
     it.skipIf(!!process.env.CI)('should filter requirements by type_id', async () => {
       // Get the first requirement to use its type_id for filtering
       const firstResponse = await requirementService.list({ limit: 1 })
-      
+
       if (firstResponse.data.length === 0) {
         console.log('⏭️ Skipping test: No requirements available for type filtering')
         return
@@ -458,7 +485,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
 
       const response = await requirementService.list({
         type_id: actualTypeId,
-        limit: 10
+        limit: 10,
       })
 
       expect(response).toBeDefined()
@@ -476,7 +503,8 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
     it.skipIf(!!process.env.CI)('should include related data when requested', async () => {
       const response = await requirementService.list({
         limit: 5,
-        include: 'user_story,acceptance_criteria,type,creator,assignee,source_relationships,target_relationships'
+        include:
+          'user_story,acceptance_criteria,type,creator,assignee,source_relationships,target_relationships',
       })
 
       expect(response).toBeDefined()
@@ -491,13 +519,17 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
           expect(requirementWithIncludes.user_story.id).toBeDefined()
           expect(requirementWithIncludes.user_story.reference_id).toBeDefined()
           expect(requirementWithIncludes.user_story.title).toBeDefined()
-          console.log(`   📚 User Story: ${requirementWithIncludes.user_story.reference_id} - "${requirementWithIncludes.user_story.title}"`)
+          console.log(
+            `   📚 User Story: ${requirementWithIncludes.user_story.reference_id} - "${requirementWithIncludes.user_story.title}"`,
+          )
         }
 
         if (requirementWithIncludes.acceptance_criteria) {
           expect(requirementWithIncludes.acceptance_criteria.id).toBeDefined()
           expect(requirementWithIncludes.acceptance_criteria.reference_id).toBeDefined()
-          console.log(`   ✅ Acceptance Criteria: ${requirementWithIncludes.acceptance_criteria.reference_id}`)
+          console.log(
+            `   ✅ Acceptance Criteria: ${requirementWithIncludes.acceptance_criteria.reference_id}`,
+          )
         }
 
         if (requirementWithIncludes.type) {
@@ -520,12 +552,16 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
 
         if (requirementWithIncludes.source_relationships) {
           expect(Array.isArray(requirementWithIncludes.source_relationships)).toBe(true)
-          console.log(`   🔗 Source Relationships: ${requirementWithIncludes.source_relationships.length}`)
+          console.log(
+            `   🔗 Source Relationships: ${requirementWithIncludes.source_relationships.length}`,
+          )
         }
 
         if (requirementWithIncludes.target_relationships) {
           expect(Array.isArray(requirementWithIncludes.target_relationships)).toBe(true)
-          console.log(`   🎯 Target Relationships: ${requirementWithIncludes.target_relationships.length}`)
+          console.log(
+            `   🎯 Target Relationships: ${requirementWithIncludes.target_relationships.length}`,
+          )
         }
       }
     })
@@ -545,7 +581,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         type_id: testRequirementTypeId,
         limit: 10,
         order_by: 'created_at',
-        include: 'creator,assignee,type'
+        include: 'creator,assignee,type',
       })
 
       expect(response).toBeDefined()
@@ -569,7 +605,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
 
       const response = await requirementService.list({
         user_story_id: nonExistentId,
-        limit: 10
+        limit: 10,
       })
 
       expect(response).toBeDefined()
@@ -595,14 +631,19 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
       const existingRequirementId = listResponse.data[0].id
 
       // Retrieve the requirement by ID
-      const requirement = await requirementService.get(existingRequirementId, 'user_story,acceptance_criteria,type,creator,assignee')
+      const requirement = await requirementService.get(
+        existingRequirementId,
+        'user_story,acceptance_criteria,type,creator,assignee',
+      )
 
       expect(requirement).toBeDefined()
       expect(requirement.id).toBe(existingRequirementId)
       expect(requirement.reference_id).toBeDefined()
       expect(requirement.title).toBeDefined()
 
-      console.log(`\n🎯 Retrieved requirement by ID: ${requirement.reference_id} - "${requirement.title}"`)
+      console.log(
+        `\n🎯 Retrieved requirement by ID: ${requirement.reference_id} - "${requirement.title}"`,
+      )
 
       // Check included data
       if (requirement.user_story) {
@@ -637,16 +678,28 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         const requirement = await requirementService.get(requirementId)
 
         // Clean up empty related objects that the API returns as empty instead of null
-        if (requirement.creator && requirement.creator.id === '00000000-0000-0000-0000-000000000000') {
+        if (
+          requirement.creator &&
+          requirement.creator.id === '00000000-0000-0000-0000-000000000000'
+        ) {
           requirement.creator = undefined
         }
-        if (requirement.assignee && requirement.assignee.id === '00000000-0000-0000-0000-000000000000') {
+        if (
+          requirement.assignee &&
+          requirement.assignee.id === '00000000-0000-0000-0000-000000000000'
+        ) {
           requirement.assignee = undefined
         }
-        if (requirement.user_story && requirement.user_story.id === '00000000-0000-0000-0000-000000000000') {
+        if (
+          requirement.user_story &&
+          requirement.user_story.id === '00000000-0000-0000-0000-000000000000'
+        ) {
           requirement.user_story = undefined
         }
-        if (requirement.acceptance_criteria && requirement.acceptance_criteria.id === '00000000-0000-0000-0000-000000000000') {
+        if (
+          requirement.acceptance_criteria &&
+          requirement.acceptance_criteria.id === '00000000-0000-0000-0000-000000000000'
+        ) {
           requirement.acceptance_criteria = undefined
         }
         if (requirement.type && requirement.type.id === '00000000-0000-0000-0000-000000000000') {
@@ -664,7 +717,9 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
 
         expect(validation.isValid).toBe(true)
 
-        console.log(`✅ Individual requirement schema validation passed: ${requirement.reference_id}`)
+        console.log(
+          `✅ Individual requirement schema validation passed: ${requirement.reference_id}`,
+        )
       } else {
         console.log('ℹ️ No requirements available for individual schema validation')
       }
@@ -685,57 +740,64 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
   })
 
   describe('PUT /api/v1/requirements/:id - Update Requirement', () => {
-    it.skipIf(!!process.env.CI)('should test requirement update endpoint (requires existing requirement)', async () => {
-      // Get an existing requirement to test with
-      const listResponse = await requirementService.list({ limit: 1 })
+    it.skipIf(!!process.env.CI)(
+      'should test requirement update endpoint (requires existing requirement)',
+      async () => {
+        // Get an existing requirement to test with
+        const listResponse = await requirementService.list({ limit: 1 })
 
-      if (listResponse.data.length === 0) {
-        console.log('⏭️ Skipping test: No requirements available for update testing')
-        return
-      }
-
-      const existingRequirement = listResponse.data[0]
-      const originalTitle = existingRequirement.title
-      const originalPriority = existingRequirement.priority
-
-      console.log(`📝 Testing update on existing requirement: ${existingRequirement.reference_id}`)
-      console.log(`   Original title: "${originalTitle}"`)
-      console.log(`   Original priority: ${originalPriority}`)
-
-      // For integration testing, we'll test the update endpoint structure
-      // but revert changes to avoid affecting the test data
-      const updateRequest: UpdateRequirementRequest = {
-        title: `${originalTitle} [TEMP UPDATE]`,
-        priority: originalPriority === 1 ? 2 : 1
-      }
-
-      try {
-        const updatedRequirement = await requirementService.update(existingRequirement.id, updateRequest)
-
-        expect(updatedRequirement).toBeDefined()
-        expect(updatedRequirement.id).toBe(existingRequirement.id)
-        expect(updatedRequirement.title).toBe(updateRequest.title)
-        expect(updatedRequirement.priority).toBe(updateRequest.priority)
-
-        console.log(`✅ Update successful: ${updatedRequirement.reference_id}`)
-        console.log(`   New title: "${updatedRequirement.title}"`)
-        console.log(`   New priority: ${updatedRequirement.priority}`)
-
-        // Revert the changes
-        const revertRequest: UpdateRequirementRequest = {
-          title: originalTitle,
-          priority: originalPriority
+        if (listResponse.data.length === 0) {
+          console.log('⏭️ Skipping test: No requirements available for update testing')
+          return
         }
 
-        await requirementService.update(existingRequirement.id, revertRequest)
-        console.log(`🔄 Reverted changes to maintain test data integrity`)
+        const existingRequirement = listResponse.data[0]
+        const originalTitle = existingRequirement.title
+        const originalPriority = existingRequirement.priority
 
-      } catch (error) {
-        console.log(`⚠️ Requirement update failed: ${error}`)
-        // Test passes if we can identify the error type
-        expect(error).toBeDefined()
-      }
-    })
+        console.log(
+          `📝 Testing update on existing requirement: ${existingRequirement.reference_id}`,
+        )
+        console.log(`   Original title: "${originalTitle}"`)
+        console.log(`   Original priority: ${originalPriority}`)
+
+        // For integration testing, we'll test the update endpoint structure
+        // but revert changes to avoid affecting the test data
+        const updateRequest: UpdateRequirementRequest = {
+          title: `${originalTitle} [TEMP UPDATE]`,
+          priority: originalPriority === 1 ? 2 : 1,
+        }
+
+        try {
+          const updatedRequirement = await requirementService.update(
+            existingRequirement.id,
+            updateRequest,
+          )
+
+          expect(updatedRequirement).toBeDefined()
+          expect(updatedRequirement.id).toBe(existingRequirement.id)
+          expect(updatedRequirement.title).toBe(updateRequest.title)
+          expect(updatedRequirement.priority).toBe(updateRequest.priority)
+
+          console.log(`✅ Update successful: ${updatedRequirement.reference_id}`)
+          console.log(`   New title: "${updatedRequirement.title}"`)
+          console.log(`   New priority: ${updatedRequirement.priority}`)
+
+          // Revert the changes
+          const revertRequest: UpdateRequirementRequest = {
+            title: originalTitle,
+            priority: originalPriority,
+          }
+
+          await requirementService.update(existingRequirement.id, revertRequest)
+          console.log(`🔄 Reverted changes to maintain test data integrity`)
+        } catch (error) {
+          console.log(`⚠️ Requirement update failed: ${error}`)
+          // Test passes if we can identify the error type
+          expect(error).toBeDefined()
+        }
+      },
+    )
 
     it.skipIf(!!process.env.CI)('should test partial requirement update', async () => {
       // Get an existing requirement to test with
@@ -751,11 +813,14 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
 
       // Test partial update (only title)
       const updateRequest: UpdateRequirementRequest = {
-        title: `${originalTitle} [PARTIAL UPDATE]`
+        title: `${originalTitle} [PARTIAL UPDATE]`,
       }
 
       try {
-        const updatedRequirement = await requirementService.update(existingRequirement.id, updateRequest)
+        const updatedRequirement = await requirementService.update(
+          existingRequirement.id,
+          updateRequest,
+        )
 
         expect(updatedRequirement.title).toBe(updateRequest.title)
         // Other fields should remain unchanged
@@ -767,11 +832,10 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
 
         // Revert the change
         const revertRequest: UpdateRequirementRequest = {
-          title: originalTitle
+          title: originalTitle,
         }
         await requirementService.update(existingRequirement.id, revertRequest)
         console.log(`🔄 Reverted partial update`)
-
       } catch (error) {
         console.log(`⚠️ Partial requirement update failed: ${error}`)
         expect(error).toBeDefined()
@@ -782,7 +846,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
       const updateRequest: UpdateRequirementRequest = {
         title: 'Updated Requirement Title',
         description: 'Updated requirement description',
-        priority: 2
+        priority: 2,
       }
 
       // Validate that our request object has the expected structure
@@ -800,7 +864,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
     it.skipIf(!!process.env.CI)('should handle update of non-existent requirement', async () => {
       const nonExistentId = '00000000-0000-0000-0000-000000000000'
       const updateRequest: UpdateRequirementRequest = {
-        title: 'This should fail'
+        title: 'This should fail',
       }
 
       try {
@@ -815,29 +879,32 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
   })
 
   describe('DELETE /api/v1/requirements/:id - Delete Requirement', () => {
-    it.skipIf(!!process.env.CI)('should test requirement deletion endpoint (skipped to preserve test data)', async () => {
-      // For integration testing, we'll test the deletion endpoint behavior
-      // without actually deleting existing requirements to preserve test data
+    it.skipIf(!!process.env.CI)(
+      'should test requirement deletion endpoint (skipped to preserve test data)',
+      async () => {
+        // For integration testing, we'll test the deletion endpoint behavior
+        // without actually deleting existing requirements to preserve test data
 
-      console.log('📝 Testing requirement deletion endpoint behavior')
-      console.log('⚠️ Actual deletion skipped to preserve test data integrity')
+        console.log('📝 Testing requirement deletion endpoint behavior')
+        console.log('⚠️ Actual deletion skipped to preserve test data integrity')
 
-      // Test deletion of non-existent requirement to verify error handling
-      const nonExistentId = '00000000-0000-0000-0000-000000000000'
+        // Test deletion of non-existent requirement to verify error handling
+        const nonExistentId = '00000000-0000-0000-0000-000000000000'
 
-      try {
-        await requirementService.delete(nonExistentId)
-        throw new Error('Should have failed to delete non-existent requirement')
-      } catch (error) {
-        // Expected to fail with 404 or similar error
-        expect(error).toBeDefined()
-        console.log('✅ Correctly handled deletion of non-existent requirement')
-      }
+        try {
+          await requirementService.delete(nonExistentId)
+          throw new Error('Should have failed to delete non-existent requirement')
+        } catch (error) {
+          // Expected to fail with 404 or similar error
+          expect(error).toBeDefined()
+          console.log('✅ Correctly handled deletion of non-existent requirement')
+        }
 
-      // If we had a test requirement, the deletion would work like this:
-      // await requirementService.delete(testRequirement.id)
-      console.log('📋 Deletion endpoint structure validated')
-    })
+        // If we had a test requirement, the deletion would work like this:
+        // await requirementService.delete(testRequirement.id)
+        console.log('📋 Deletion endpoint structure validated')
+      },
+    )
 
     it.skipIf(!!process.env.CI)('should handle deletion of non-existent requirement', async () => {
       const nonExistentId = '00000000-0000-0000-0000-000000000000'
@@ -878,7 +945,9 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
           expect(Array.isArray(validationResult.warnings)).toBe(true)
         }
 
-        console.log(`✅ Deletion validation for ${existingRequirement.reference_id}: can_delete=${validationResult.can_delete}`)
+        console.log(
+          `✅ Deletion validation for ${existingRequirement.reference_id}: can_delete=${validationResult.can_delete}`,
+        )
         if (validationResult.dependencies && validationResult.dependencies.length > 0) {
           console.log(`   Dependencies: ${validationResult.dependencies.length}`)
         }
@@ -895,7 +964,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
 
       const response = await requirementService.list({
         limit: 3,
-        include: 'user_story,acceptance_criteria,type,creator,assignee'
+        include: 'user_story,acceptance_criteria,type,creator,assignee',
       })
 
       // Validate list response structure
@@ -1001,16 +1070,28 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
 
       for (const requirement of response.data) {
         // Clean up empty related objects that the API returns as empty instead of null
-        if (requirement.creator && requirement.creator.id === '00000000-0000-0000-0000-000000000000') {
+        if (
+          requirement.creator &&
+          requirement.creator.id === '00000000-0000-0000-0000-000000000000'
+        ) {
           requirement.creator = undefined
         }
-        if (requirement.assignee && requirement.assignee.id === '00000000-0000-0000-0000-000000000000') {
+        if (
+          requirement.assignee &&
+          requirement.assignee.id === '00000000-0000-0000-0000-000000000000'
+        ) {
           requirement.assignee = undefined
         }
-        if (requirement.user_story && requirement.user_story.id === '00000000-0000-0000-0000-000000000000') {
+        if (
+          requirement.user_story &&
+          requirement.user_story.id === '00000000-0000-0000-0000-000000000000'
+        ) {
           requirement.user_story = undefined
         }
-        if (requirement.acceptance_criteria && requirement.acceptance_criteria.id === '00000000-0000-0000-0000-000000000000') {
+        if (
+          requirement.acceptance_criteria &&
+          requirement.acceptance_criteria.id === '00000000-0000-0000-0000-000000000000'
+        ) {
           requirement.acceptance_criteria = undefined
         }
         if (requirement.type && requirement.type.id === '00000000-0000-0000-0000-000000000000') {
@@ -1024,7 +1105,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         } else {
           invalidCount++
           console.log(`   ❌ Schema validation failed for ${requirement.reference_id}:`)
-          validation.errors.forEach(error => console.log(`      - ${error}`))
+          validation.errors.forEach((error) => console.log(`      - ${error}`))
         }
       }
 

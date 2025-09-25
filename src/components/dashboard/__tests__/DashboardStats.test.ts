@@ -13,7 +13,7 @@ const vuetify = createVuetify()
 describe('DashboardStats', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    
+
     // Mock the entities store
     vi.mocked(useEntitiesStore).mockReturnValue({
       stats: {
@@ -37,7 +37,7 @@ describe('DashboardStats', () => {
     expect(wrapper.text()).toContain('12') // user stories count
     expect(wrapper.text()).toContain('25') // requirements count
     expect(wrapper.text()).toContain('8') // active tasks count
-    
+
     // Check labels
     expect(wrapper.text()).toContain('Эпики')
     expect(wrapper.text()).toContain('Пользовательские истории')
@@ -57,8 +57,8 @@ describe('DashboardStats', () => {
 
     // Check that loading prop is passed correctly
     expect(wrapper.props('loading')).toBe(true)
-    
-    // In a real test environment with proper Vuetify setup, 
+
+    // In a real test environment with proper Vuetify setup,
     // we would check for loading indicators
     // For now, just verify the component renders
     expect(wrapper.exists()).toBe(true)

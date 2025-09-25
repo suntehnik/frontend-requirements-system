@@ -4,9 +4,7 @@
     <v-row class="mb-6">
       <v-col cols="12">
         <div>
-          <h1 class="text-h4 font-weight-bold text-primary mb-2">
-            Главная страница
-          </h1>
+          <h1 class="text-h4 font-weight-bold text-primary mb-2">Главная страница</h1>
           <p class="text-body-1 text-medium-emphasis mb-0">
             Добро пожаловать в систему управления требованиями
           </p>
@@ -33,12 +31,7 @@
     <!-- Error Display -->
     <v-row v-if="error" class="mt-4">
       <v-col cols="12">
-        <v-alert
-          type="error"
-          variant="tonal"
-          closable
-          @click:close="clearError"
-        >
+        <v-alert type="error" variant="tonal" closable @click:close="clearError">
           <v-alert-title>Ошибка загрузки данных</v-alert-title>
           {{ error }}
         </v-alert>
@@ -73,17 +66,17 @@ onMounted(async () => {
   try {
     // Load dashboard data
     await entitiesStore.loadDashboardData()
-    
+
     // Show success notification
     uiStore.showSuccess('Данные загружены', 'Информация на главной странице обновлена')
   } catch (error) {
     console.error('Failed to load dashboard data:', error)
-    
+
     // Show error notification
     uiStore.showError(
       'Ошибка загрузки',
       'Не удалось загрузить данные для главной страницы. Попробуйте обновить страницу.',
-      true // persistent
+      true, // persistent
     )
   }
 })

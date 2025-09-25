@@ -1,16 +1,11 @@
 /**
  * API Response Validator
- * 
+ *
  * Validates API responses against TypeScript interfaces and expected behavior.
  * Provides schema validation, HTTP status code validation, and data type validation.
  */
 
-import type {
-  EpicStatus,
-  UserStoryStatus,
-  RequirementStatus,
-  Priority
-} from '@/types'
+import type { EpicStatus, UserStoryStatus, RequirementStatus, Priority } from '@/types'
 
 // Validation result types
 export interface ValidationResult {
@@ -52,7 +47,7 @@ export class HttpStatusValidator {
   static validate(
     actualStatus: number,
     expectedStatus: number,
-    statusText?: string
+    statusText?: string,
   ): HttpStatusValidationResult {
     const isValid = actualStatus === expectedStatus
     const errors: string[] = []
@@ -62,7 +57,7 @@ export class HttpStatusValidator {
       errors.push(
         `Expected HTTP status ${expectedStatus}, got ${actualStatus}${
           statusText ? ` (${statusText})` : ''
-        }`
+        }`,
       )
     }
 
@@ -78,7 +73,7 @@ export class HttpStatusValidator {
       warnings,
       expectedStatus,
       actualStatus,
-      statusText: statusText || ''
+      statusText: statusText || '',
     }
   }
 
@@ -94,7 +89,7 @@ export class HttpStatusValidator {
       errors.push(
         `Expected success status (${this.VALID_SUCCESS_CODES.join(', ')}), got ${actualStatus}${
           statusText ? ` (${statusText})` : ''
-        }`
+        }`,
       )
     }
 
@@ -104,7 +99,7 @@ export class HttpStatusValidator {
       warnings,
       expectedStatus: 200, // Default expected success status
       actualStatus,
-      statusText: statusText || ''
+      statusText: statusText || '',
     }
   }
 
@@ -114,7 +109,7 @@ export class HttpStatusValidator {
   static validateError(
     actualStatus: number,
     expectedErrorStatus?: number,
-    statusText?: string
+    statusText?: string,
   ): HttpStatusValidationResult {
     const isValidErrorCode = this.VALID_ERROR_CODES.includes(actualStatus)
     const isExpectedError = expectedErrorStatus ? actualStatus === expectedErrorStatus : true
@@ -127,7 +122,7 @@ export class HttpStatusValidator {
       errors.push(
         `Expected error status (${this.VALID_ERROR_CODES.join(', ')}), got ${actualStatus}${
           statusText ? ` (${statusText})` : ''
-        }`
+        }`,
       )
     }
 
@@ -135,7 +130,7 @@ export class HttpStatusValidator {
       errors.push(
         `Expected specific error status ${expectedErrorStatus}, got ${actualStatus}${
           statusText ? ` (${statusText})` : ''
-        }`
+        }`,
       )
     }
 
@@ -145,7 +140,7 @@ export class HttpStatusValidator {
       warnings,
       expectedStatus: expectedErrorStatus || 400, // Default expected error status
       actualStatus,
-      statusText: statusText || ''
+      statusText: statusText || '',
     }
   }
 }
@@ -161,7 +156,7 @@ export class DataTypeValidator {
     value: unknown,
     expectedType: string,
     fieldName: string,
-    isOptional = false
+    isOptional = false,
   ): FieldValidationResult {
     const actualType = value === null ? 'null' : typeof value
     let isValid = true
@@ -174,7 +169,7 @@ export class DataTypeValidator {
         isValid: true,
         expectedType,
         actualType,
-        message: 'Optional field is undefined/null'
+        message: 'Optional field is undefined/null',
       }
     }
 
@@ -185,7 +180,7 @@ export class DataTypeValidator {
         isValid: false,
         expectedType,
         actualType,
-        message: `Required field '${fieldName}' is missing or null`
+        message: `Required field '${fieldName}' is missing or null`,
       }
     }
 
@@ -234,7 +229,9 @@ export class DataTypeValidator {
         break
 
       case 'uuid':
-        isValid = typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
+        isValid =
+          typeof value === 'string' &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
         if (!isValid) {
           message = `Expected UUID string, got ${actualType}`
         }
@@ -250,7 +247,7 @@ export class DataTypeValidator {
       isValid,
       expectedType,
       actualType,
-      message: message || 'Valid'
+      message: message || 'Valid',
     }
   }
 
@@ -261,7 +258,7 @@ export class DataTypeValidator {
     value: unknown,
     validValues: T[],
     fieldName: string,
-    isOptional = false
+    isOptional = false,
   ): FieldValidationResult {
     if (isOptional && (value === undefined || value === null)) {
       return {
@@ -269,7 +266,7 @@ export class DataTypeValidator {
         isValid: true,
         expectedType: `enum(${validValues.join('|')})`,
         actualType: value === null ? 'null' : typeof value,
-        message: 'Optional enum field is undefined/null'
+        message: 'Optional enum field is undefined/null',
       }
     }
 
@@ -281,9 +278,9 @@ export class DataTypeValidator {
       isValid,
       expectedType: `enum(${validValues.join('|')})`,
       actualType,
-      message: isValid 
-        ? 'Valid enum value' 
-        : `Expected one of [${validValues.join(', ')}], got ${value}`
+      message: isValid
+        ? 'Valid enum value'
+        : `Expected one of [${validValues.join(', ')}], got ${value}`,
     }
   }
 }
@@ -309,7 +306,7 @@ export class SchemaValidator {
         warnings,
         fieldValidations,
         missingFields,
-        unexpectedFields
+        unexpectedFields,
       }
     }
 
@@ -341,7 +338,7 @@ export class SchemaValidator {
     }
 
     // Collect errors from field validations
-    fieldValidations.forEach(validation => {
+    fieldValidations.forEach((validation) => {
       if (!validation.isValid) {
         errors.push(`Field '${validation.field}': ${validation.message}`)
       }
@@ -361,7 +358,7 @@ export class SchemaValidator {
       warnings,
       fieldValidations,
       missingFields,
-      unexpectedFields
+      unexpectedFields,
     }
   }
 
@@ -382,13 +379,29 @@ export class SchemaValidator {
         warnings,
         fieldValidations,
         missingFields,
-        unexpectedFields
+        unexpectedFields,
       }
     }
 
     const epic = data as Record<string, unknown>
-    const requiredFields = ['id', 'reference_id', 'title', 'status', 'priority', 'creator_id', 'created_at', 'last_modified']
-    const optionalFields = ['description', 'assignee_id', 'creator', 'assignee', 'user_stories', 'comments']
+    const requiredFields = [
+      'id',
+      'reference_id',
+      'title',
+      'status',
+      'priority',
+      'creator_id',
+      'created_at',
+      'last_modified',
+    ]
+    const optionalFields = [
+      'description',
+      'assignee_id',
+      'creator',
+      'assignee',
+      'user_stories',
+      'comments',
+    ]
     const validStatuses: EpicStatus[] = ['Backlog', 'Draft', 'In Progress', 'Done', 'Cancelled']
     const validPriorities: Priority[] = [1, 2, 3, 4]
 
@@ -401,17 +414,27 @@ export class SchemaValidator {
 
     // Validate required field types
     fieldValidations.push(DataTypeValidator.validateField(epic.id, 'uuid', 'id'))
-    fieldValidations.push(DataTypeValidator.validateField(epic.reference_id, 'string', 'reference_id'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(epic.reference_id, 'string', 'reference_id'),
+    )
     fieldValidations.push(DataTypeValidator.validateField(epic.title, 'string', 'title'))
     fieldValidations.push(DataTypeValidator.validateEnum(epic.status, validStatuses, 'status'))
-    fieldValidations.push(DataTypeValidator.validateEnum(epic.priority, validPriorities, 'priority'))
+    fieldValidations.push(
+      DataTypeValidator.validateEnum(epic.priority, validPriorities, 'priority'),
+    )
     fieldValidations.push(DataTypeValidator.validateField(epic.creator_id, 'uuid', 'creator_id'))
     fieldValidations.push(DataTypeValidator.validateField(epic.created_at, 'date', 'created_at'))
-    fieldValidations.push(DataTypeValidator.validateField(epic.last_modified, 'date', 'last_modified'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(epic.last_modified, 'date', 'last_modified'),
+    )
 
     // Validate optional fields
-    fieldValidations.push(DataTypeValidator.validateField(epic.description, 'string', 'description', true))
-    fieldValidations.push(DataTypeValidator.validateField(epic.assignee_id, 'uuid', 'assignee_id', true))
+    fieldValidations.push(
+      DataTypeValidator.validateField(epic.description, 'string', 'description', true),
+    )
+    fieldValidations.push(
+      DataTypeValidator.validateField(epic.assignee_id, 'uuid', 'assignee_id', true),
+    )
 
     // Validate nested objects if present
     if (epic.creator) {
@@ -429,11 +452,15 @@ export class SchemaValidator {
     }
 
     if (epic.user_stories) {
-      fieldValidations.push(DataTypeValidator.validateField(epic.user_stories, 'array', 'user_stories', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(epic.user_stories, 'array', 'user_stories', true),
+      )
     }
 
     if (epic.comments) {
-      fieldValidations.push(DataTypeValidator.validateField(epic.comments, 'array', 'comments', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(epic.comments, 'array', 'comments', true),
+      )
     }
 
     // Check for unexpected fields
@@ -445,7 +472,7 @@ export class SchemaValidator {
     }
 
     // Collect errors from field validations
-    fieldValidations.forEach(validation => {
+    fieldValidations.forEach((validation) => {
       if (!validation.isValid) {
         errors.push(`Field '${validation.field}': ${validation.message}`)
       }
@@ -465,7 +492,7 @@ export class SchemaValidator {
       warnings,
       fieldValidations,
       missingFields,
-      unexpectedFields
+      unexpectedFields,
     }
   }
 
@@ -486,14 +513,39 @@ export class SchemaValidator {
         warnings,
         fieldValidations,
         missingFields,
-        unexpectedFields
+        unexpectedFields,
       }
     }
 
     const userStory = data as Record<string, unknown>
-    const requiredFields = ['id', 'reference_id', 'title', 'status', 'priority', 'epic_id', 'creator_id', 'created_at', 'last_modified']
-    const optionalFields = ['description', 'assignee_id', 'epic', 'creator', 'assignee', 'acceptance_criteria', 'requirements', 'comments']
-    const validStatuses: UserStoryStatus[] = ['Backlog', 'Draft', 'In Progress', 'Done', 'Cancelled']
+    const requiredFields = [
+      'id',
+      'reference_id',
+      'title',
+      'status',
+      'priority',
+      'epic_id',
+      'creator_id',
+      'created_at',
+      'last_modified',
+    ]
+    const optionalFields = [
+      'description',
+      'assignee_id',
+      'epic',
+      'creator',
+      'assignee',
+      'acceptance_criteria',
+      'requirements',
+      'comments',
+    ]
+    const validStatuses: UserStoryStatus[] = [
+      'Backlog',
+      'Draft',
+      'In Progress',
+      'Done',
+      'Cancelled',
+    ]
     const validPriorities: Priority[] = [1, 2, 3, 4]
 
     // Check required fields
@@ -505,18 +557,32 @@ export class SchemaValidator {
 
     // Validate required field types
     fieldValidations.push(DataTypeValidator.validateField(userStory.id, 'uuid', 'id'))
-    fieldValidations.push(DataTypeValidator.validateField(userStory.reference_id, 'string', 'reference_id'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(userStory.reference_id, 'string', 'reference_id'),
+    )
     fieldValidations.push(DataTypeValidator.validateField(userStory.title, 'string', 'title'))
     fieldValidations.push(DataTypeValidator.validateEnum(userStory.status, validStatuses, 'status'))
-    fieldValidations.push(DataTypeValidator.validateEnum(userStory.priority, validPriorities, 'priority'))
+    fieldValidations.push(
+      DataTypeValidator.validateEnum(userStory.priority, validPriorities, 'priority'),
+    )
     fieldValidations.push(DataTypeValidator.validateField(userStory.epic_id, 'uuid', 'epic_id'))
-    fieldValidations.push(DataTypeValidator.validateField(userStory.creator_id, 'uuid', 'creator_id'))
-    fieldValidations.push(DataTypeValidator.validateField(userStory.created_at, 'date', 'created_at'))
-    fieldValidations.push(DataTypeValidator.validateField(userStory.last_modified, 'date', 'last_modified'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(userStory.creator_id, 'uuid', 'creator_id'),
+    )
+    fieldValidations.push(
+      DataTypeValidator.validateField(userStory.created_at, 'date', 'created_at'),
+    )
+    fieldValidations.push(
+      DataTypeValidator.validateField(userStory.last_modified, 'date', 'last_modified'),
+    )
 
     // Validate optional fields
-    fieldValidations.push(DataTypeValidator.validateField(userStory.description, 'string', 'description', true))
-    fieldValidations.push(DataTypeValidator.validateField(userStory.assignee_id, 'uuid', 'assignee_id', true))
+    fieldValidations.push(
+      DataTypeValidator.validateField(userStory.description, 'string', 'description', true),
+    )
+    fieldValidations.push(
+      DataTypeValidator.validateField(userStory.assignee_id, 'uuid', 'assignee_id', true),
+    )
 
     // Validate nested objects if present
     if (userStory.epic) {
@@ -539,15 +605,26 @@ export class SchemaValidator {
     }
 
     if (userStory.acceptance_criteria) {
-      fieldValidations.push(DataTypeValidator.validateField(userStory.acceptance_criteria, 'array', 'acceptance_criteria', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(
+          userStory.acceptance_criteria,
+          'array',
+          'acceptance_criteria',
+          true,
+        ),
+      )
     }
 
     if (userStory.requirements) {
-      fieldValidations.push(DataTypeValidator.validateField(userStory.requirements, 'array', 'requirements', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(userStory.requirements, 'array', 'requirements', true),
+      )
     }
 
     if (userStory.comments) {
-      fieldValidations.push(DataTypeValidator.validateField(userStory.comments, 'array', 'comments', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(userStory.comments, 'array', 'comments', true),
+      )
     }
 
     // Check for unexpected fields
@@ -559,7 +636,7 @@ export class SchemaValidator {
     }
 
     // Collect errors from field validations
-    fieldValidations.forEach(validation => {
+    fieldValidations.forEach((validation) => {
       if (!validation.isValid) {
         errors.push(`Field '${validation.field}': ${validation.message}`)
       }
@@ -579,7 +656,7 @@ export class SchemaValidator {
       warnings,
       fieldValidations,
       missingFields,
-      unexpectedFields
+      unexpectedFields,
     }
   }
 
@@ -600,12 +677,20 @@ export class SchemaValidator {
         warnings,
         fieldValidations,
         missingFields,
-        unexpectedFields
+        unexpectedFields,
       }
     }
 
     const ac = data as Record<string, unknown>
-    const requiredFields = ['id', 'reference_id', 'description', 'user_story_id', 'author_id', 'created_at', 'last_modified']
+    const requiredFields = [
+      'id',
+      'reference_id',
+      'description',
+      'user_story_id',
+      'author_id',
+      'created_at',
+      'last_modified',
+    ]
     const optionalFields = ['user_story', 'author', 'requirements', 'comments']
 
     // Check required fields
@@ -617,16 +702,24 @@ export class SchemaValidator {
 
     // Validate required field types
     fieldValidations.push(DataTypeValidator.validateField(ac.id, 'uuid', 'id'))
-    fieldValidations.push(DataTypeValidator.validateField(ac.reference_id, 'string', 'reference_id'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(ac.reference_id, 'string', 'reference_id'),
+    )
     fieldValidations.push(DataTypeValidator.validateField(ac.description, 'string', 'description'))
-    fieldValidations.push(DataTypeValidator.validateField(ac.user_story_id, 'uuid', 'user_story_id'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(ac.user_story_id, 'uuid', 'user_story_id'),
+    )
     fieldValidations.push(DataTypeValidator.validateField(ac.author_id, 'uuid', 'author_id'))
     fieldValidations.push(DataTypeValidator.validateField(ac.created_at, 'date', 'created_at'))
-    fieldValidations.push(DataTypeValidator.validateField(ac.last_modified, 'date', 'last_modified'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(ac.last_modified, 'date', 'last_modified'),
+    )
 
     // Validate nested objects if present
     if (ac.user_story) {
-      fieldValidations.push(DataTypeValidator.validateField(ac.user_story, 'object', 'user_story', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(ac.user_story, 'object', 'user_story', true),
+      )
     }
 
     if (ac.author) {
@@ -637,7 +730,9 @@ export class SchemaValidator {
     }
 
     if (ac.requirements) {
-      fieldValidations.push(DataTypeValidator.validateField(ac.requirements, 'array', 'requirements', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(ac.requirements, 'array', 'requirements', true),
+      )
     }
 
     if (ac.comments) {
@@ -653,7 +748,7 @@ export class SchemaValidator {
     }
 
     // Collect errors from field validations
-    fieldValidations.forEach(validation => {
+    fieldValidations.forEach((validation) => {
       if (!validation.isValid) {
         errors.push(`Field '${validation.field}': ${validation.message}`)
       }
@@ -673,7 +768,7 @@ export class SchemaValidator {
       warnings,
       fieldValidations,
       missingFields,
-      unexpectedFields
+      unexpectedFields,
     }
   }
 
@@ -694,13 +789,36 @@ export class SchemaValidator {
         warnings,
         fieldValidations,
         missingFields,
-        unexpectedFields
+        unexpectedFields,
       }
     }
 
     const req = data as Record<string, unknown>
-    const requiredFields = ['id', 'reference_id', 'title', 'status', 'priority', 'user_story_id', 'type_id', 'creator_id', 'created_at', 'last_modified']
-    const optionalFields = ['description', 'acceptance_criteria_id', 'assignee_id', 'user_story', 'acceptance_criteria', 'type', 'creator', 'assignee', 'source_relationships', 'target_relationships', 'comments']
+    const requiredFields = [
+      'id',
+      'reference_id',
+      'title',
+      'status',
+      'priority',
+      'user_story_id',
+      'type_id',
+      'creator_id',
+      'created_at',
+      'last_modified',
+    ]
+    const optionalFields = [
+      'description',
+      'acceptance_criteria_id',
+      'assignee_id',
+      'user_story',
+      'acceptance_criteria',
+      'type',
+      'creator',
+      'assignee',
+      'source_relationships',
+      'target_relationships',
+      'comments',
+    ]
     const validStatuses: RequirementStatus[] = ['Draft', 'Active', 'Obsolete']
     const validPriorities: Priority[] = [1, 2, 3, 4]
 
@@ -713,28 +831,54 @@ export class SchemaValidator {
 
     // Validate required field types
     fieldValidations.push(DataTypeValidator.validateField(req.id, 'uuid', 'id'))
-    fieldValidations.push(DataTypeValidator.validateField(req.reference_id, 'string', 'reference_id'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(req.reference_id, 'string', 'reference_id'),
+    )
     fieldValidations.push(DataTypeValidator.validateField(req.title, 'string', 'title'))
     fieldValidations.push(DataTypeValidator.validateEnum(req.status, validStatuses, 'status'))
     fieldValidations.push(DataTypeValidator.validateEnum(req.priority, validPriorities, 'priority'))
-    fieldValidations.push(DataTypeValidator.validateField(req.user_story_id, 'uuid', 'user_story_id'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(req.user_story_id, 'uuid', 'user_story_id'),
+    )
     fieldValidations.push(DataTypeValidator.validateField(req.type_id, 'uuid', 'type_id'))
     fieldValidations.push(DataTypeValidator.validateField(req.creator_id, 'uuid', 'creator_id'))
     fieldValidations.push(DataTypeValidator.validateField(req.created_at, 'date', 'created_at'))
-    fieldValidations.push(DataTypeValidator.validateField(req.last_modified, 'date', 'last_modified'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(req.last_modified, 'date', 'last_modified'),
+    )
 
     // Validate optional fields
-    fieldValidations.push(DataTypeValidator.validateField(req.description, 'string', 'description', true))
-    fieldValidations.push(DataTypeValidator.validateField(req.acceptance_criteria_id, 'uuid', 'acceptance_criteria_id', true))
-    fieldValidations.push(DataTypeValidator.validateField(req.assignee_id, 'uuid', 'assignee_id', true))
+    fieldValidations.push(
+      DataTypeValidator.validateField(req.description, 'string', 'description', true),
+    )
+    fieldValidations.push(
+      DataTypeValidator.validateField(
+        req.acceptance_criteria_id,
+        'uuid',
+        'acceptance_criteria_id',
+        true,
+      ),
+    )
+    fieldValidations.push(
+      DataTypeValidator.validateField(req.assignee_id, 'uuid', 'assignee_id', true),
+    )
 
     // Validate nested objects if present
     if (req.user_story) {
-      fieldValidations.push(DataTypeValidator.validateField(req.user_story, 'object', 'user_story', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(req.user_story, 'object', 'user_story', true),
+      )
     }
 
     if (req.acceptance_criteria) {
-      fieldValidations.push(DataTypeValidator.validateField(req.acceptance_criteria, 'object', 'acceptance_criteria', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(
+          req.acceptance_criteria,
+          'object',
+          'acceptance_criteria',
+          true,
+        ),
+      )
     }
 
     if (req.type) {
@@ -756,15 +900,31 @@ export class SchemaValidator {
     }
 
     if (req.source_relationships) {
-      fieldValidations.push(DataTypeValidator.validateField(req.source_relationships, 'array', 'source_relationships', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(
+          req.source_relationships,
+          'array',
+          'source_relationships',
+          true,
+        ),
+      )
     }
 
     if (req.target_relationships) {
-      fieldValidations.push(DataTypeValidator.validateField(req.target_relationships, 'array', 'target_relationships', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(
+          req.target_relationships,
+          'array',
+          'target_relationships',
+          true,
+        ),
+      )
     }
 
     if (req.comments) {
-      fieldValidations.push(DataTypeValidator.validateField(req.comments, 'array', 'comments', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(req.comments, 'array', 'comments', true),
+      )
     }
 
     // Check for unexpected fields
@@ -776,7 +936,7 @@ export class SchemaValidator {
     }
 
     // Collect errors from field validations
-    fieldValidations.forEach(validation => {
+    fieldValidations.forEach((validation) => {
       if (!validation.isValid) {
         errors.push(`Field '${validation.field}': ${validation.message}`)
       }
@@ -796,7 +956,7 @@ export class SchemaValidator {
       warnings,
       fieldValidations,
       missingFields,
-      unexpectedFields
+      unexpectedFields,
     }
   }
 
@@ -817,13 +977,30 @@ export class SchemaValidator {
         warnings,
         fieldValidations,
         missingFields,
-        unexpectedFields
+        unexpectedFields,
       }
     }
 
     const comment = data as Record<string, unknown>
-    const requiredFields = ['id', 'content', 'entity_type', 'entity_id', 'author_id', 'is_resolved', 'created_at', 'updated_at']
-    const optionalFields = ['parent_comment_id', 'linked_text', 'text_position_start', 'text_position_end', 'author', 'parent_comment', 'replies']
+    const requiredFields = [
+      'id',
+      'content',
+      'entity_type',
+      'entity_id',
+      'author_id',
+      'is_resolved',
+      'created_at',
+      'updated_at',
+    ]
+    const optionalFields = [
+      'parent_comment_id',
+      'linked_text',
+      'text_position_start',
+      'text_position_end',
+      'author',
+      'parent_comment',
+      'replies',
+    ]
     const validEntityTypes = ['epic', 'user_story', 'acceptance_criteria', 'requirement']
 
     // Check required fields
@@ -836,18 +1013,40 @@ export class SchemaValidator {
     // Validate required field types
     fieldValidations.push(DataTypeValidator.validateField(comment.id, 'uuid', 'id'))
     fieldValidations.push(DataTypeValidator.validateField(comment.content, 'string', 'content'))
-    fieldValidations.push(DataTypeValidator.validateEnum(comment.entity_type, validEntityTypes, 'entity_type'))
+    fieldValidations.push(
+      DataTypeValidator.validateEnum(comment.entity_type, validEntityTypes, 'entity_type'),
+    )
     fieldValidations.push(DataTypeValidator.validateField(comment.entity_id, 'uuid', 'entity_id'))
     fieldValidations.push(DataTypeValidator.validateField(comment.author_id, 'uuid', 'author_id'))
-    fieldValidations.push(DataTypeValidator.validateField(comment.is_resolved, 'boolean', 'is_resolved'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(comment.is_resolved, 'boolean', 'is_resolved'),
+    )
     fieldValidations.push(DataTypeValidator.validateField(comment.created_at, 'date', 'created_at'))
     fieldValidations.push(DataTypeValidator.validateField(comment.updated_at, 'date', 'updated_at'))
 
     // Validate optional fields
-    fieldValidations.push(DataTypeValidator.validateField(comment.parent_comment_id, 'uuid', 'parent_comment_id', true))
-    fieldValidations.push(DataTypeValidator.validateField(comment.linked_text, 'string', 'linked_text', true))
-    fieldValidations.push(DataTypeValidator.validateField(comment.text_position_start, 'number', 'text_position_start', true))
-    fieldValidations.push(DataTypeValidator.validateField(comment.text_position_end, 'number', 'text_position_end', true))
+    fieldValidations.push(
+      DataTypeValidator.validateField(comment.parent_comment_id, 'uuid', 'parent_comment_id', true),
+    )
+    fieldValidations.push(
+      DataTypeValidator.validateField(comment.linked_text, 'string', 'linked_text', true),
+    )
+    fieldValidations.push(
+      DataTypeValidator.validateField(
+        comment.text_position_start,
+        'number',
+        'text_position_start',
+        true,
+      ),
+    )
+    fieldValidations.push(
+      DataTypeValidator.validateField(
+        comment.text_position_end,
+        'number',
+        'text_position_end',
+        true,
+      ),
+    )
 
     // Validate nested objects if present
     if (comment.author) {
@@ -858,11 +1057,15 @@ export class SchemaValidator {
     }
 
     if (comment.parent_comment) {
-      fieldValidations.push(DataTypeValidator.validateField(comment.parent_comment, 'object', 'parent_comment', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(comment.parent_comment, 'object', 'parent_comment', true),
+      )
     }
 
     if (comment.replies) {
-      fieldValidations.push(DataTypeValidator.validateField(comment.replies, 'array', 'replies', true))
+      fieldValidations.push(
+        DataTypeValidator.validateField(comment.replies, 'array', 'replies', true),
+      )
     }
 
     // Check for unexpected fields
@@ -874,7 +1077,7 @@ export class SchemaValidator {
     }
 
     // Collect errors from field validations
-    fieldValidations.forEach(validation => {
+    fieldValidations.forEach((validation) => {
       if (!validation.isValid) {
         errors.push(`Field '${validation.field}': ${validation.message}`)
       }
@@ -894,7 +1097,7 @@ export class SchemaValidator {
       warnings,
       fieldValidations,
       missingFields,
-      unexpectedFields
+      unexpectedFields,
     }
   }
 
@@ -903,7 +1106,7 @@ export class SchemaValidator {
    */
   static validateListResponse(
     data: unknown,
-    itemValidator?: (item: unknown) => SchemaValidationResult
+    itemValidator?: (item: unknown) => SchemaValidationResult,
   ): SchemaValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
@@ -918,7 +1121,7 @@ export class SchemaValidator {
         warnings,
         fieldValidations,
         missingFields,
-        unexpectedFields
+        unexpectedFields,
       }
     }
 
@@ -934,7 +1137,9 @@ export class SchemaValidator {
 
     // Validate field types
     fieldValidations.push(DataTypeValidator.validateField(listResponse.data, 'array', 'data'))
-    fieldValidations.push(DataTypeValidator.validateField(listResponse.total_count, 'number', 'total_count'))
+    fieldValidations.push(
+      DataTypeValidator.validateField(listResponse.total_count, 'number', 'total_count'),
+    )
     fieldValidations.push(DataTypeValidator.validateField(listResponse.limit, 'number', 'limit'))
     fieldValidations.push(DataTypeValidator.validateField(listResponse.offset, 'number', 'offset'))
 
@@ -957,7 +1162,7 @@ export class SchemaValidator {
     }
 
     // Collect errors from field validations
-    fieldValidations.forEach(validation => {
+    fieldValidations.forEach((validation) => {
       if (!validation.isValid) {
         errors.push(`Field '${validation.field}': ${validation.message}`)
       }
@@ -977,7 +1182,7 @@ export class SchemaValidator {
       warnings,
       fieldValidations,
       missingFields,
-      unexpectedFields
+      unexpectedFields,
     }
   }
 }
@@ -997,7 +1202,7 @@ export class ApiResponseValidator {
       data: unknown
     },
     expectedStatus: number,
-    schemaValidator?: (data: unknown) => SchemaValidationResult
+    schemaValidator?: (data: unknown) => SchemaValidationResult,
   ): {
     httpValidation: HttpStatusValidationResult
     schemaValidation?: SchemaValidationResult
@@ -1006,7 +1211,7 @@ export class ApiResponseValidator {
     const httpValidation = HttpStatusValidator.validate(
       response.status,
       expectedStatus,
-      response.statusText
+      response.statusText,
     )
 
     let schemaValidation: SchemaValidationResult | undefined
@@ -1019,7 +1224,7 @@ export class ApiResponseValidator {
     return {
       httpValidation,
       schemaValidation,
-      overallValid
+      overallValid,
     }
   }
 
@@ -1028,12 +1233,10 @@ export class ApiResponseValidator {
    */
   static validateEpicListResponse(
     response: { status: number; statusText?: string; data: unknown },
-    expectedStatus = 200
+    expectedStatus = 200,
   ) {
-    return this.validateResponse(
-      response,
-      expectedStatus,
-      (data) => SchemaValidator.validateListResponse(data, SchemaValidator.validateEpic)
+    return this.validateResponse(response, expectedStatus, (data) =>
+      SchemaValidator.validateListResponse(data, SchemaValidator.validateEpic),
     )
   }
 
@@ -1042,12 +1245,10 @@ export class ApiResponseValidator {
    */
   static validateUserStoryListResponse(
     response: { status: number; statusText?: string; data: unknown },
-    expectedStatus = 200
+    expectedStatus = 200,
   ) {
-    return this.validateResponse(
-      response,
-      expectedStatus,
-      (data) => SchemaValidator.validateListResponse(data, SchemaValidator.validateUserStory)
+    return this.validateResponse(response, expectedStatus, (data) =>
+      SchemaValidator.validateListResponse(data, SchemaValidator.validateUserStory),
     )
   }
 
@@ -1056,12 +1257,10 @@ export class ApiResponseValidator {
    */
   static validateAcceptanceCriteriaListResponse(
     response: { status: number; statusText?: string; data: unknown },
-    expectedStatus = 200
+    expectedStatus = 200,
   ) {
-    return this.validateResponse(
-      response,
-      expectedStatus,
-      (data) => SchemaValidator.validateListResponse(data, SchemaValidator.validateAcceptanceCriteria)
+    return this.validateResponse(response, expectedStatus, (data) =>
+      SchemaValidator.validateListResponse(data, SchemaValidator.validateAcceptanceCriteria),
     )
   }
 
@@ -1070,12 +1269,10 @@ export class ApiResponseValidator {
    */
   static validateRequirementListResponse(
     response: { status: number; statusText?: string; data: unknown },
-    expectedStatus = 200
+    expectedStatus = 200,
   ) {
-    return this.validateResponse(
-      response,
-      expectedStatus,
-      (data) => SchemaValidator.validateListResponse(data, SchemaValidator.validateRequirement)
+    return this.validateResponse(response, expectedStatus, (data) =>
+      SchemaValidator.validateListResponse(data, SchemaValidator.validateRequirement),
     )
   }
 
@@ -1084,13 +1281,9 @@ export class ApiResponseValidator {
    */
   static validateEpicResponse(
     response: { status: number; statusText?: string; data: unknown },
-    expectedStatus = 200
+    expectedStatus = 200,
   ) {
-    return this.validateResponse(
-      response,
-      expectedStatus,
-      SchemaValidator.validateEpic
-    )
+    return this.validateResponse(response, expectedStatus, SchemaValidator.validateEpic)
   }
 
   /**
@@ -1098,13 +1291,9 @@ export class ApiResponseValidator {
    */
   static validateUserStoryResponse(
     response: { status: number; statusText?: string; data: unknown },
-    expectedStatus = 200
+    expectedStatus = 200,
   ) {
-    return this.validateResponse(
-      response,
-      expectedStatus,
-      SchemaValidator.validateUserStory
-    )
+    return this.validateResponse(response, expectedStatus, SchemaValidator.validateUserStory)
   }
 
   /**
@@ -1112,12 +1301,12 @@ export class ApiResponseValidator {
    */
   static validateAcceptanceCriteriaResponse(
     response: { status: number; statusText?: string; data: unknown },
-    expectedStatus = 200
+    expectedStatus = 200,
   ) {
     return this.validateResponse(
       response,
       expectedStatus,
-      SchemaValidator.validateAcceptanceCriteria
+      SchemaValidator.validateAcceptanceCriteria,
     )
   }
 
@@ -1126,13 +1315,9 @@ export class ApiResponseValidator {
    */
   static validateRequirementResponse(
     response: { status: number; statusText?: string; data: unknown },
-    expectedStatus = 200
+    expectedStatus = 200,
   ) {
-    return this.validateResponse(
-      response,
-      expectedStatus,
-      SchemaValidator.validateRequirement
-    )
+    return this.validateResponse(response, expectedStatus, SchemaValidator.validateRequirement)
   }
 
   /**
@@ -1140,12 +1325,10 @@ export class ApiResponseValidator {
    */
   static validateCommentListResponse(
     response: { status: number; statusText?: string; data: unknown },
-    expectedStatus = 200
+    expectedStatus = 200,
   ) {
-    return this.validateResponse(
-      response,
-      expectedStatus,
-      (data) => SchemaValidator.validateListResponse(data, SchemaValidator.validateComment)
+    return this.validateResponse(response, expectedStatus, (data) =>
+      SchemaValidator.validateListResponse(data, SchemaValidator.validateComment),
     )
   }
 
@@ -1154,12 +1337,8 @@ export class ApiResponseValidator {
    */
   static validateCommentResponse(
     response: { status: number; statusText?: string; data: unknown },
-    expectedStatus = 200
+    expectedStatus = 200,
   ) {
-    return this.validateResponse(
-      response,
-      expectedStatus,
-      SchemaValidator.validateComment
-    )
+    return this.validateResponse(response, expectedStatus, SchemaValidator.validateComment)
   }
 }

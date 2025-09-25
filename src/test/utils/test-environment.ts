@@ -1,6 +1,6 @@
 /**
  * Test Environment Configuration Loader
- * 
+ *
  * Loads and validates environment configuration for integration tests
  * from .env.integration.local file
  */
@@ -35,17 +35,17 @@ export function loadIntegrationTestConfig(): IntegrationTestConfig {
     VITE_ADMIN_PASSWORD: import.meta.env.VITE_ADMIN_PASSWORD,
     VITE_TEST_TIMEOUT: import.meta.env.VITE_TEST_TIMEOUT,
     VITE_TEST_RETRY_ATTEMPTS: import.meta.env.VITE_TEST_RETRY_ATTEMPTS,
-    VITE_CLEANUP_AFTER_TESTS: import.meta.env.VITE_CLEANUP_AFTER_TESTS
+    VITE_CLEANUP_AFTER_TESTS: import.meta.env.VITE_CLEANUP_AFTER_TESTS,
   }
 
   // Validate required environment variables
   const requiredVars = ['VITE_SERVER_URL', 'VITE_ADMIN_USER', 'VITE_ADMIN_PASSWORD']
-  const missingVars = requiredVars.filter(varName => !env[varName as keyof EnvironmentVariables])
-  
+  const missingVars = requiredVars.filter((varName) => !env[varName as keyof EnvironmentVariables])
+
   if (missingVars.length > 0) {
     throw new Error(
       `Missing required environment variables: ${missingVars.join(', ')}. ` +
-      'Please ensure .env.integration.local file is properly configured.'
+        'Please ensure .env.integration.local file is properly configured.',
     )
   }
 
@@ -56,7 +56,7 @@ export function loadIntegrationTestConfig(): IntegrationTestConfig {
     adminPassword: env.VITE_ADMIN_PASSWORD!,
     timeout: parseInt(env.VITE_TEST_TIMEOUT || '30000', 10),
     retryAttempts: parseInt(env.VITE_TEST_RETRY_ATTEMPTS || '3', 10),
-    cleanupAfterTests: env.VITE_CLEANUP_AFTER_TESTS?.toLowerCase() !== 'false'
+    cleanupAfterTests: env.VITE_CLEANUP_AFTER_TESTS?.toLowerCase() !== 'false',
   }
 
   // Validate server URL format

@@ -8,7 +8,7 @@ import type {
   Priority,
   CreateUserStoryRequest,
   UpdateUserStoryRequest,
-  Epic
+  Epic,
 } from '@/types'
 import { SchemaValidator } from '@/test/utils/api-response-validator'
 
@@ -32,7 +32,7 @@ class TestAuthManager {
 
       const loginResponse = await authService.login({
         username,
-        password
+        password,
       })
 
       // Store token information
@@ -54,11 +54,17 @@ class TestAuthManager {
     if (this.authToken && this.expiresAt) {
       const authData = JSON.stringify({
         token: this.authToken,
-        expires_at: this.expiresAt
+        expires_at: this.expiresAt,
       })
 
       // Update the mocked localStorage
-      const localStorageMock = (window as unknown as { localStorage: { getItem: { mockImplementation: (fn: (key: string) => string | null) => void } } }).localStorage
+      const localStorageMock = (
+        window as unknown as {
+          localStorage: {
+            getItem: { mockImplementation: (fn: (key: string) => string | null) => void }
+          }
+        }
+      ).localStorage
       localStorageMock.getItem.mockImplementation((key: string) => {
         if (key === 'auth') {
           return authData
@@ -79,7 +85,13 @@ class TestAuthManager {
     this.expiresAt = null
 
     // Clear localStorage mock
-    const localStorageMock = (window as unknown as { localStorage: { getItem: { mockImplementation: (fn: (key: string) => string | null) => void } } }).localStorage
+    const localStorageMock = (
+      window as unknown as {
+        localStorage: {
+          getItem: { mockImplementation: (fn: (key: string) => string | null) => void }
+        }
+      }
+    ).localStorage
     localStorageMock.getItem.mockImplementation(() => null)
   }
 }
@@ -88,13 +100,16 @@ class TestAuthManager {
 class UserStoryTestDataManager {
   private createdUserStories: string[] = []
 
-  async createTestUserStory(epicId: string, overrides?: Partial<CreateUserStoryRequest>): Promise<UserStory> {
+  async createTestUserStory(
+    epicId: string,
+    overrides?: Partial<CreateUserStoryRequest>,
+  ): Promise<UserStory> {
     const testUserStory: CreateUserStoryRequest = {
       title: `Test User Story ${Date.now()}`,
       description: 'Test user story for integration testing',
       priority: 3,
       epic_id: epicId,
-      ...overrides
+      ...overrides,
     }
 
     const userStory = await userStoryService.create(testUserStory)
@@ -165,70 +180,78 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
   })
 
   describe('POST /api/v1/user-stories - Create User Story', () => {
-    it.skipIf(!!process.env.CI)('should test user story creation endpoint (currently failing due to API validation)', async () => {
-      if (!testEpic) {
-        console.log('⏭️ Skipping test: No test epic available')
-        return
-      }
+    it.skipIf(!!process.env.CI)(
+      'should test user story creation endpoint (currently failing due to API validation)',
+      async () => {
+        if (!testEpic) {
+          console.log('⏭️ Skipping test: No test epic available')
+          return
+        }
 
-      const createRequest: CreateUserStoryRequest = {
-        title: 'Test User Story Creation',
-        description: 'Testing user story creation via API',
-        priority: 2,
-        epic_id: testEpic.id
-      }
+        const createRequest: CreateUserStoryRequest = {
+          title: 'Test User Story Creation',
+          description: 'Testing user story creation via API',
+          priority: 2,
+          epic_id: testEpic.id,
+        }
 
-      try {
-        const userStory = await userStoryService.create(createRequest)
-        testDataManager.addForCleanup(userStory.id)
+        try {
+          const userStory = await userStoryService.create(createRequest)
+          testDataManager.addForCleanup(userStory.id)
 
-        // If creation succeeds, validate the response
-        expect(userStory).toBeDefined()
-        expect(userStory.id).toBeDefined()
-        expect(userStory.reference_id).toBeDefined()
-        expect(userStory.title).toBe(createRequest.title)
-        expect(userStory.description).toBe(createRequest.description)
-        expect(userStory.priority).toBe(createRequest.priority)
-        expect(userStory.epic_id).toBe(createRequest.epic_id)
+          // If creation succeeds, validate the response
+          expect(userStory).toBeDefined()
+          expect(userStory.id).toBeDefined()
+          expect(userStory.reference_id).toBeDefined()
+          expect(userStory.title).toBe(createRequest.title)
+          expect(userStory.description).toBe(createRequest.description)
+          expect(userStory.priority).toBe(createRequest.priority)
+          expect(userStory.epic_id).toBe(createRequest.epic_id)
 
-        console.log(`✅ Created user story: ${userStory.reference_id} - "${userStory.title}"`)
-      } catch (error) {
-        // For now, we expect this to fail due to API validation requirements
-        console.log(`⚠️ User story creation failed as expected: ${error}`)
-        console.log('📝 This indicates the API requires additional fields not in our TypeScript interface')
+          console.log(`✅ Created user story: ${userStory.reference_id} - "${userStory.title}"`)
+        } catch (error) {
+          // For now, we expect this to fail due to API validation requirements
+          console.log(`⚠️ User story creation failed as expected: ${error}`)
+          console.log(
+            '📝 This indicates the API requires additional fields not in our TypeScript interface',
+          )
 
-        // Test passes if we get a validation error (expected behavior)
-        expect(error).toBeDefined()
-      }
-    })
+          // Test passes if we get a validation error (expected behavior)
+          expect(error).toBeDefined()
+        }
+      },
+    )
 
-    it.skipIf(!!process.env.CI)('should test minimal user story creation (currently failing)', async () => {
-      if (!testEpic) {
-        console.log('⏭️ Skipping test: No test epic available')
-        return
-      }
+    it.skipIf(!!process.env.CI)(
+      'should test minimal user story creation (currently failing)',
+      async () => {
+        if (!testEpic) {
+          console.log('⏭️ Skipping test: No test epic available')
+          return
+        }
 
-      const createRequest: CreateUserStoryRequest = {
-        title: 'Minimal User Story',
-        priority: 4,
-        epic_id: testEpic.id
-      }
+        const createRequest: CreateUserStoryRequest = {
+          title: 'Minimal User Story',
+          priority: 4,
+          epic_id: testEpic.id,
+        }
 
-      try {
-        const userStory = await userStoryService.create(createRequest)
-        testDataManager.addForCleanup(userStory.id)
+        try {
+          const userStory = await userStoryService.create(createRequest)
+          testDataManager.addForCleanup(userStory.id)
 
-        expect(userStory).toBeDefined()
-        expect(userStory.title).toBe(createRequest.title)
-        expect(userStory.priority).toBe(createRequest.priority)
-        expect(userStory.epic_id).toBe(createRequest.epic_id)
+          expect(userStory).toBeDefined()
+          expect(userStory.title).toBe(createRequest.title)
+          expect(userStory.priority).toBe(createRequest.priority)
+          expect(userStory.epic_id).toBe(createRequest.epic_id)
 
-        console.log(`✅ Created minimal user story: ${userStory.reference_id}`)
-      } catch (error) {
-        console.log(`⚠️ Minimal user story creation failed as expected: ${error}`)
-        expect(error).toBeDefined()
-      }
-    })
+          console.log(`✅ Created minimal user story: ${userStory.reference_id}`)
+        } catch (error) {
+          console.log(`⚠️ Minimal user story creation failed as expected: ${error}`)
+          expect(error).toBeDefined()
+        }
+      },
+    )
 
     it.skipIf(!!process.env.CI)('should validate user story creation request format', async () => {
       if (!testEpic) {
@@ -240,7 +263,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
         title: 'Schema Validation Test User Story',
         description: 'Testing schema validation',
         priority: 1,
-        epic_id: testEpic.id
+        epic_id: testEpic.id,
       }
 
       // Validate that our request object has the expected structure
@@ -260,7 +283,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
       const response = await userStoryService.list({
         limit: 10,
         offset: 0,
-        order_by: 'created_at'
+        order_by: 'created_at',
       })
 
       // Validate response structure
@@ -284,7 +307,9 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
         expect(firstUserStory.priority).toBeDefined()
         expect(firstUserStory.epic_id).toBeDefined()
 
-        console.log(`🎯 First user story: ${firstUserStory.reference_id} - "${firstUserStory.title}"`)
+        console.log(
+          `🎯 First user story: ${firstUserStory.reference_id} - "${firstUserStory.title}"`,
+        )
       }
     })
 
@@ -296,7 +321,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
 
       const response = await userStoryService.list({
         epic_id: testEpic.id,
-        limit: 20
+        limit: 20,
       })
 
       expect(response).toBeDefined()
@@ -319,7 +344,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
       for (const status of statuses) {
         const response = await userStoryService.list({
           status,
-          limit: 10
+          limit: 10,
         })
 
         expect(response).toBeDefined()
@@ -343,7 +368,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
       for (const priority of priorities) {
         const response = await userStoryService.list({
           priority,
-          limit: 10
+          limit: 10,
         })
 
         expect(response).toBeDefined()
@@ -351,7 +376,9 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
         expect(Array.isArray(response.data)).toBe(true)
 
         const priorityText = ['', 'Critical', 'High', 'Medium', 'Low'][priority]
-        console.log(`   Priority ${priority} (${priorityText}): ${response.data.length} user stories`)
+        console.log(
+          `   Priority ${priority} (${priorityText}): ${response.data.length} user stories`,
+        )
 
         // Verify all user stories have the correct priority
         response.data.forEach((userStory: UserStory) => {
@@ -363,7 +390,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
     it.skipIf(!!process.env.CI)('should include related data when requested', async () => {
       const response = await userStoryService.list({
         limit: 5,
-        include: 'epic,creator,assignee,acceptance_criteria,requirements'
+        include: 'epic,creator,assignee,acceptance_criteria,requirements',
       })
 
       expect(response).toBeDefined()
@@ -378,7 +405,9 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
           expect(userStoryWithIncludes.epic.id).toBeDefined()
           expect(userStoryWithIncludes.epic.reference_id).toBeDefined()
           expect(userStoryWithIncludes.epic.title).toBeDefined()
-          console.log(`   📚 Epic: ${userStoryWithIncludes.epic.reference_id} - "${userStoryWithIncludes.epic.title}"`)
+          console.log(
+            `   📚 Epic: ${userStoryWithIncludes.epic.reference_id} - "${userStoryWithIncludes.epic.title}"`,
+          )
         }
 
         if (userStoryWithIncludes.creator) {
@@ -395,7 +424,9 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
 
         if (userStoryWithIncludes.acceptance_criteria) {
           expect(Array.isArray(userStoryWithIncludes.acceptance_criteria)).toBe(true)
-          console.log(`   ✅ Acceptance Criteria: ${userStoryWithIncludes.acceptance_criteria.length}`)
+          console.log(
+            `   ✅ Acceptance Criteria: ${userStoryWithIncludes.acceptance_criteria.length}`,
+          )
         }
 
         if (userStoryWithIncludes.requirements) {
@@ -419,7 +450,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
         priority: 3,
         limit: 10,
         order_by: 'created_at',
-        include: 'creator,assignee'
+        include: 'creator,assignee',
       })
 
       expect(response).toBeDefined()
@@ -457,7 +488,9 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
       expect(userStory.reference_id).toBeDefined()
       expect(userStory.title).toBeDefined()
 
-      console.log(`\n🎯 Retrieved user story by ID: ${userStory.reference_id} - "${userStory.title}"`)
+      console.log(
+        `\n🎯 Retrieved user story by ID: ${userStory.reference_id} - "${userStory.title}"`,
+      )
 
       // Check included data
       if (userStory.epic) {
@@ -484,7 +517,10 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
         if (userStory.creator && userStory.creator.id === '00000000-0000-0000-0000-000000000000') {
           userStory.creator = undefined
         }
-        if (userStory.assignee && userStory.assignee.id === '00000000-0000-0000-0000-000000000000') {
+        if (
+          userStory.assignee &&
+          userStory.assignee.id === '00000000-0000-0000-0000-000000000000'
+        ) {
           userStory.assignee = undefined
         }
         if (userStory.epic && userStory.epic.id === '00000000-0000-0000-0000-000000000000') {
@@ -510,57 +546,62 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
   })
 
   describe('PUT /api/v1/user-stories/:id - Update User Story', () => {
-    it.skipIf(!!process.env.CI)('should test user story update endpoint (requires existing user story)', async () => {
-      // Get an existing user story to test with
-      const listResponse = await userStoryService.list({ limit: 1 })
+    it.skipIf(!!process.env.CI)(
+      'should test user story update endpoint (requires existing user story)',
+      async () => {
+        // Get an existing user story to test with
+        const listResponse = await userStoryService.list({ limit: 1 })
 
-      if (listResponse.data.length === 0) {
-        console.log('⏭️ Skipping test: No user stories available for update testing')
-        return
-      }
-
-      const existingUserStory = listResponse.data[0]
-      const originalTitle = existingUserStory.title
-      const originalPriority = existingUserStory.priority
-
-      console.log(`📝 Testing update on existing user story: ${existingUserStory.reference_id}`)
-      console.log(`   Original title: "${originalTitle}"`)
-      console.log(`   Original priority: ${originalPriority}`)
-
-      // For integration testing, we'll test the update endpoint structure
-      // but revert changes to avoid affecting the test data
-      const updateRequest: UpdateUserStoryRequest = {
-        title: `${originalTitle} [TEMP UPDATE]`,
-        priority: originalPriority === 1 ? 2 : 1
-      }
-
-      try {
-        const updatedUserStory = await userStoryService.update(existingUserStory.id, updateRequest)
-
-        expect(updatedUserStory).toBeDefined()
-        expect(updatedUserStory.id).toBe(existingUserStory.id)
-        expect(updatedUserStory.title).toBe(updateRequest.title)
-        expect(updatedUserStory.priority).toBe(updateRequest.priority)
-
-        console.log(`✅ Update successful: ${updatedUserStory.reference_id}`)
-        console.log(`   New title: "${updatedUserStory.title}"`)
-        console.log(`   New priority: ${updatedUserStory.priority}`)
-
-        // Revert the changes
-        const revertRequest: UpdateUserStoryRequest = {
-          title: originalTitle,
-          priority: originalPriority
+        if (listResponse.data.length === 0) {
+          console.log('⏭️ Skipping test: No user stories available for update testing')
+          return
         }
 
-        await userStoryService.update(existingUserStory.id, revertRequest)
-        console.log(`🔄 Reverted changes to maintain test data integrity`)
+        const existingUserStory = listResponse.data[0]
+        const originalTitle = existingUserStory.title
+        const originalPriority = existingUserStory.priority
 
-      } catch (error) {
-        console.log(`⚠️ User story update failed: ${error}`)
-        // Test passes if we can identify the error type
-        expect(error).toBeDefined()
-      }
-    })
+        console.log(`📝 Testing update on existing user story: ${existingUserStory.reference_id}`)
+        console.log(`   Original title: "${originalTitle}"`)
+        console.log(`   Original priority: ${originalPriority}`)
+
+        // For integration testing, we'll test the update endpoint structure
+        // but revert changes to avoid affecting the test data
+        const updateRequest: UpdateUserStoryRequest = {
+          title: `${originalTitle} [TEMP UPDATE]`,
+          priority: originalPriority === 1 ? 2 : 1,
+        }
+
+        try {
+          const updatedUserStory = await userStoryService.update(
+            existingUserStory.id,
+            updateRequest,
+          )
+
+          expect(updatedUserStory).toBeDefined()
+          expect(updatedUserStory.id).toBe(existingUserStory.id)
+          expect(updatedUserStory.title).toBe(updateRequest.title)
+          expect(updatedUserStory.priority).toBe(updateRequest.priority)
+
+          console.log(`✅ Update successful: ${updatedUserStory.reference_id}`)
+          console.log(`   New title: "${updatedUserStory.title}"`)
+          console.log(`   New priority: ${updatedUserStory.priority}`)
+
+          // Revert the changes
+          const revertRequest: UpdateUserStoryRequest = {
+            title: originalTitle,
+            priority: originalPriority,
+          }
+
+          await userStoryService.update(existingUserStory.id, revertRequest)
+          console.log(`🔄 Reverted changes to maintain test data integrity`)
+        } catch (error) {
+          console.log(`⚠️ User story update failed: ${error}`)
+          // Test passes if we can identify the error type
+          expect(error).toBeDefined()
+        }
+      },
+    )
 
     it.skipIf(!!process.env.CI)('should test partial user story update', async () => {
       // Get an existing user story to test with
@@ -576,7 +617,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
 
       // Test partial update (only title)
       const updateRequest: UpdateUserStoryRequest = {
-        title: `${originalTitle} [PARTIAL UPDATE]`
+        title: `${originalTitle} [PARTIAL UPDATE]`,
       }
 
       try {
@@ -591,11 +632,10 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
 
         // Revert the change
         const revertRequest: UpdateUserStoryRequest = {
-          title: originalTitle
+          title: originalTitle,
         }
         await userStoryService.update(existingUserStory.id, revertRequest)
         console.log(`🔄 Reverted partial update`)
-
       } catch (error) {
         console.log(`⚠️ Partial user story update failed: ${error}`)
         expect(error).toBeDefined()
@@ -604,29 +644,32 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
   })
 
   describe('DELETE /api/v1/user-stories/:id - Delete User Story', () => {
-    it.skipIf(!!process.env.CI)('should test user story deletion endpoint (skipped to preserve test data)', async () => {
-      // For integration testing, we'll test the deletion endpoint behavior
-      // without actually deleting existing user stories to preserve test data
+    it.skipIf(!!process.env.CI)(
+      'should test user story deletion endpoint (skipped to preserve test data)',
+      async () => {
+        // For integration testing, we'll test the deletion endpoint behavior
+        // without actually deleting existing user stories to preserve test data
 
-      console.log('📝 Testing user story deletion endpoint behavior')
-      console.log('⚠️ Actual deletion skipped to preserve test data integrity')
+        console.log('📝 Testing user story deletion endpoint behavior')
+        console.log('⚠️ Actual deletion skipped to preserve test data integrity')
 
-      // Test deletion of non-existent user story to verify error handling
-      const nonExistentId = '00000000-0000-0000-0000-000000000000'
+        // Test deletion of non-existent user story to verify error handling
+        const nonExistentId = '00000000-0000-0000-0000-000000000000'
 
-      try {
-        await userStoryService.delete(nonExistentId)
-        throw new Error('Should have failed to delete non-existent user story')
-      } catch (error) {
-        // Expected to fail with 404 or similar error
-        expect(error).toBeDefined()
-        console.log('✅ Correctly handled deletion of non-existent user story')
-      }
+        try {
+          await userStoryService.delete(nonExistentId)
+          throw new Error('Should have failed to delete non-existent user story')
+        } catch (error) {
+          // Expected to fail with 404 or similar error
+          expect(error).toBeDefined()
+          console.log('✅ Correctly handled deletion of non-existent user story')
+        }
 
-      // If we had a test user story, the deletion would work like this:
-      // await userStoryService.delete(testUserStory.id)
-      console.log('📋 Deletion endpoint structure validated')
-    })
+        // If we had a test user story, the deletion would work like this:
+        // await userStoryService.delete(testUserStory.id)
+        console.log('📋 Deletion endpoint structure validated')
+      },
+    )
 
     it.skipIf(!!process.env.CI)('should handle deletion of non-existent user story', async () => {
       const nonExistentId = '00000000-0000-0000-0000-000000000000'
@@ -648,7 +691,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
 
       const response = await userStoryService.list({
         limit: 3,
-        include: 'epic,creator,assignee'
+        include: 'epic,creator,assignee',
       })
 
       // Validate list response structure

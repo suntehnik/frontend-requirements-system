@@ -112,7 +112,11 @@
                 <v-icon size="48" color="grey">mdi-folder-open-outline</v-icon>
                 <p class="text-h6 mt-2">Эпики не найдены</p>
                 <p class="text-body-2 text-grey">
-                  {{ search || hasActiveFilters ? 'Попробуйте изменить критерии поиска' : 'Создайте первый эпик' }}
+                  {{
+                    search || hasActiveFilters
+                      ? 'Попробуйте изменить критерии поиска'
+                      : 'Создайте первый эпик'
+                  }}
                 </p>
               </div>
             </template>
@@ -161,12 +165,12 @@ const filteredEpics = computed(() => {
 
   // Apply status filter
   if (filters.value.status) {
-    result = result.filter(epic => epic.status === filters.value.status)
+    result = result.filter((epic) => epic.status === filters.value.status)
   }
 
   // Apply priority filter
   if (filters.value.priority) {
-    result = result.filter(epic => epic.priority === filters.value.priority)
+    result = result.filter((epic) => epic.priority === filters.value.priority)
   }
 
   return result
