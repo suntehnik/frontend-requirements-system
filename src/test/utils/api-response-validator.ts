@@ -801,6 +801,104 @@ export class SchemaValidator {
   }
 
   /**
+   * Validate Comment object
+   */
+  static validateComment(data: unknown): SchemaValidationResult {
+    const errors: string[] = []
+    const warnings: string[] = []
+    const fieldValidations: FieldValidationResult[] = []
+    const missingFields: string[] = []
+    const unexpectedFields: string[] = []
+
+    if (!data || typeof data !== 'object') {
+      return {
+        isValid: false,
+        errors: ['Expected comment object, got ' + typeof data],
+        warnings,
+        fieldValidations,
+        missingFields,
+        unexpectedFields
+      }
+    }
+
+    const comment = data as Record<string, unknown>
+    const requiredFields = ['id', 'content', 'entity_type', 'entity_id', 'author_id', 'is_resolved', 'created_at', 'updated_at']
+    const optionalFields = ['parent_comment_id', 'linked_text', 'text_position_start', 'text_position_end', 'author', 'parent_comment', 'replies']
+    const validEntityTypes = ['epic', 'user_story', 'acceptance_criteria', 'requirement']
+
+    // Check required fields
+    for (const field of requiredFields) {
+      if (!(field in comment)) {
+        missingFields.push(field)
+      }
+    }
+
+    // Validate required field types
+    fieldValidations.push(DataTypeValidator.validateField(comment.id, 'uuid', 'id'))
+    fieldValidations.push(DataTypeValidator.validateField(comment.content, 'string', 'content'))
+    fieldValidations.push(DataTypeValidator.validateEnum(comment.entity_type, validEntityTypes, 'entity_type'))
+    fieldValidations.push(DataTypeValidator.validateField(comment.entity_id, 'uuid', 'entity_id'))
+    fieldValidations.push(DataTypeValidator.validateField(comment.author_id, 'uuid', 'author_id'))
+    fieldValidations.push(DataTypeValidator.validateField(comment.is_resolved, 'boolean', 'is_resolved'))
+    fieldValidations.push(DataTypeValidator.validateField(comment.created_at, 'date', 'created_at'))
+    fieldValidations.push(DataTypeValidator.validateField(comment.updated_at, 'date', 'updated_at'))
+
+    // Validate optional fields
+    fieldValidations.push(DataTypeValidator.validateField(comment.parent_comment_id, 'uuid', 'parent_comment_id', true))
+    fieldValidations.push(DataTypeValidator.validateField(comment.linked_text, 'string', 'linked_text', true))
+    fieldValidations.push(DataTypeValidator.validateField(comment.text_position_start, 'number', 'text_position_start', true))
+    fieldValidations.push(DataTypeValidator.validateField(comment.text_position_end, 'number', 'text_position_end', true))
+
+    // Validate nested objects if present
+    if (comment.author) {
+      const authorValidation = this.validateUser(comment.author)
+      if (!authorValidation.isValid) {
+        errors.push(`Invalid author object: ${authorValidation.errors.join(', ')}`)
+      }
+    }
+
+    if (comment.parent_comment) {
+      fieldValidations.push(DataTypeValidator.validateField(comment.parent_comment, 'object', 'parent_comment', true))
+    }
+
+    if (comment.replies) {
+      fieldValidations.push(DataTypeValidator.validateField(comment.replies, 'array', 'replies', true))
+    }
+
+    // Check for unexpected fields
+    const expectedFields = [...requiredFields, ...optionalFields]
+    for (const field in comment) {
+      if (!expectedFields.includes(field)) {
+        unexpectedFields.push(field)
+      }
+    }
+
+    // Collect errors from field validations
+    fieldValidations.forEach(validation => {
+      if (!validation.isValid) {
+        errors.push(`Field '${validation.field}': ${validation.message}`)
+      }
+    })
+
+    if (missingFields.length > 0) {
+      errors.push(`Missing required fields: ${missingFields.join(', ')}`)
+    }
+
+    if (unexpectedFields.length > 0) {
+      warnings.push(`Unexpected fields: ${unexpectedFields.join(', ')}`)
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      warnings,
+      fieldValidations,
+      missingFields,
+      unexpectedFields
+    }
+  }
+
+  /**
    * Validate ListResponse structure
    */
   static validateListResponse(
@@ -1034,6 +1132,34 @@ export class ApiResponseValidator {
       response,
       expectedStatus,
       SchemaValidator.validateRequirement
+    )
+  }
+
+  /**
+   * Validate Comment list response
+   */
+  static validateCommentListResponse(
+    response: { status: number; statusText?: string; data: unknown },
+    expectedStatus = 200
+  ) {
+    return this.validateResponse(
+      response,
+      expectedStatus,
+      (data) => SchemaValidator.validateListResponse(data, SchemaValidator.validateComment)
+    )
+  }
+
+  /**
+   * Validate single Comment response
+   */
+  static validateCommentResponse(
+    response: { status: number; statusText?: string; data: unknown },
+    expectedStatus = 200
+  ) {
+    return this.validateResponse(
+      response,
+      expectedStatus,
+      SchemaValidator.validateComment
     )
   }
 }
