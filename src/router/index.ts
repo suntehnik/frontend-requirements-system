@@ -75,6 +75,13 @@ const router = createRouter({
           component: () => import('@/views/SearchView.vue'),
         },
 
+        // Form Components Demo (for development)
+        {
+          path: '/demo/forms',
+          name: 'forms-demo',
+          component: () => import('@/components/forms/FormComponentsDemo.vue'),
+        },
+
         // Admin routes
         {
           path: '/admin/users',
