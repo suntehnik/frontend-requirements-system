@@ -64,12 +64,12 @@ export const useEntitiesStore = defineStore('entities', () => {
     }
   })
 
-  // Recent activity computed (last 10 items sorted by last_modified)
+  // Recent activity computed (last 10 items sorted by updated_at)
   const recentActivity = computed(() => {
     const allEntities: Array<{
       type: 'epic' | 'user_story' | 'requirement'
       entity: Epic | UserStory | Requirement
-      lastModified: Date
+      updatedAt: Date
     }> = []
 
     // Add epics
@@ -77,7 +77,7 @@ export const useEntitiesStore = defineStore('entities', () => {
       allEntities.push({
         type: 'epic',
         entity: epic,
-        lastModified: new Date(epic.last_modified),
+        updatedAt: new Date(epic.updated_at),
       })
     })
 
@@ -86,7 +86,7 @@ export const useEntitiesStore = defineStore('entities', () => {
       allEntities.push({
         type: 'user_story',
         entity: story,
-        lastModified: new Date(story.last_modified),
+        updatedAt: new Date(story.updated_at),
       })
     })
 
@@ -95,13 +95,13 @@ export const useEntitiesStore = defineStore('entities', () => {
       allEntities.push({
         type: 'requirement',
         entity: req,
-        lastModified: new Date(req.last_modified),
+        updatedAt: new Date(req.updated_at),
       })
     })
 
     // Sort by last modified and take top 10
     return allEntities
-      .sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime())
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
       .slice(0, 10)
   })
 
@@ -535,9 +535,9 @@ export const useEntitiesStore = defineStore('entities', () => {
     try {
       // Try to load real data first
       await Promise.all([
-        fetchEpics({ limit: 50, order_by: 'last_modified' }),
-        fetchUserStories({ limit: 50, order_by: 'last_modified' }),
-        fetchRequirements({ limit: 50, order_by: 'last_modified' }),
+        fetchEpics({ limit: 50, order_by: 'updated_at' }),
+        fetchUserStories({ limit: 50, order_by: 'updated_at' }),
+        fetchRequirements({ limit: 50, order_by: 'updated_at' }),
       ])
     } catch (error) {
       console.warn('Failed to load real data, using mock data for development:', error)
@@ -570,7 +570,7 @@ export const useEntitiesStore = defineStore('entities', () => {
         creator_id: 'user1',
         assignee_id: 'user2',
         created_at: twoDaysAgo,
-        last_modified: yesterday,
+        updated_at: yesterday,
       },
       {
         id: '2',
@@ -581,7 +581,7 @@ export const useEntitiesStore = defineStore('entities', () => {
         priority: 2,
         creator_id: 'user1',
         created_at: yesterday,
-        last_modified: now,
+        updated_at: now,
       },
     ]
 
@@ -598,7 +598,7 @@ export const useEntitiesStore = defineStore('entities', () => {
         creator_id: 'user1',
         assignee_id: 'user2',
         created_at: yesterday,
-        last_modified: now,
+        updated_at: now,
       },
       {
         id: '2',
@@ -611,7 +611,7 @@ export const useEntitiesStore = defineStore('entities', () => {
         epic_id: '2',
         creator_id: 'user1',
         created_at: now,
-        last_modified: now,
+        updated_at: now,
       },
     ]
 
@@ -629,7 +629,7 @@ export const useEntitiesStore = defineStore('entities', () => {
         creator_id: 'user1',
         assignee_id: 'user2',
         created_at: yesterday,
-        last_modified: now,
+        updated_at: now,
       },
       {
         id: '2',
@@ -642,7 +642,7 @@ export const useEntitiesStore = defineStore('entities', () => {
         type_id: 'type1',
         creator_id: 'user1',
         created_at: now,
-        last_modified: now,
+        updated_at: now,
       },
     ]
 

@@ -46,7 +46,7 @@ const mockEpic: Epic = {
   creator_id: 'user1',
   assignee_id: 'user2',
   created_at: '2024-01-01T00:00:00Z',
-  last_modified: '2024-01-01T00:00:00Z',
+  updated_at: '2024-01-01T00:00:00Z',
 }
 
 describe('EpicForm', () => {

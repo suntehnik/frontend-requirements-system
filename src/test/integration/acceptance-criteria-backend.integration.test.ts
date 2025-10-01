@@ -253,7 +253,7 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
         expect(criteria.user_story_id).toBe(createRequest.user_story_id)
         expect(criteria.author_id).toBeDefined()
         expect(criteria.created_at).toBeDefined()
-        expect(criteria.last_modified).toBeDefined()
+        expect(criteria.updated_at).toBeDefined()
 
         // Validate data types
         expect(typeof criteria.id).toBe('string')
@@ -262,13 +262,13 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
         expect(typeof criteria.user_story_id).toBe('string')
         expect(typeof criteria.author_id).toBe('string')
         expect(typeof criteria.created_at).toBe('string')
-        expect(typeof criteria.last_modified).toBe('string')
+        expect(typeof criteria.updated_at).toBe('string')
 
         // Validate date formats
         expect(new Date(criteria.created_at)).toBeInstanceOf(Date)
-        expect(new Date(criteria.last_modified)).toBeInstanceOf(Date)
+        expect(new Date(criteria.updated_at)).toBeInstanceOf(Date)
         expect(new Date(criteria.created_at).getTime()).not.toBeNaN()
-        expect(new Date(criteria.last_modified).getTime()).not.toBeNaN()
+        expect(new Date(criteria.updated_at).getTime()).not.toBeNaN()
 
         console.log(
           `✅ Created acceptance criteria: ${criteria.reference_id} - "${criteria.description.substring(0, 50)}..."`,
@@ -756,7 +756,7 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
         expect(criteria).toHaveProperty('user_story_id')
         expect(criteria).toHaveProperty('author_id')
         expect(criteria).toHaveProperty('created_at')
-        expect(criteria).toHaveProperty('last_modified')
+        expect(criteria).toHaveProperty('updated_at')
 
         // Data types
         expect(typeof criteria.id).toBe('string')
@@ -765,13 +765,13 @@ describe('Acceptance Criteria Backend Integration - CRUD Operations', () => {
         expect(typeof criteria.user_story_id).toBe('string')
         expect(typeof criteria.author_id).toBe('string')
         expect(typeof criteria.created_at).toBe('string')
-        expect(typeof criteria.last_modified).toBe('string')
+        expect(typeof criteria.updated_at).toBe('string')
 
         // Date validation
         expect(new Date(criteria.created_at)).toBeInstanceOf(Date)
-        expect(new Date(criteria.last_modified)).toBeInstanceOf(Date)
+        expect(new Date(criteria.updated_at)).toBeInstanceOf(Date)
         expect(new Date(criteria.created_at).getTime()).not.toBeNaN()
-        expect(new Date(criteria.last_modified).getTime()).not.toBeNaN()
+        expect(new Date(criteria.updated_at).getTime()).not.toBeNaN()
 
         // Included related data validation
         if (criteria.user_story) {

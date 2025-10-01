@@ -201,7 +201,7 @@ const itemsPerPage = ref(25)
 const totalCount = ref(0)
 
 // Sorting
-const sortBy = ref<string>('last_modified')
+const sortBy = ref<string>('updated_at')
 const sortOrder = ref<'asc' | 'desc'>('desc')
 
 // Table headers

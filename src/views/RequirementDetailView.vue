@@ -14,7 +14,7 @@
               >
             </div>
             <div class="text-subtitle-1 text-grey-darken-1">
-              Создано {{ requirement.created_at }} • Обновлено {{ requirement.last_modified }}
+              Создано {{ requirement.created_at }} • Обновлено {{ requirement.updated_at }}
             </div>
           </div>
           <div>
@@ -235,7 +235,7 @@ const requirement = ref({
   epic: 'EP-001: Система аутентификации',
   epic_id: '1',
   created_at: '2024-01-15',
-  last_modified: '2024-01-20',
+  updated_at: '2024-01-20',
 })
 
 const outgoingRelationships = ref([

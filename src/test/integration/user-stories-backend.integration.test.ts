@@ -713,7 +713,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
         expect(userStory).toHaveProperty('epic_id')
         expect(userStory).toHaveProperty('creator_id')
         expect(userStory).toHaveProperty('created_at')
-        expect(userStory).toHaveProperty('last_modified')
+        expect(userStory).toHaveProperty('updated_at')
 
         // Data types
         expect(typeof userStory.id).toBe('string')
@@ -722,7 +722,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
         expect(typeof userStory.epic_id).toBe('string')
         expect(typeof userStory.creator_id).toBe('string')
         expect(typeof userStory.created_at).toBe('string')
-        expect(typeof userStory.last_modified).toBe('string')
+        expect(typeof userStory.updated_at).toBe('string')
 
         // Enum validation
         expect(['Backlog', 'Draft', 'In Progress', 'Done', 'Cancelled']).toContain(userStory.status)
@@ -730,9 +730,9 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
 
         // Date validation
         expect(new Date(userStory.created_at)).toBeInstanceOf(Date)
-        expect(new Date(userStory.last_modified)).toBeInstanceOf(Date)
+        expect(new Date(userStory.updated_at)).toBeInstanceOf(Date)
         expect(new Date(userStory.created_at).getTime()).not.toBeNaN()
-        expect(new Date(userStory.last_modified).getTime()).not.toBeNaN()
+        expect(new Date(userStory.updated_at).getTime()).not.toBeNaN()
 
         // Included related data validation
         if (userStory.epic) {

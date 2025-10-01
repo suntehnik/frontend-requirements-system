@@ -33,7 +33,7 @@ export type StatusByEntityType<T extends EntityType> = T extends 'epic'
 
 // Partial update types
 export type PartialEntity<T> = Partial<
-  Omit<T, 'id' | 'reference_id' | 'created_at' | 'last_modified' | 'updated_at'>
+  Omit<T, 'id' | 'reference_id' | 'created_at' | 'updated_at'>
 >
 
 // Priority labels mapping
