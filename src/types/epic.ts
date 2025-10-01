@@ -41,6 +41,7 @@ export interface EpicListParams {
   assignee_id?: string
   status?: EpicStatus
   priority?: Priority
+  search?: string
   order_by?: string
   limit?: number
   offset?: number
