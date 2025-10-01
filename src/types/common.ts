@@ -28,6 +28,20 @@ export interface ListResponse<T> {
   offset: number
 }
 
+// Pagination Types
+export interface PaginationInfo {
+  currentPage: number
+  pageSize: number
+  totalCount: number
+  totalPages: number
+}
+
+export interface PaginationState {
+  page: number
+  pageSize: number
+  totalCount: number
+}
+
 // Error Response Format
 export interface ErrorResponse {
   error: {

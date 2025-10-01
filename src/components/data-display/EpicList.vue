@@ -3,53 +3,28 @@
     <!-- Filters -->
     <v-row>
       <v-col cols="12" md="3">
-        <v-select
-          v-model="filters.status"
-          :items="statusOptions"
-          label="Статус"
-          variant="outlined"
-          density="compact"
-          clearable
-          @update:model-value="applyFilters"
-        />
+        <v-select v-model="filters.status" :items="statusOptions" label="Статус" variant="outlined" density="compact"
+          clearable @update:model-value="applyFilters" />
       </v-col>
       <v-col cols="12" md="3">
-        <v-select
-          v-model="filters.priority"
-          :items="priorityOptions"
-          label="Приоритет"
-          variant="outlined"
-          density="compact"
-          clearable
-          @update:model-value="applyFilters"
-        />
+        <v-select v-model="filters.priority" :items="priorityOptions" label="Приоритет" variant="outlined"
+          density="compact" clearable @update:model-value="applyFilters" />
       </v-col>
       <v-col cols="12" md="6">
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Поиск эпиков"
-          single-line
-          hide-details
-          variant="outlined"
-          density="compact"
-          clearable
-        />
+        <v-text-field v-model="search" append-icon="mdi-magnify" label="Поиск эпиков" single-line hide-details
+          variant="outlined" density="compact" clearable @update:model-value="handleSearchChange" />
       </v-col>
     </v-row>
 
     <v-row>
       <v-col cols="12">
         <v-card>
-          <v-data-table
-            :headers="headers"
-            :items="filteredEpics"
-            :search="search"
-            :loading="loading"
-            class="elevation-1"
-            :items-per-page="25"
-            :items-per-page-options="[10, 25, 50, 100]"
-          >
+          <v-data-table-server :headers="headers" :items="props.epics" :loading="loading" class="elevation-1"
+            :items-per-page="pageSize" :items-per-page-options="pageSizeOptions" :page="currentPage" :sort-by="sortBy"
+            @update:options="handleOptionsChange" @click:row="handleRowClick" :items-length="totalCount"
+            :multi-sort="false" :must-sort="false" :hide-default-footer="!shouldShowPagination">
+
+            <!-- Table content templates -->
             <template v-slot:[`item.status`]="{ item }">
               <v-chip :color="getStatusColor(item.status)" size="small">
                 {{ getStatusText(item.status) }}
@@ -72,28 +47,8 @@
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
-              <v-btn
-                icon="mdi-eye"
-                size="small"
-                variant="text"
-                :to="`/epics/${item.id}`"
-                title="Просмотр"
-              />
-              <v-btn
-                icon="mdi-pencil"
-                size="small"
-                variant="text"
-                @click="$emit('edit', item)"
-                title="Редактировать"
-              />
-              <v-btn
-                icon="mdi-delete"
-                size="small"
-                variant="text"
-                color="error"
-                @click="$emit('delete', item)"
-                title="Удалить"
-              />
+              <v-btn icon="mdi-delete" size="small" variant="text" color="error"
+                @click="handleDeleteClick($event, item)" title="Удалить" />
             </template>
 
             <template v-slot:no-data>
@@ -109,7 +64,7 @@
                 </p>
               </div>
             </template>
-          </v-data-table>
+          </v-data-table-server>
         </v-card>
       </v-col>
     </v-row>
@@ -118,18 +73,23 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import type { Epic, EpicStatus, Priority } from '@/types'
 
 interface Props {
   epics: Epic[]
   loading?: boolean
+  totalCount?: number
+  currentPage?: number
+  pageSize?: number
 }
 
 interface Emits {
   (e: 'create'): void
-  (e: 'edit', epic: Epic): void
   (e: 'delete', epic: Epic): void
   (e: 'filter-change', filters: FilterState): void
+  (e: 'options-change', options: DataTableOptions): void
+  (e: 'search-change', query: string): void
 }
 
 interface FilterState {
@@ -137,25 +97,43 @@ interface FilterState {
   priority?: Priority
 }
 
+interface SortItem {
+  key: string
+  order: 'asc' | 'desc'
+}
+
+interface DataTableOptions {
+  page: number
+  itemsPerPage: number
+  sortBy: { key: string; order: 'asc' | 'desc' }[]
+}
+
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
+  totalCount: 0,
+  currentPage: 1,
+  pageSize: 25,
 })
 
 const emit = defineEmits<Emits>()
 
+// Router
+const router = useRouter()
+
 // State
 const search = ref('')
 const filters = ref<FilterState>({})
+const sortBy = ref<SortItem[]>([])
 
 // Table configuration
 const headers = [
   { title: 'ID', key: 'reference_id', sortable: true },
   { title: 'Название', key: 'title', sortable: true },
-  { title: 'Статус', key: 'status', sortable: true },
-  { title: 'Приоритет', key: 'priority', sortable: true },
-  { title: 'Ответственный', key: 'assignee', sortable: true },
-  { title: 'Создан', key: 'created_at', sortable: true },
-  { title: 'Действия', key: 'actions', sortable: false },
+  { title: 'Статус', key: 'status', sortable: true, class: 'd-none d-md-table-cell' },
+  { title: 'Приоритет', key: 'priority', sortable: true, class: 'd-none d-lg-table-cell' },
+  { title: 'Ответственный', key: 'assignee', sortable: true, class: 'd-none d-lg-table-cell' },
+  { title: 'Создан', key: 'created_at', sortable: true, class: 'd-none d-xl-table-cell' },
+  { title: '', key: 'actions', sortable: false },
 ]
 
 // Filter options
@@ -175,29 +153,44 @@ const priorityOptions = [
 ]
 
 // Computed
-const filteredEpics = computed(() => {
-  let result = props.epics
-
-  // Apply status filter
-  if (filters.value.status) {
-    result = result.filter((epic) => epic.status === filters.value.status)
-  }
-
-  // Apply priority filter
-  if (filters.value.priority) {
-    result = result.filter((epic) => epic.priority === filters.value.priority)
-  }
-
-  return result
-})
-
 const hasActiveFilters = computed(() => {
   return Boolean(filters.value.status || filters.value.priority)
 })
 
+const totalCount = computed(() => props.totalCount || 0)
+const pageSize = computed(() => props.pageSize || 25)
+const currentPage = computed(() => props.currentPage || 1)
+
+// Show pagination when there are more than one page of results
+const shouldShowPagination = computed(() => totalCount.value > pageSize.value)
+
+// Page size options as specified in requirements (10, 25-default, 50, 100)
+const pageSizeOptions = [10, 25, 50, 100]
+
 // Methods
 const applyFilters = () => {
   emit('filter-change', { ...filters.value })
+}
+
+const handleRowClick = (_event: Event, { item }: { item: Epic }) => {
+  router.push(`/epics/${item.reference_id}`)
+}
+
+const handleDeleteClick = (event: Event, item: Epic) => {
+  event.stopPropagation() // Prevent row click event
+  emit('delete', item)
+}
+
+const handleOptionsChange = (options: DataTableOptions) => {
+  // Update local sortBy state
+  sortBy.value = options.sortBy
+
+  // Emit the options change to parent
+  emit('options-change', options)
+}
+
+const handleSearchChange = (query: string) => {
+  emit('search-change', query)
 }
 
 // Utility functions
@@ -252,3 +245,38 @@ const formatDate = (dateString: string) => {
   })
 }
 </script>
+
+<style scoped>
+/* Простой responsive дизайн с использованием Vuetify классов */
+.v-data-table {
+  overflow-x: auto;
+}
+
+/* Обрезка длинных заголовков */
+:deep(.v-data-table td) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* Заголовок всегда виден полностью */
+:deep(.v-data-table td:nth-child(2)) {
+  max-width: 300px;
+}
+
+/* Hover эффект для строк таблицы */
+:deep(.v-data-table tbody tr) {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+:deep(.v-data-table tbody tr:hover) {
+  background-color: rgba(var(--v-theme-primary), 0.08) !important;
+}
+
+/* Убираем hover эффект с кнопок действий */
+:deep(.v-data-table tbody tr:hover td:last-child) {
+  background-color: transparent;
+}
+</style>
