@@ -22,7 +22,7 @@
               <h1 class="text-h4">{{ epic.reference_id }}: {{ epic.title }}</h1>
               <div class="text-subtitle-1 text-grey-darken-1 mt-1">
                 Создан {{ formatDate(epic.created_at) }} • Обновлен
-                {{ formatDate(epic.last_modified) }}
+                {{ formatDate(epic.updated_at) }}
               </div>
             </div>
             <div>

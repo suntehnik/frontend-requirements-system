@@ -47,7 +47,7 @@
                 {{ activity.entity.status }}
               </v-chip>
               <span class="text-caption text-medium-emphasis">
-                {{ formatRelativeTime(activity.lastModified) }}
+                {{ formatRelativeTime(activity.updatedAt) }}
               </span>
             </v-list-item-subtitle>
 

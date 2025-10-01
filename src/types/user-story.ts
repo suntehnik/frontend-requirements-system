@@ -19,7 +19,7 @@ export interface UserStory {
   creator_id: string
   assignee_id?: string
   created_at: string
-  last_modified: string
+  updated_at: string
 
   // Optional populated fields
   epic?: BaseEpic

@@ -392,7 +392,7 @@ export class SchemaValidator {
       'priority',
       'creator_id',
       'created_at',
-      'last_modified',
+      'updated_at',
     ]
     const optionalFields = [
       'description',
@@ -425,7 +425,7 @@ export class SchemaValidator {
     fieldValidations.push(DataTypeValidator.validateField(epic.creator_id, 'uuid', 'creator_id'))
     fieldValidations.push(DataTypeValidator.validateField(epic.created_at, 'date', 'created_at'))
     fieldValidations.push(
-      DataTypeValidator.validateField(epic.last_modified, 'date', 'last_modified'),
+      DataTypeValidator.validateField(epic.updated_at, 'date', 'updated_at'),
     )
 
     // Validate optional fields
@@ -527,7 +527,7 @@ export class SchemaValidator {
       'epic_id',
       'creator_id',
       'created_at',
-      'last_modified',
+      'updated_at',
     ]
     const optionalFields = [
       'description',
@@ -573,7 +573,7 @@ export class SchemaValidator {
       DataTypeValidator.validateField(userStory.created_at, 'date', 'created_at'),
     )
     fieldValidations.push(
-      DataTypeValidator.validateField(userStory.last_modified, 'date', 'last_modified'),
+      DataTypeValidator.validateField(userStory.updated_at, 'date', 'updated_at'),
     )
 
     // Validate optional fields
@@ -689,7 +689,7 @@ export class SchemaValidator {
       'user_story_id',
       'author_id',
       'created_at',
-      'last_modified',
+      'updated_at',
     ]
     const optionalFields = ['user_story', 'author', 'requirements', 'comments']
 
@@ -712,7 +712,7 @@ export class SchemaValidator {
     fieldValidations.push(DataTypeValidator.validateField(ac.author_id, 'uuid', 'author_id'))
     fieldValidations.push(DataTypeValidator.validateField(ac.created_at, 'date', 'created_at'))
     fieldValidations.push(
-      DataTypeValidator.validateField(ac.last_modified, 'date', 'last_modified'),
+      DataTypeValidator.validateField(ac.updated_at, 'date', 'updated_at'),
     )
 
     // Validate nested objects if present
@@ -804,7 +804,7 @@ export class SchemaValidator {
       'type_id',
       'creator_id',
       'created_at',
-      'last_modified',
+      'updated_at',
     ]
     const optionalFields = [
       'description',
@@ -844,7 +844,7 @@ export class SchemaValidator {
     fieldValidations.push(DataTypeValidator.validateField(req.creator_id, 'uuid', 'creator_id'))
     fieldValidations.push(DataTypeValidator.validateField(req.created_at, 'date', 'created_at'))
     fieldValidations.push(
-      DataTypeValidator.validateField(req.last_modified, 'date', 'last_modified'),
+      DataTypeValidator.validateField(req.updated_at, 'date', 'updated_at'),
     )
 
     // Validate optional fields

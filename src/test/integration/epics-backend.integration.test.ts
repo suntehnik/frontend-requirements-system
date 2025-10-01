@@ -182,7 +182,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
       expect(firstEpic.priority).toBeDefined()
       expect(firstEpic.creator_id).toBeDefined()
       expect(firstEpic.created_at).toBeDefined()
-      expect(firstEpic.last_modified).toBeDefined()
+      expect(firstEpic.updated_at).toBeDefined()
 
       // Проверяем типы данных
       expect(typeof firstEpic.id).toBe('string')
@@ -401,7 +401,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
   })
 
   it.skipIf(!!process.env.CI)('should handle sorting correctly', async () => {
-    const sortOrders = ['created_at', 'last_modified', 'title', 'priority']
+    const sortOrders = ['created_at', 'updated_at', 'title', 'priority']
 
     console.log('\n📊 Testing sorting options:')
 
@@ -434,7 +434,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
             expect(second.priority).toBeDefined()
             break
           case 'created_at':
-          case 'last_modified':
+          case 'updated_at':
             // Проверяем что даты определены и валидны
             expect(first.created_at).toBeDefined()
             expect(second.created_at).toBeDefined()
@@ -509,7 +509,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
       expect(epic).toHaveProperty('priority')
       expect(epic).toHaveProperty('creator_id')
       expect(epic).toHaveProperty('created_at')
-      expect(epic).toHaveProperty('last_modified')
+      expect(epic).toHaveProperty('updated_at')
 
       // Типы данных
       expect(typeof epic.id).toBe('string')
@@ -517,7 +517,7 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
       expect(typeof epic.title).toBe('string')
       expect(typeof epic.creator_id).toBe('string')
       expect(typeof epic.created_at).toBe('string')
-      expect(typeof epic.last_modified).toBe('string')
+      expect(typeof epic.updated_at).toBe('string')
 
       // Валидация enum значений
       expect(['Backlog', 'Draft', 'In Progress', 'Done', 'Cancelled']).toContain(epic.status)
@@ -525,9 +525,9 @@ describe('Epics Backend Integration - Enhanced Validation', () => {
 
       // Валидация дат
       expect(new Date(epic.created_at)).toBeInstanceOf(Date)
-      expect(new Date(epic.last_modified)).toBeInstanceOf(Date)
+      expect(new Date(epic.updated_at)).toBeInstanceOf(Date)
       expect(new Date(epic.created_at).getTime()).not.toBeNaN()
-      expect(new Date(epic.last_modified).getTime()).not.toBeNaN()
+      expect(new Date(epic.updated_at).getTime()).not.toBeNaN()
 
       // Включенные связанные данные
       if (epic.creator) {

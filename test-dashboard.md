@@ -82,4 +82,4 @@ When visiting http://localhost:3002/ (or current port):
 - 2 Epics (EP-001: In Progress, EP-002: Draft)
 - 2 User Stories (US-001: In Progress, US-002: Draft)  
 - 2 Requirements (REQ-001: Active, REQ-002: Draft)
-- Recent activity should show all 6 items sorted by last_modified date
+- Recent activity should show all 6 items sorted by updated_at date

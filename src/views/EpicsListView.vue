@@ -164,7 +164,7 @@ const loadEpics = async () => {
     await entitiesStore.fetchEpics({
       include: 'creator,assignee',
       limit: 100,
-      order_by: 'last_modified',
+      order_by: 'updated_at',
     })
   } catch (error) {
     console.error('Failed to load epics:', error)

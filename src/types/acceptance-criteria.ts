@@ -10,7 +10,7 @@ export interface AcceptanceCriteria {
   user_story_id: string
   author_id: string
   created_at: string
-  last_modified: string
+  updated_at: string
 
   // Optional populated fields
   user_story?: BaseUserStory

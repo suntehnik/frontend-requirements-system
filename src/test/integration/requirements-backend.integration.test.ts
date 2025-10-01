@@ -271,7 +271,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         expect(requirement.type_id).toBe(createRequest.type_id)
         expect(requirement.creator_id).toBeDefined()
         expect(requirement.created_at).toBeDefined()
-        expect(requirement.last_modified).toBeDefined()
+        expect(requirement.updated_at).toBeDefined()
 
         // Validate data types
         expect(typeof requirement.id).toBe('string')
@@ -281,7 +281,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         expect(typeof requirement.type_id).toBe('string')
         expect(typeof requirement.creator_id).toBe('string')
         expect(typeof requirement.created_at).toBe('string')
-        expect(typeof requirement.last_modified).toBe('string')
+        expect(typeof requirement.updated_at).toBe('string')
 
         // Validate enum values
         expect(['Draft', 'Active', 'Obsolete']).toContain(requirement.status)
@@ -289,9 +289,9 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
 
         // Validate date formats
         expect(new Date(requirement.created_at)).toBeInstanceOf(Date)
-        expect(new Date(requirement.last_modified)).toBeInstanceOf(Date)
+        expect(new Date(requirement.updated_at)).toBeInstanceOf(Date)
         expect(new Date(requirement.created_at).getTime()).not.toBeNaN()
-        expect(new Date(requirement.last_modified).getTime()).not.toBeNaN()
+        expect(new Date(requirement.updated_at).getTime()).not.toBeNaN()
 
         console.log(`✅ Created requirement: ${requirement.reference_id} - "${requirement.title}"`)
       } catch (error) {
@@ -987,7 +987,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         expect(requirement).toHaveProperty('type_id')
         expect(requirement).toHaveProperty('creator_id')
         expect(requirement).toHaveProperty('created_at')
-        expect(requirement).toHaveProperty('last_modified')
+        expect(requirement).toHaveProperty('updated_at')
 
         // Data types
         expect(typeof requirement.id).toBe('string')
@@ -997,7 +997,7 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
         expect(typeof requirement.type_id).toBe('string')
         expect(typeof requirement.creator_id).toBe('string')
         expect(typeof requirement.created_at).toBe('string')
-        expect(typeof requirement.last_modified).toBe('string')
+        expect(typeof requirement.updated_at).toBe('string')
 
         // Enum validation
         expect(['Draft', 'Active', 'Obsolete']).toContain(requirement.status)
@@ -1005,9 +1005,9 @@ describe('Requirements Backend Integration - CRUD Operations', () => {
 
         // Date validation
         expect(new Date(requirement.created_at)).toBeInstanceOf(Date)
-        expect(new Date(requirement.last_modified)).toBeInstanceOf(Date)
+        expect(new Date(requirement.updated_at)).toBeInstanceOf(Date)
         expect(new Date(requirement.created_at).getTime()).not.toBeNaN()
-        expect(new Date(requirement.last_modified).getTime()).not.toBeNaN()
+        expect(new Date(requirement.updated_at).getTime()).not.toBeNaN()
 
         // Included related data validation
         if (requirement.user_story) {

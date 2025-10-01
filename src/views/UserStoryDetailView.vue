@@ -28,7 +28,7 @@
               </div>
               <div class="text-subtitle-1 text-grey-darken-1">
                 Создана {{ formatDate(userStory.created_at) }} • Обновлена
-                {{ formatDate(userStory.last_modified) }}
+                {{ formatDate(userStory.updated_at) }}
               </div>
             </div>
             <div>
