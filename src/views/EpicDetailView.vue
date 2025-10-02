@@ -15,8 +15,6 @@
 
     <!-- Content -->
     <div v-else-if="epic">
-      <!-- Breadcrumbs Navigation -->
-      <AppBreadcrumbs :epic-title="epic.title" class="mb-4" />
 
       <!-- Two-Column Layout -->
       <v-row class="fill-height">
@@ -140,7 +138,6 @@ import { commentService } from '@/services/comment-service'
 import { useEntitiesStore } from '@/stores/entities'
 import { EpicForm } from '@/components/forms'
 import { EpicToolbar, EpicDescription, UserStoriesPanel } from '@/components/data-display'
-import AppBreadcrumbs from '@/components/common/AppBreadcrumbs.vue'
 import type { Epic, UserStory, Comment, UpdateEpicRequest } from '@/types'
 
 const route = useRoute()
