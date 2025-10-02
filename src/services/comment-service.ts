@@ -62,9 +62,9 @@ export class CommentService extends BaseApiService {
   }
 
   // Entity-specific comment operations
-  async getEntityComments(entityType: EntityType, entityId: string): Promise<Comment[]> {
+  async getEntityComments(entityType: EntityType, entityId: string): Promise<Comment[] | CommentListResponse> {
     const entityPath = this.getEntityPath(entityType)
-    return await this.apiGet<Comment[]>(`/${entityPath}/${entityId}/comments`)
+    return await this.apiGet<Comment[] | CommentListResponse>(`/${entityPath}/${entityId}/comments`)
   }
 
   async createEntityComment(

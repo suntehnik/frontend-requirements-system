@@ -12,8 +12,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { epicService } from '@/services/epic-service'
+import type { Epic } from '@/types'
 
 interface BreadcrumbItem {
   title: string
@@ -22,16 +24,43 @@ interface BreadcrumbItem {
   icon?: string
 }
 
+interface Props {
+  epicTitle?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  epicTitle: undefined,
+})
+
 const route = useRoute()
+const currentEpic = ref<Epic | null>(null)
+
+// Watch for route changes to load epic data when needed
+watch(
+  () => route.params.id,
+  async (newId) => {
+    if (route.path.startsWith('/epics/') && newId && typeof newId === 'string') {
+      try {
+        currentEpic.value = await epicService.get(newId)
+      } catch (error) {
+        console.error('Failed to load epic for breadcrumbs:', error)
+        currentEpic.value = null
+      }
+    } else {
+      currentEpic.value = null
+    }
+  },
+  { immediate: true }
+)
 
 const breadcrumbs = computed((): BreadcrumbItem[] => {
   const path = route.path
   const items: BreadcrumbItem[] = []
 
-  // Always start with dashboard
+  // Always start with Home (dashboard)
   if (path !== '/dashboard') {
     items.push({
-      title: 'Главная',
+      title: 'Home',
       to: '/dashboard',
       icon: 'mdi-home',
     })
@@ -40,16 +69,27 @@ const breadcrumbs = computed((): BreadcrumbItem[] => {
   // Generate breadcrumbs based on current route
   if (path.startsWith('/epics')) {
     items.push({
-      title: 'Эпики',
+      title: 'Epics',
       to: path === '/epics' ? undefined : '/epics',
       disabled: path === '/epics',
     })
 
     if (route.params.id) {
-      items.push({
-        title: `Эпик ${route.params.id}`,
-        disabled: true,
-      })
+      // Use provided epic title prop, or loaded epic data, or fallback to reference ID
+      const epicTitle = props.epicTitle || currentEpic.value?.title
+      const referenceId = currentEpic.value?.reference_id || route.params.id
+      
+      if (epicTitle) {
+        items.push({
+          title: `${referenceId} ${epicTitle}`,
+          disabled: true,
+        })
+      } else {
+        items.push({
+          title: `Epic ${route.params.id}`,
+          disabled: true,
+        })
+      }
     }
   } else if (path.startsWith('/user-stories')) {
     items.push({
