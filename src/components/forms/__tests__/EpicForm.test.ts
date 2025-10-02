@@ -62,7 +62,8 @@ describe('EpicForm', () => {
     })
 
     expect(wrapper.find('.text-h5').text()).toBe('Создать эпик')
-    expect(wrapper.vm.isEditing).toBe(false)
+    // Test that the form shows create mode by checking the submit button text
+    expect(wrapper.find('[type="submit"]').text()).toBe('Создать')
   })
 
   it('should render edit form when epic is provided', () => {
@@ -76,8 +77,10 @@ describe('EpicForm', () => {
     })
 
     expect(wrapper.find('.text-h5').text()).toBe('Редактировать эпик')
-    expect(wrapper.vm.isEditing).toBe(true)
-    expect(wrapper.vm.form.title).toBe('Test Epic')
+    // Test that the form shows edit mode by checking the submit button text
+    expect(wrapper.find('[type="submit"]').text()).toBe('Сохранить')
+    // Test that status selector is present in edit mode
+    expect(wrapper.findComponent({ name: 'StatusSelector' }).exists()).toBe(true)
   })
 
   it('should emit submit event with form data', async () => {
