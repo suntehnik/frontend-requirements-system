@@ -2,39 +2,97 @@
   <div class="epic-toolbar d-flex align-center ga-3 mb-4">
     <!-- Status Chip -->
     <div class="position-relative">
-      <v-chip v-if="!showStatusDropdown" :color="getStatusColor(localStatus)" size="large" :loading="updating"
-        @click="toggleStatusDropdown" class="toolbar-chip" rounded="xl">
+      <v-chip
+        v-if="!showStatusDropdown"
+        :color="getStatusColor(localStatus)"
+        size="large"
+        :loading="updating"
+        @click="toggleStatusDropdown"
+        class="toolbar-chip"
+        rounded="xl"
+      >
         {{ getStatusText(localStatus) }}
       </v-chip>
 
-      <v-select v-else v-model="localStatus" :items="statusOptions" item-title="text" item-value="value"
-        variant="outlined" density="compact" hide-details style="min-width: 140px" :loading="updating"
-        @update:model-value="updateStatus" @blur="hideStatusDropdown" ref="statusSelectRef" />
+      <v-select
+        v-else
+        v-model="localStatus"
+        :items="statusOptions"
+        item-title="text"
+        item-value="value"
+        variant="outlined"
+        density="compact"
+        hide-details
+        style="min-width: 140px"
+        :loading="updating"
+        @update:model-value="updateStatus"
+        @blur="hideStatusDropdown"
+        ref="statusSelectRef"
+      />
     </div>
 
     <!-- Priority Chip -->
     <div class="position-relative">
-      <v-chip v-if="!showPriorityDropdown" :color="getPriorityColor(localPriority)" variant="outlined" size="large"
-        :loading="updating" @click="togglePriorityDropdown" class="toolbar-chip" rounded="xl">
+      <v-chip
+        v-if="!showPriorityDropdown"
+        :color="getPriorityColor(localPriority)"
+        variant="outlined"
+        size="large"
+        :loading="updating"
+        @click="togglePriorityDropdown"
+        class="toolbar-chip"
+        rounded="xl"
+      >
         {{ getPriorityText(localPriority) }}
       </v-chip>
 
-      <v-select v-else v-model="localPriority" :items="priorityOptions" item-title="text" item-value="value"
-        variant="outlined" density="compact" hide-details style="min-width: 140px" :loading="updating"
-        @update:model-value="updatePriority" @blur="hidePriorityDropdown" ref="prioritySelectRef" />
+      <v-select
+        v-else
+        v-model="localPriority"
+        :items="priorityOptions"
+        item-title="text"
+        item-value="value"
+        variant="outlined"
+        density="compact"
+        hide-details
+        style="min-width: 140px"
+        :loading="updating"
+        @update:model-value="updatePriority"
+        @blur="hidePriorityDropdown"
+        ref="prioritySelectRef"
+      />
     </div>
 
     <!-- Assignee Chip -->
     <div class="position-relative">
-      <v-chip v-if="!showAssigneeDropdown" color="grey-lighten-3" size="large" :loading="updating || usersLoading"
-        @click="toggleAssigneeDropdown" class="toolbar-chip assignee-chip" rounded="xl">
+      <v-chip
+        v-if="!showAssigneeDropdown"
+        color="grey-lighten-3"
+        size="large"
+        :loading="updating || usersLoading"
+        @click="toggleAssigneeDropdown"
+        class="toolbar-chip assignee-chip"
+        rounded="xl"
+      >
         <v-icon start size="small">mdi-account</v-icon>
         {{ getAssigneeText() }}
       </v-chip>
 
-      <v-select v-else v-model="localAssigneeId" :items="assigneeOptions" item-title="text" item-value="value"
-        variant="outlined" density="compact" hide-details style="min-width: 160px" :loading="updating || usersLoading"
-        @update:model-value="updateAssignee" @blur="hideAssigneeDropdown" ref="assigneeSelectRef" />
+      <v-select
+        v-else
+        v-model="localAssigneeId"
+        :items="assigneeOptions"
+        item-title="text"
+        item-value="value"
+        variant="outlined"
+        density="compact"
+        hide-details
+        style="min-width: 160px"
+        :loading="updating || usersLoading"
+        @update:model-value="updateAssignee"
+        @blur="hideAssigneeDropdown"
+        ref="assigneeSelectRef"
+      />
     </div>
   </div>
 </template>
@@ -78,7 +136,7 @@ const statusOptions = [
   { text: 'Черновик', value: 'Draft' },
   { text: 'В работе', value: 'In Progress' },
   { text: 'Выполнено', value: 'Done' },
-  { text: 'Отменено', value: 'Cancelled' }
+  { text: 'Отменено', value: 'Cancelled' },
 ]
 
 // Priority options
@@ -86,24 +144,28 @@ const priorityOptions = [
   { text: 'Критический', value: 1 },
   { text: 'Высокий', value: 2 },
   { text: 'Средний', value: 3 },
-  { text: 'Низкий', value: 4 }
+  { text: 'Низкий', value: 4 },
 ]
 
 // Assignee options
 const assigneeOptions = computed(() => [
   { text: 'Не назначен', value: null },
-  ...users.value.map(user => ({
+  ...users.value.map((user) => ({
     text: user.username,
-    value: user.id
-  }))
+    value: user.id,
+  })),
 ])
 
 // Watch for epic changes to update local state
-watch(() => props.epic, (newEpic) => {
-  localStatus.value = newEpic.status
-  localPriority.value = newEpic.priority
-  localAssigneeId.value = newEpic.assignee_id || null
-}, { deep: true })
+watch(
+  () => props.epic,
+  (newEpic) => {
+    localStatus.value = newEpic.status
+    localPriority.value = newEpic.priority
+    localAssigneeId.value = newEpic.assignee_id || null
+  },
+  { deep: true },
+)
 
 // Load users for assignee dropdown
 const loadUsers = async () => {
@@ -117,7 +179,7 @@ const loadUsers = async () => {
       currentUsers.push(props.epic.creator)
     }
 
-    if (props.epic.assignee && !currentUsers.find(u => u.id === props.epic.assignee?.id)) {
+    if (props.epic.assignee && !currentUsers.find((u) => u.id === props.epic.assignee?.id)) {
       currentUsers.push(props.epic.assignee)
     }
 
@@ -192,7 +254,7 @@ const updatePriority = async (newPriority: number) => {
   try {
     updating.value = true
     const updatedEpic = await epicService.update(props.epic.id, {
-      priority: newPriority as Priority
+      priority: newPriority as Priority,
     })
     emit('updated', updatedEpic)
     hidePriorityDropdown()
@@ -271,7 +333,7 @@ const getPriorityText = (priority: number) => {
 }
 
 const getAssigneeText = () => {
-  const assignee = users.value.find(u => u.id === localAssigneeId.value)
+  const assignee = users.value.find((u) => u.id === localAssigneeId.value)
   return assignee?.username || 'Не назначен'
 }
 

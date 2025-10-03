@@ -11,12 +11,12 @@
       <div v-if="loading" class="text-center py-4">
         <v-progress-circular indeterminate size="32" color="primary" />
       </div>
-      
+
       <!-- User Stories List -->
       <v-list v-else-if="userStories && userStories.length > 0" class="pa-0">
-        <v-list-item 
-          v-for="story in userStories" 
-          :key="story.id" 
+        <v-list-item
+          v-for="story in userStories"
+          :key="story.id"
           :to="`/user-stories/${story.reference_id}`"
           class="px-0 py-2"
           rounded
@@ -24,29 +24,21 @@
           <template v-slot:prepend>
             <v-icon color="primary" class="mr-3">mdi-book-open-variant</v-icon>
           </template>
-          
+
           <v-list-item-title class="text-body-1 font-weight-medium mb-1">
             {{ story.reference_id }}: {{ story.title }}
           </v-list-item-title>
-          
+
           <v-list-item-subtitle>
             <div class="d-flex align-center gap-3 flex-wrap">
-              <v-chip 
-                :color="getStatusColor(story.status)" 
-                size="x-small" 
-                variant="flat"
-              >
+              <v-chip :color="getStatusColor(story.status)" size="x-small" variant="flat">
                 {{ getStatusText(story.status) }}
               </v-chip>
-              
-              <v-chip 
-                :color="getPriorityColor(story.priority)" 
-                size="x-small" 
-                variant="outlined"
-              >
+
+              <v-chip :color="getPriorityColor(story.priority)" size="x-small" variant="outlined">
                 {{ getPriorityText(story.priority) }}
               </v-chip>
-              
+
               <span v-if="story.assignee" class="text-caption text-grey-darken-1">
                 <v-icon size="12" class="mr-1">mdi-account</v-icon>
                 {{ story.assignee.username }}
@@ -57,13 +49,13 @@
               </span>
             </div>
           </v-list-item-subtitle>
-          
+
           <template v-slot:append>
             <v-icon color="grey-lighten-1">mdi-chevron-right</v-icon>
           </template>
         </v-list-item>
       </v-list>
-      
+
       <!-- Empty State -->
       <div v-else class="text-center text-grey-darken-1 py-8">
         <v-icon size="48" color="grey-lighten-1" class="mb-2">mdi-book-open-variant</v-icon>
@@ -71,7 +63,12 @@
         <div class="text-body-2 mb-4 text-grey-darken-2">
           Создайте первую пользовательскую историю для этого эпика
         </div>
-        <v-btn color="primary" size="small" prepend-icon="mdi-plus" @click="$emit('add-user-story')">
+        <v-btn
+          color="primary"
+          size="small"
+          prepend-icon="mdi-plus"
+          @click="$emit('add-user-story')"
+        >
           Создать первую историю
         </v-btn>
       </div>

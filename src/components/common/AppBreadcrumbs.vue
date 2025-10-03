@@ -50,7 +50,7 @@ watch(
       currentEpic.value = null
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const breadcrumbs = computed((): BreadcrumbItem[] => {
@@ -78,7 +78,7 @@ const breadcrumbs = computed((): BreadcrumbItem[] => {
       // Use provided epic title prop, or loaded epic data, or fallback to reference ID
       const epicTitle = props.epicTitle || currentEpic.value?.title
       const referenceId = currentEpic.value?.reference_id || route.params.id
-      
+
       if (epicTitle) {
         items.push({
           title: `${referenceId} ${epicTitle}`,

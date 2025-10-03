@@ -424,9 +424,7 @@ export class SchemaValidator {
     )
     fieldValidations.push(DataTypeValidator.validateField(epic.creator_id, 'uuid', 'creator_id'))
     fieldValidations.push(DataTypeValidator.validateField(epic.created_at, 'date', 'created_at'))
-    fieldValidations.push(
-      DataTypeValidator.validateField(epic.updated_at, 'date', 'updated_at'),
-    )
+    fieldValidations.push(DataTypeValidator.validateField(epic.updated_at, 'date', 'updated_at'))
 
     // Validate optional fields
     fieldValidations.push(
@@ -711,9 +709,7 @@ export class SchemaValidator {
     )
     fieldValidations.push(DataTypeValidator.validateField(ac.author_id, 'uuid', 'author_id'))
     fieldValidations.push(DataTypeValidator.validateField(ac.created_at, 'date', 'created_at'))
-    fieldValidations.push(
-      DataTypeValidator.validateField(ac.updated_at, 'date', 'updated_at'),
-    )
+    fieldValidations.push(DataTypeValidator.validateField(ac.updated_at, 'date', 'updated_at'))
 
     // Validate nested objects if present
     if (ac.user_story) {
@@ -843,9 +839,7 @@ export class SchemaValidator {
     fieldValidations.push(DataTypeValidator.validateField(req.type_id, 'uuid', 'type_id'))
     fieldValidations.push(DataTypeValidator.validateField(req.creator_id, 'uuid', 'creator_id'))
     fieldValidations.push(DataTypeValidator.validateField(req.created_at, 'date', 'created_at'))
-    fieldValidations.push(
-      DataTypeValidator.validateField(req.updated_at, 'date', 'updated_at'),
-    )
+    fieldValidations.push(DataTypeValidator.validateField(req.updated_at, 'date', 'updated_at'))
 
     // Validate optional fields
     fieldValidations.push(

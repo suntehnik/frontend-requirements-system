@@ -10,7 +10,21 @@ const vuetify = createVuetify()
 // Mock Vuetify components
 const mockVSelect = {
   template: '<div class="v-select"><slot /></div>',
-  props: ['modelValue', 'items', 'label', 'placeholder', 'rules', 'errorMessages', 'disabled', 'loading', 'clearable', 'variant', 'density', 'itemTitle', 'itemValue'],
+  props: [
+    'modelValue',
+    'items',
+    'label',
+    'placeholder',
+    'rules',
+    'errorMessages',
+    'disabled',
+    'loading',
+    'clearable',
+    'variant',
+    'density',
+    'itemTitle',
+    'itemValue',
+  ],
   emits: ['update:modelValue'],
 }
 
@@ -55,7 +69,7 @@ describe('StatusSelector', () => {
 
     const configStore = useConfigStore()
     const epicOptions = configStore.epicStatusOptions
-    
+
     expect(wrapper.vm.statusOptions).toEqual(epicOptions)
   })
 
@@ -72,7 +86,7 @@ describe('StatusSelector', () => {
 
     const configStore = useConfigStore()
     const userStoryOptions = configStore.userStoryStatusOptions
-    
+
     expect(wrapper.vm.statusOptions).toEqual(userStoryOptions)
   })
 
@@ -89,7 +103,7 @@ describe('StatusSelector', () => {
 
     const configStore = useConfigStore()
     const requirementOptions = configStore.requirementStatusOptions
-    
+
     expect(wrapper.vm.statusOptions).toEqual(requirementOptions)
   })
 
@@ -105,7 +119,7 @@ describe('StatusSelector', () => {
     })
 
     await wrapper.vm.handleUpdate('Draft')
-    
+
     expect(wrapper.emitted('update:modelValue')).toBeTruthy()
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['Draft'])
   })

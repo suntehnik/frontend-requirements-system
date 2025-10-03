@@ -17,14 +17,9 @@
     @update:model-value="handleUpdate"
   >
     <template #selection="{ item }">
-      <v-chip
-        :color="item.raw.color"
-        :text="item.raw.label"
-        size="small"
-        variant="flat"
-      />
+      <v-chip :color="item.raw.color" :text="item.raw.label" size="small" variant="flat" />
     </template>
-    
+
     <template #item="{ item, props }">
       <v-list-item v-bind="props">
         <template #prepend>
@@ -63,7 +58,14 @@ interface Props {
   disabled?: boolean
   loading?: boolean
   clearable?: boolean
-  variant?: 'filled' | 'outlined' | 'plain' | 'underlined' | 'solo' | 'solo-inverted' | 'solo-filled'
+  variant?:
+    | 'filled'
+    | 'outlined'
+    | 'plain'
+    | 'underlined'
+    | 'solo'
+    | 'solo-inverted'
+    | 'solo-filled'
   density?: 'default' | 'comfortable' | 'compact'
   class?: string
 }
@@ -120,13 +122,13 @@ const handleUpdate = (value: Priority | null): void => {
 
 // Helper function to get priority label by value
 const getPriorityLabel = (priority: Priority): string => {
-  const option = priorityOptions.value.find(opt => opt.value === priority)
+  const option = priorityOptions.value.find((opt) => opt.value === priority)
   return option?.label || `Приоритет ${priority}`
 }
 
 // Helper function to get priority color by value
 const getPriorityColor = (priority: Priority): string => {
-  const option = priorityOptions.value.find(opt => opt.value === priority)
+  const option = priorityOptions.value.find((opt) => opt.value === priority)
   return option?.color || 'grey'
 }
 

@@ -104,7 +104,7 @@ describe('EpicForm', () => {
 
     // Mock the formRef.validate method
     vm.formRef = {
-      validate: vi.fn().mockResolvedValue({ valid: true })
+      validate: vi.fn().mockResolvedValue({ valid: true }),
     }
 
     // Call handleSubmit directly
@@ -144,7 +144,7 @@ describe('EpicForm', () => {
 
     // Mock the formRef.validate method to return invalid
     vm.formRef = {
-      validate: vi.fn().mockResolvedValue({ valid: false })
+      validate: vi.fn().mockResolvedValue({ valid: false }),
     }
 
     // Try to call handleSubmit directly

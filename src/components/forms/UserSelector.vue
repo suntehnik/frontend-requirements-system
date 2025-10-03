@@ -27,7 +27,7 @@
         <span>{{ item.raw.displayName }}</span>
       </div>
     </template>
-    
+
     <template #item="{ item, props }">
       <v-list-item v-bind="props">
         <template #prepend>
@@ -76,7 +76,14 @@ interface Props {
   disabled?: boolean
   loading?: boolean
   clearable?: boolean
-  variant?: 'filled' | 'outlined' | 'plain' | 'underlined' | 'solo' | 'solo-inverted' | 'solo-filled'
+  variant?:
+    | 'filled'
+    | 'outlined'
+    | 'plain'
+    | 'underlined'
+    | 'solo'
+    | 'solo-inverted'
+    | 'solo-filled'
   density?: 'default' | 'comfortable' | 'compact'
   class?: string
   excludeRoles?: UserRole[]
@@ -110,7 +117,7 @@ const searchQuery = ref('')
 
 // Computed
 const usersWithDisplayName = computed<UserWithDisplayName[]>(() => {
-  return configStore.users.map(user => ({
+  return configStore.users.map((user) => ({
     ...user,
     displayName: `${user.username} (${user.email})`,
   }))
@@ -121,21 +128,22 @@ const filteredUsers = computed<UserWithDisplayName[]>(() => {
 
   // Filter by included roles
   if (props.includeRoles.length > 0) {
-    users = users.filter(user => props.includeRoles.includes(user.role))
+    users = users.filter((user) => props.includeRoles.includes(user.role))
   }
 
   // Filter by excluded roles
   if (props.excludeRoles.length > 0) {
-    users = users.filter(user => !props.excludeRoles.includes(user.role))
+    users = users.filter((user) => !props.excludeRoles.includes(user.role))
   }
 
   // Filter by search query
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    users = users.filter(user => 
-      user.username.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query) ||
-      user.displayName.toLowerCase().includes(query)
+    users = users.filter(
+      (user) =>
+        user.username.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query) ||
+        user.displayName.toLowerCase().includes(query),
     )
   }
 
@@ -202,7 +210,7 @@ watch(
     if (error) {
       console.error('Error loading users:', error)
     }
-  }
+  },
 )
 
 // Expose helper functions for external use

@@ -21,7 +21,7 @@ describe('EntitiesStore Pagination', () => {
 
   it('should initialize with default pagination state', () => {
     const store = useEntitiesStore()
-    
+
     expect(store.epicsPagination.page).toBe(1)
     expect(store.epicsPagination.pageSize).toBe(25)
     expect(store.epicsPagination.totalCount).toBe(0)
@@ -87,11 +87,11 @@ describe('EntitiesStore Pagination', () => {
 
   it('should reset to page 1 when changing page size', () => {
     const store = useEntitiesStore()
-    
+
     // Set to page 3
     store.setEpicsPage(3)
     expect(store.epicsPagination.page).toBe(3)
-    
+
     // Change page size - should reset to page 1
     store.setEpicsPageSize(50)
     expect(store.epicsPagination.page).toBe(1)

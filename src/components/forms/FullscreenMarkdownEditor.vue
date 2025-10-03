@@ -14,12 +14,7 @@
         </v-btn>
         <v-toolbar-title>Редактирование описания</v-toolbar-title>
         <v-spacer />
-        <v-btn
-          variant="text"
-          @click="handleSave"
-          :loading="saving"
-          :disabled="!hasChanges"
-        >
+        <v-btn variant="text" @click="handleSave" :loading="saving" :disabled="!hasChanges">
           Сохранить
         </v-btn>
       </v-toolbar>
@@ -137,7 +132,7 @@ watch(
       internalValue.value = props.modelValue
       originalValue.value = props.modelValue
     }
-  }
+  },
 )
 
 watch(
@@ -148,7 +143,7 @@ watch(
       internalValue.value = newValue
       originalValue.value = newValue
     }
-  }
+  },
 )
 
 // Watch for internal show changes
