@@ -60,16 +60,12 @@
                   <p class="text-body-2 text-grey mb-4">
                     По вашим критериям поиска ничего не найдено.
                   </p>
-                  <v-btn 
-                    variant="outlined" 
-                    color="primary" 
-                    @click="clearFiltersAndSearch"
-                    prepend-icon="mdi-filter-off"
-                  >
+                  <v-btn variant="outlined" color="primary" @click="clearFiltersAndSearch"
+                    prepend-icon="mdi-filter-off">
                     Очистить фильтры
                   </v-btn>
                 </div>
-                
+
                 <!-- Empty state for no epics at all -->
                 <div v-else>
                   <v-icon size="64" color="grey-lighten-1">mdi-rocket-launch-outline</v-icon>
@@ -78,13 +74,8 @@
                     Создайте первый эпик, чтобы начать планирование проекта.
                     Эпики помогают организовать пользовательские истории по функциональным областям.
                   </p>
-                  <v-btn 
-                    variant="elevated" 
-                    color="primary" 
-                    size="large"
-                    @click="handleCreateEpic"
-                    prepend-icon="mdi-plus"
-                  >
+                  <v-btn variant="elevated" color="primary" size="large" @click="handleCreateEpic"
+                    prepend-icon="mdi-plus">
                     Создать первый эпик
                   </v-btn>
                 </div>
@@ -224,7 +215,7 @@ const clearFiltersAndSearch = () => {
   // Clear local state
   search.value = ''
   filters.value = {}
-  
+
   // Emit events to parent to clear filters and search
   emit('clear-filters')
   emit('search-change', '')
