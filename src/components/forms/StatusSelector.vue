@@ -17,23 +17,13 @@
     @update:model-value="handleUpdate"
   >
     <template #selection="{ item }">
-      <v-chip
-        :color="item.raw.color"
-        :text="item.raw.label"
-        size="small"
-        variant="flat"
-      />
+      <v-chip :color="item.raw.color" :text="item.raw.label" size="small" variant="flat" />
     </template>
-    
+
     <template #item="{ item, props }">
       <v-list-item v-bind="props">
         <template #prepend>
-          <v-icon
-            :color="item.raw.color"
-            icon="mdi-circle"
-            size="small"
-            class="mr-2"
-          />
+          <v-icon :color="item.raw.color" icon="mdi-circle" size="small" class="mr-2" />
         </template>
         <v-list-item-title>{{ item.raw.label }}</v-list-item-title>
       </v-list-item>
@@ -58,7 +48,14 @@ interface Props {
   disabled?: boolean
   loading?: boolean
   clearable?: boolean
-  variant?: 'filled' | 'outlined' | 'plain' | 'underlined' | 'solo' | 'solo-inverted' | 'solo-filled'
+  variant?:
+    | 'filled'
+    | 'outlined'
+    | 'plain'
+    | 'underlined'
+    | 'solo'
+    | 'solo-inverted'
+    | 'solo-filled'
   density?: 'default' | 'comfortable' | 'compact'
   class?: string
 }
@@ -114,13 +111,13 @@ const handleUpdate = (value: StatusValue | null): void => {
 
 // Helper function to get status label by value
 const getStatusLabel = (status: StatusValue): string => {
-  const option = statusOptions.value.find(opt => opt.value === status)
+  const option = statusOptions.value.find((opt) => opt.value === status)
   return option?.label || status
 }
 
 // Helper function to get status color by value
 const getStatusColor = (status: StatusValue): string => {
-  const option = statusOptions.value.find(opt => opt.value === status)
+  const option = statusOptions.value.find((opt) => opt.value === status)
   return option?.color || 'grey'
 }
 

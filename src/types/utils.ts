@@ -32,9 +32,7 @@ export type StatusByEntityType<T extends EntityType> = T extends 'epic'
       : never
 
 // Partial update types
-export type PartialEntity<T> = Partial<
-  Omit<T, 'id' | 'reference_id' | 'created_at' | 'updated_at'>
->
+export type PartialEntity<T> = Partial<Omit<T, 'id' | 'reference_id' | 'created_at' | 'updated_at'>>
 
 // Priority labels mapping
 export const PRIORITY_LABELS: Record<Priority, string> = {

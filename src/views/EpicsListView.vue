@@ -1,37 +1,61 @@
 <template>
   <div class="epics-list-view">
     <!-- Epic List Component with wireframe layout -->
-    <EpicList :epics="epics" :loading="isLoading" :total-count="totalCount" :current-page="currentPage"
-      :page-size="pageSize" @create="handleCreateEpic" @delete="handleDeleteEpic" @filter-change="handleFilterChange"
-      @options-change="handleOptionsChange" @search-change="handleSearchChange" @clear-filters="handleClearFilters" />
+    <EpicList
+      :epics="epics"
+      :loading="isLoading"
+      :total-count="totalCount"
+      :current-page="currentPage"
+      :page-size="pageSize"
+      @create="handleCreateEpic"
+      @delete="handleDeleteEpic"
+      @filter-change="handleFilterChange"
+      @options-change="handleOptionsChange"
+      @search-change="handleSearchChange"
+      @clear-filters="handleClearFilters"
+    />
 
     <!-- Create/Edit Epic Modal -->
     <v-dialog v-model="showEpicDialog" max-width="800px" persistent scrollable>
-      <EpicForm :epic="selectedEpic" :loading="formLoading" @submit="handleEpicSubmit" @cancel="handleEpicCancel"
-        @status-change="handleStatusChange" />
+      <EpicForm
+        :epic="selectedEpic"
+        :loading="formLoading"
+        @submit="handleEpicSubmit"
+        @cancel="handleEpicCancel"
+        @status-change="handleStatusChange"
+      />
     </v-dialog>
 
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="showDeleteDialog" max-width="500px">
       <v-card>
-        <v-card-title class="text-h5">
-          Подтверждение удаления
-        </v-card-title>
+        <v-card-title class="text-h5"> Подтверждение удаления </v-card-title>
         <v-card-text>
           <p>Вы уверены, что хотите удалить эпик?</p>
           <v-alert v-if="epicToDelete" type="warning" variant="tonal" class="mt-4">
             <strong>{{ epicToDelete.reference_id }}: {{ epicToDelete.title }}</strong>
           </v-alert>
           <p class="mt-4 text-body-2 text-grey">
-            Это действие нельзя отменить. Все связанные пользовательские истории и требования также будут удалены.
+            Это действие нельзя отменить. Все связанные пользовательские истории и требования также
+            будут удалены.
           </p>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="grey-darken-1" variant="text" @click="handleDeleteCancel" :disabled="deleteLoading">
+          <v-btn
+            color="grey-darken-1"
+            variant="text"
+            @click="handleDeleteCancel"
+            :disabled="deleteLoading"
+          >
             Отмена
           </v-btn>
-          <v-btn color="error" variant="elevated" @click="handleDeleteConfirm" :loading="deleteLoading">
+          <v-btn
+            color="error"
+            variant="elevated"
+            @click="handleDeleteConfirm"
+            :loading="deleteLoading"
+          >
             Удалить
           </v-btn>
         </v-card-actions>
@@ -42,9 +66,7 @@
     <v-snackbar v-model="showSuccessMessage" color="success" timeout="4000" location="top">
       {{ successMessage }}
       <template v-slot:actions>
-        <v-btn color="white" variant="text" @click="showSuccessMessage = false">
-          Закрыть
-        </v-btn>
+        <v-btn color="white" variant="text" @click="showSuccessMessage = false"> Закрыть </v-btn>
       </template>
     </v-snackbar>
 
@@ -52,9 +74,7 @@
     <v-snackbar v-model="showErrorMessage" color="error" timeout="6000" location="top">
       {{ errorMessage }}
       <template v-slot:actions>
-        <v-btn color="white" variant="text" @click="showErrorMessage = false">
-          Закрыть
-        </v-btn>
+        <v-btn color="white" variant="text" @click="showErrorMessage = false"> Закрыть </v-btn>
       </template>
     </v-snackbar>
   </div>
@@ -66,7 +86,14 @@ import { useEntitiesStore } from '@/stores/entities'
 import { epicService } from '@/services'
 import { EpicList } from '@/components/data-display'
 import { EpicForm } from '@/components/forms'
-import type { Epic, EpicStatus, Priority, CreateEpicRequest, UpdateEpicRequest, EpicListParams } from '@/types'
+import type {
+  Epic,
+  EpicStatus,
+  Priority,
+  CreateEpicRequest,
+  UpdateEpicRequest,
+  EpicListParams,
+} from '@/types'
 
 interface DataTableOptions {
   page: number
@@ -87,7 +114,10 @@ const deleteLoading = ref(false)
 // Filter, search, and sort state
 const currentFilters = ref<{ status?: EpicStatus; priority?: Priority }>({})
 const currentSearch = ref('')
-const currentSort = ref<{ key: string; order: 'asc' | 'desc' }>({ key: 'created_at', order: 'desc' })
+const currentSort = ref<{ key: string; order: 'asc' | 'desc' }>({
+  key: 'created_at',
+  order: 'desc',
+})
 
 // Success/Error messages
 const showSuccessMessage = ref(false)
@@ -127,8 +157,6 @@ const loadEpics = async () => {
     showError('Failed to load epics list')
   }
 }
-
-
 
 const handleEpicSubmit = async (data: CreateEpicRequest | UpdateEpicRequest) => {
   formLoading.value = true
@@ -205,8 +233,6 @@ const handleFilterChange = (filters: { status?: EpicStatus; priority?: Priority 
   loadEpics()
 }
 
-
-
 const handleOptionsChange = (options: DataTableOptions) => {
   // Handle sorting changes
   if (options.sortBy.length > 0) {
@@ -214,15 +240,15 @@ const handleOptionsChange = (options: DataTableOptions) => {
   } else {
     currentSort.value = { key: 'created_at', order: 'desc' }
   }
-  
+
   // Handle page changes
   entitiesStore.setEpicsPage(options.page)
-  
+
   // Handle page size changes
   if (options.itemsPerPage !== pageSize.value) {
     entitiesStore.setEpicsPageSize(options.itemsPerPage)
   }
-  
+
   // Reload data with new options
   loadEpics()
 }

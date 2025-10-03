@@ -19,13 +19,13 @@ export const useConfigStore = defineStore('config', () => {
   const relationshipTypes = ref<RelationshipType[]>([])
   const statusModels = ref<StatusModel[]>([])
   const users = ref<User[]>([])
-  
+
   // Loading states
   const loadingRequirementTypes = ref(false)
   const loadingRelationshipTypes = ref(false)
   const loadingStatusModels = ref(false)
   const loadingUsers = ref(false)
-  
+
   // Error states
   const requirementTypesError = ref<string | null>(null)
   const relationshipTypesError = ref<string | null>(null)
@@ -33,11 +33,12 @@ export const useConfigStore = defineStore('config', () => {
   const usersError = ref<string | null>(null)
 
   // Computed
-  const isLoading = computed(() => 
-    loadingRequirementTypes.value || 
-    loadingRelationshipTypes.value || 
-    loadingStatusModels.value || 
-    loadingUsers.value
+  const isLoading = computed(
+    () =>
+      loadingRequirementTypes.value ||
+      loadingRelationshipTypes.value ||
+      loadingStatusModels.value ||
+      loadingUsers.value,
   )
 
   // Status options for different entity types
@@ -74,7 +75,8 @@ export const useConfigStore = defineStore('config', () => {
       const response = await configService.getRequirementTypes()
       requirementTypes.value = response.requirement_types
     } catch (error) {
-      requirementTypesError.value = error instanceof Error ? error.message : 'Failed to load requirement types'
+      requirementTypesError.value =
+        error instanceof Error ? error.message : 'Failed to load requirement types'
       console.error('Failed to fetch requirement types:', error)
     } finally {
       loadingRequirementTypes.value = false
@@ -91,7 +93,8 @@ export const useConfigStore = defineStore('config', () => {
       const response = await configService.getRelationshipTypes()
       relationshipTypes.value = response.relationship_types
     } catch (error) {
-      relationshipTypesError.value = error instanceof Error ? error.message : 'Failed to load relationship types'
+      relationshipTypesError.value =
+        error instanceof Error ? error.message : 'Failed to load relationship types'
       console.error('Failed to fetch relationship types:', error)
     } finally {
       loadingRelationshipTypes.value = false
@@ -108,7 +111,8 @@ export const useConfigStore = defineStore('config', () => {
       const response = await configService.getStatusModels()
       statusModels.value = response.status_models
     } catch (error) {
-      statusModelsError.value = error instanceof Error ? error.message : 'Failed to load status models'
+      statusModelsError.value =
+        error instanceof Error ? error.message : 'Failed to load status models'
       console.error('Failed to fetch status models:', error)
     } finally {
       loadingStatusModels.value = false
@@ -158,15 +162,15 @@ export const useConfigStore = defineStore('config', () => {
   }
 
   function getUserById(id: string): User | undefined {
-    return users.value.find(user => user.id === id)
+    return users.value.find((user) => user.id === id)
   }
 
   function getRequirementTypeById(id: string): RequirementType | undefined {
-    return requirementTypes.value.find(type => type.id === id)
+    return requirementTypes.value.find((type) => type.id === id)
   }
 
   function getRelationshipTypeById(id: string): RelationshipType | undefined {
-    return relationshipTypes.value.find(type => type.id === id)
+    return relationshipTypes.value.find((type) => type.id === id)
   }
 
   // Clear all data (useful for logout)
@@ -175,7 +179,7 @@ export const useConfigStore = defineStore('config', () => {
     relationshipTypes.value = []
     statusModels.value = []
     users.value = []
-    
+
     requirementTypesError.value = null
     relationshipTypesError.value = null
     statusModelsError.value = null
@@ -188,25 +192,25 @@ export const useConfigStore = defineStore('config', () => {
     relationshipTypes,
     statusModels,
     users,
-    
+
     // Loading states
     loadingRequirementTypes,
     loadingRelationshipTypes,
     loadingStatusModels,
     loadingUsers,
     isLoading,
-    
+
     // Error states
     requirementTypesError,
     relationshipTypesError,
     statusModelsError,
     usersError,
-    
+
     // Computed
     epicStatusOptions,
     userStoryStatusOptions,
     requirementStatusOptions,
-    
+
     // Actions
     fetchRequirementTypes,
     fetchRelationshipTypes,

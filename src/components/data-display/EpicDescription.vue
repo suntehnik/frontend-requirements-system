@@ -40,4 +40,3 @@ defineEmits<{
   'edit-description': []
 }>()
 </script>
-

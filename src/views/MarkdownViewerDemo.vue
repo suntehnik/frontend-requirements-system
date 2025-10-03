@@ -40,11 +40,7 @@
         <v-card>
           <v-card-title>Limited Height with Scrolling</v-card-title>
           <v-card-text>
-            <MarkdownViewer 
-              :content="longContent" 
-              max-height="300px"
-              class-name="custom-viewer"
-            />
+            <MarkdownViewer :content="longContent" max-height="300px" class-name="custom-viewer" />
           </v-card-text>
         </v-card>
       </v-col>

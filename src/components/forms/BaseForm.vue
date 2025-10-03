@@ -1,10 +1,5 @@
 <template>
-  <v-form
-    ref="formRef"
-    v-model="isFormValid"
-    :disabled="disabled"
-    @submit.prevent="handleSubmit"
-  >
+  <v-form ref="formRef" v-model="isFormValid" :disabled="disabled" @submit.prevent="handleSubmit">
     <slot
       :is-valid="isFormValid"
       :loading="loading"
@@ -75,7 +70,7 @@ watch(
   (newValue) => {
     emit('valid', newValue)
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 // Validate on mount if requested

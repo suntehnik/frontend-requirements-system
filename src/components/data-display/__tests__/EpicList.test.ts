@@ -29,7 +29,11 @@ interface EpicListComponent {
   handleCreateEpic: () => void
   handleRowClick: (event: Event, data: { item: Epic }) => void
   handleDeleteClick: (event: Event, item: Epic) => void
-  handleOptionsChange: (options: { page: number; itemsPerPage: number; sortBy: Array<{ key: string; order: 'asc' | 'desc' }> }) => void
+  handleOptionsChange: (options: {
+    page: number
+    itemsPerPage: number
+    sortBy: Array<{ key: string; order: 'asc' | 'desc' }>
+  }) => void
   getStatusColor: (status: EpicStatus) => string
   getStatusText: (status: EpicStatus) => string
   getPriorityColor: (priority: Priority) => string
@@ -41,8 +45,12 @@ interface EpicListComponent {
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/epics/:reference_id', name: 'EpicDetail', component: { template: '<div>Epic Detail</div>' } }
-  ]
+    {
+      path: '/epics/:reference_id',
+      name: 'EpicDetail',
+      component: { template: '<div>Epic Detail</div>' },
+    },
+  ],
 })
 
 const vuetify = createVuetify()
@@ -65,9 +73,9 @@ const createMockEpic = (overrides: Partial<Epic> = {}): Epic => ({
     email: 'test@example.com',
     role: 'User',
     created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
+    updated_at: '2024-01-01T00:00:00Z',
   },
-  ...overrides
+  ...overrides,
 })
 
 const createWrapper = (props: Record<string, unknown> = {}) => {
@@ -76,14 +84,14 @@ const createWrapper = (props: Record<string, unknown> = {}) => {
     loading: false,
     totalCount: 0,
     currentPage: 1,
-    pageSize: 25
+    pageSize: 25,
   }
-  
+
   return mount(EpicList, {
     props: { ...defaultProps, ...props },
     global: {
-      plugins: [vuetify, router]
-    }
+      plugins: [vuetify, router],
+    },
   })
 }
 
@@ -98,14 +106,14 @@ describe('EpicList Component', () => {
       const wrapper = createWrapper({ epics })
 
       const headers = (wrapper.vm as unknown as EpicListComponent).headers
-      const mandatoryColumns = headers.filter(h => h.key === 'reference_id' || h.key === 'title')
-      
+      const mandatoryColumns = headers.filter((h) => h.key === 'reference_id' || h.key === 'title')
+
       expect(mandatoryColumns).toHaveLength(2)
       expect(mandatoryColumns[0].key).toBe('reference_id')
       expect(mandatoryColumns[1].key).toBe('title')
-      
+
       // Mandatory columns should not have responsive classes that hide them
-      mandatoryColumns.forEach(col => {
+      mandatoryColumns.forEach((col) => {
         expect(col.class).toBeUndefined()
       })
     })
@@ -113,29 +121,34 @@ describe('EpicList Component', () => {
     it('should hide optional columns on narrow screens using responsive classes', () => {
       const wrapper = createWrapper()
       const headers = (wrapper.vm as unknown as EpicListComponent).headers
-      
+
       // Status column should be hidden on small screens (d-none d-md-table-cell)
-      const statusColumn = headers.find(h => h.key === 'status')
+      const statusColumn = headers.find((h) => h.key === 'status')
       expect(statusColumn?.class).toBe('d-none d-md-table-cell')
-      
+
       // Priority and assignee columns should be hidden on medium screens (d-none d-lg-table-cell)
-      const priorityColumn = headers.find(h => h.key === 'priority')
-      const assigneeColumn = headers.find(h => h.key === 'assignee')
+      const priorityColumn = headers.find((h) => h.key === 'priority')
+      const assigneeColumn = headers.find((h) => h.key === 'assignee')
       expect(priorityColumn?.class).toBe('d-none d-lg-table-cell')
       expect(assigneeColumn?.class).toBe('d-none d-lg-table-cell')
-      
+
       // Created date should be hidden on large screens (d-none d-xl-table-cell)
-      const createdColumn = headers.find(h => h.key === 'created_at')
+      const createdColumn = headers.find((h) => h.key === 'created_at')
       expect(createdColumn?.class).toBe('d-none d-xl-table-cell')
     })
 
     it('should handle long content without horizontal scrolling (Requirements 1.5, 1.12)', () => {
-      const epics = [createMockEpic({ title: 'Very long epic title that should be truncated to prevent horizontal scrolling issues' })]
+      const epics = [
+        createMockEpic({
+          title:
+            'Very long epic title that should be truncated to prevent horizontal scrolling issues',
+        }),
+      ]
       const wrapper = createWrapper({ epics })
 
       // Verify that the component accepts the epics prop
       expect(wrapper.props('epics')).toEqual(epics)
-      
+
       // Verify that headers are configured properly
       expect((wrapper.vm as unknown as EpicListComponent).headers).toBeDefined()
       expect((wrapper.vm as unknown as EpicListComponent).headers.length).toBeGreaterThan(0)
@@ -146,8 +159,8 @@ describe('EpicList Component', () => {
       const headers = (wrapper.vm as unknown as EpicListComponent).headers
 
       // Verify sortable columns as per Requirement 1.8
-      const sortableColumns = headers.filter(h => h.sortable)
-      const sortableKeys = sortableColumns.map(h => h.key)
+      const sortableColumns = headers.filter((h) => h.sortable)
+      const sortableKeys = sortableColumns.map((h) => h.key)
 
       expect(sortableKeys).toContain('reference_id')
       expect(sortableKeys).toContain('title')
@@ -164,7 +177,7 @@ describe('EpicList Component', () => {
       // Verify filter options are configured
       expect((wrapper.vm as unknown as EpicListComponent).statusOptions).toBeDefined()
       expect((wrapper.vm as unknown as EpicListComponent).priorityOptions).toBeDefined()
-      
+
       // Check status options
       const statusOptions = (wrapper.vm as unknown as EpicListComponent).statusOptions
       expect(statusOptions).toEqual([
@@ -172,7 +185,7 @@ describe('EpicList Component', () => {
         { title: 'Черновик', value: 'Draft' },
         { title: 'В работе', value: 'In Progress' },
         { title: 'Выполнено', value: 'Done' },
-        { title: 'Отменено', value: 'Cancelled' }
+        { title: 'Отменено', value: 'Cancelled' },
       ])
 
       // Check priority options
@@ -181,7 +194,7 @@ describe('EpicList Component', () => {
         { title: 'Критический', value: 1 },
         { title: 'Высокий', value: 2 },
         { title: 'Средний', value: 3 },
-        { title: 'Низкий', value: 4 }
+        { title: 'Низкий', value: 4 },
       ])
     })
 
@@ -254,10 +267,10 @@ describe('EpicList Component', () => {
 
   describe('Pagination with Different Page Sizes (Requirement 1.9)', () => {
     it('should implement pagination when more than 50 epics exist', () => {
-      const wrapper = createWrapper({ 
+      const wrapper = createWrapper({
         totalCount: 100,
         pageSize: 25,
-        currentPage: 1
+        currentPage: 1,
       })
 
       expect((wrapper.vm as unknown as EpicListComponent).shouldShowPagination).toBe(true)
@@ -266,19 +279,19 @@ describe('EpicList Component', () => {
     })
 
     it('should not show pagination when 50 or fewer epics exist', () => {
-      const wrapper = createWrapper({ 
+      const wrapper = createWrapper({
         totalCount: 30,
         pageSize: 25,
-        currentPage: 1
+        currentPage: 1,
       })
 
       expect((wrapper.vm as unknown as EpicListComponent).shouldShowPagination).toBe(true) // 30 > 25, so pagination should show
-      
+
       // Test with exactly 25 items
-      const wrapper2 = createWrapper({ 
+      const wrapper2 = createWrapper({
         totalCount: 25,
         pageSize: 25,
-        currentPage: 1
+        currentPage: 1,
       })
 
       expect((wrapper2.vm as unknown as EpicListComponent).shouldShowPagination).toBe(false) // 25 == 25, no pagination needed
@@ -287,7 +300,9 @@ describe('EpicList Component', () => {
     it('should provide configurable page size options', () => {
       const wrapper = createWrapper()
 
-      expect((wrapper.vm as unknown as EpicListComponent).pageSizeOptions).toEqual([10, 25, 50, 100])
+      expect((wrapper.vm as unknown as EpicListComponent).pageSizeOptions).toEqual([
+        10, 25, 50, 100,
+      ])
     })
 
     it('should emit options-change event when pagination changes', async () => {
@@ -296,7 +311,7 @@ describe('EpicList Component', () => {
       const mockOptions = {
         page: 2,
         itemsPerPage: 50,
-        sortBy: [{ key: 'title', order: 'asc' as const }]
+        sortBy: [{ key: 'title', order: 'asc' as const }],
       }
 
       await (wrapper.vm as unknown as EpicListComponent).handleOptionsChange(mockOptions)
@@ -311,12 +326,14 @@ describe('EpicList Component', () => {
       const mockOptions = {
         page: 1,
         itemsPerPage: 25,
-        sortBy: [{ key: 'priority', order: 'desc' as const }]
+        sortBy: [{ key: 'priority', order: 'desc' as const }],
       }
 
       await (wrapper.vm as unknown as EpicListComponent).handleOptionsChange(mockOptions)
 
-      expect((wrapper.vm as unknown as EpicListComponent).sortBy).toEqual([{ key: 'priority', order: 'desc' }])
+      expect((wrapper.vm as unknown as EpicListComponent).sortBy).toEqual([
+        { key: 'priority', order: 'desc' },
+      ])
     })
   })
 
@@ -339,7 +356,7 @@ describe('EpicList Component', () => {
 
       const routerPushSpy = vi.spyOn(router, 'push')
       const mockEvent = {
-        stopPropagation: vi.fn()
+        stopPropagation: vi.fn(),
       } as unknown as Event
 
       // Simulate delete button click
@@ -430,7 +447,7 @@ describe('EpicList Component', () => {
         title: 'Test Epic Title',
         status: 'In Progress',
         priority: 1,
-        created_at: '2024-01-15T10:30:00Z'
+        created_at: '2024-01-15T10:30:00Z',
       })
       const wrapper = createWrapper({ epics: [epic] })
 
@@ -442,11 +459,15 @@ describe('EpicList Component', () => {
 
       expect((wrapper.vm as unknown as EpicListComponent).getStatusColor('Backlog')).toBe('grey')
       expect((wrapper.vm as unknown as EpicListComponent).getStatusColor('Draft')).toBe('orange')
-      expect((wrapper.vm as unknown as EpicListComponent).getStatusColor('In Progress')).toBe('blue')
+      expect((wrapper.vm as unknown as EpicListComponent).getStatusColor('In Progress')).toBe(
+        'blue',
+      )
       expect((wrapper.vm as unknown as EpicListComponent).getStatusColor('Done')).toBe('green')
       expect((wrapper.vm as unknown as EpicListComponent).getStatusColor('Cancelled')).toBe('red')
 
-      expect((wrapper.vm as unknown as EpicListComponent).getStatusText('In Progress')).toBe('В работе')
+      expect((wrapper.vm as unknown as EpicListComponent).getStatusText('In Progress')).toBe(
+        'В работе',
+      )
       expect((wrapper.vm as unknown as EpicListComponent).getStatusText('Done')).toBe('Выполнено')
     })
 
@@ -467,7 +488,9 @@ describe('EpicList Component', () => {
     it('should format dates correctly', () => {
       const wrapper = createWrapper()
 
-      const formattedDate = (wrapper.vm as unknown as EpicListComponent).formatDate('2024-01-15T10:30:00Z')
+      const formattedDate = (wrapper.vm as unknown as EpicListComponent).formatDate(
+        '2024-01-15T10:30:00Z',
+      )
       expect(formattedDate).toBe('15.01.2024')
     })
 
@@ -479,16 +502,16 @@ describe('EpicList Component', () => {
           email: 'test@example.com',
           role: 'User',
           created_at: '2024-01-01T00:00:00Z',
-          updated_at: '2024-01-01T00:00:00Z'
-        }
+          updated_at: '2024-01-01T00:00:00Z',
+        },
       })
 
       const epicWithoutAssignee = createMockEpic({
-        assignee: undefined
+        assignee: undefined,
       })
 
       const wrapper = createWrapper({ epics: [epicWithAssignee, epicWithoutAssignee] })
-      
+
       // Verify that both epics are accepted
       expect(wrapper.props('epics')).toHaveLength(2)
     })
@@ -517,7 +540,7 @@ describe('EpicList Component', () => {
         loading: false,
         totalCount: 0,
         currentPage: 1,
-        pageSize: 25
+        pageSize: 25,
       })
     })
 
@@ -542,7 +565,7 @@ describe('EpicList Component', () => {
       const mockOptions = {
         page: 1,
         itemsPerPage: 25,
-        sortBy: []
+        sortBy: [],
       }
       await (wrapper.vm as unknown as EpicListComponent).handleOptionsChange(mockOptions)
       expect(wrapper.emitted('options-change')).toBeTruthy()

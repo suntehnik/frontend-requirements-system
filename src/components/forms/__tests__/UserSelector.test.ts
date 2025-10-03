@@ -11,7 +11,23 @@ const vuetify = createVuetify()
 // Mock Vuetify components
 const mockVAutocomplete = {
   template: '<div class="v-autocomplete"><slot /></div>',
-  props: ['modelValue', 'items', 'label', 'placeholder', 'rules', 'errorMessages', 'disabled', 'loading', 'clearable', 'variant', 'density', 'search', 'itemTitle', 'itemValue', 'noFilter'],
+  props: [
+    'modelValue',
+    'items',
+    'label',
+    'placeholder',
+    'rules',
+    'errorMessages',
+    'disabled',
+    'loading',
+    'clearable',
+    'variant',
+    'density',
+    'search',
+    'itemTitle',
+    'itemValue',
+    'noFilter',
+  ],
   emits: ['update:modelValue', 'update:search'],
 }
 
@@ -55,7 +71,7 @@ const mockUsers: User[] = [
 describe('UserSelector', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    
+
     // Mock the config store
     const configStore = useConfigStore()
     configStore.users = mockUsers
@@ -96,7 +112,7 @@ describe('UserSelector', () => {
     })
 
     await wrapper.vm.handleSearch('admin')
-    
+
     const filteredUsers = wrapper.vm.filteredUsers
     expect(filteredUsers).toHaveLength(1)
     expect(filteredUsers[0].username).toBe('admin')
@@ -115,7 +131,7 @@ describe('UserSelector', () => {
 
     const filteredUsers = wrapper.vm.filteredUsers
     expect(filteredUsers).toHaveLength(2)
-    expect(filteredUsers.map(u => u.role)).toEqual(['Administrator', 'User'])
+    expect(filteredUsers.map((u) => u.role)).toEqual(['Administrator', 'User'])
   })
 
   it('filters users by excluded roles', () => {
@@ -131,7 +147,7 @@ describe('UserSelector', () => {
 
     const filteredUsers = wrapper.vm.filteredUsers
     expect(filteredUsers).toHaveLength(2)
-    expect(filteredUsers.map(u => u.role)).toEqual(['Administrator', 'User'])
+    expect(filteredUsers.map((u) => u.role)).toEqual(['Administrator', 'User'])
   })
 
   it('emits update:modelValue when selection changes', async () => {
@@ -143,7 +159,7 @@ describe('UserSelector', () => {
     })
 
     await wrapper.vm.handleUpdate('1')
-    
+
     expect(wrapper.emitted('update:modelValue')).toBeTruthy()
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['1'])
   })

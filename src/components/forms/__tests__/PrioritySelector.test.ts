@@ -8,7 +8,21 @@ const vuetify = createVuetify()
 // Mock Vuetify components
 const mockVSelect = {
   template: '<div class="v-select"><slot /></div>',
-  props: ['modelValue', 'items', 'label', 'placeholder', 'rules', 'errorMessages', 'disabled', 'loading', 'clearable', 'variant', 'density', 'itemTitle', 'itemValue'],
+  props: [
+    'modelValue',
+    'items',
+    'label',
+    'placeholder',
+    'rules',
+    'errorMessages',
+    'disabled',
+    'loading',
+    'clearable',
+    'variant',
+    'density',
+    'itemTitle',
+    'itemValue',
+  ],
   emits: ['update:modelValue'],
 }
 
@@ -46,14 +60,14 @@ describe('PrioritySelector', () => {
 
     const priorityOptions = wrapper.vm.priorityOptions
     expect(priorityOptions).toHaveLength(4)
-    
+
     expect(priorityOptions[0]).toEqual({
       value: 1,
       label: 'Критический',
       description: 'Требует немедленного внимания',
       color: 'red',
     })
-    
+
     expect(priorityOptions[3]).toEqual({
       value: 4,
       label: 'Низкий',
@@ -77,7 +91,7 @@ describe('PrioritySelector', () => {
     })
 
     await wrapper.vm.handleUpdate(2)
-    
+
     expect(wrapper.emitted('update:modelValue')).toBeTruthy()
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([2])
   })

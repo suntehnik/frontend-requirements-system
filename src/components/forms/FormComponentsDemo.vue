@@ -22,7 +22,7 @@
               />
               <v-card-text class="pt-2">
                 <strong>Выбранное значение:</strong> {{ formData.priority }}
-                <br>
+                <br />
                 <strong>Лейбл:</strong> {{ priorityLabel }}
               </v-card-text>
             </v-card>
@@ -82,7 +82,7 @@
               />
               <v-card-text class="pt-2">
                 <strong>Выбранный ID:</strong> {{ formData.assigneeId }}
-                <br>
+                <br />
                 <strong>Имя пользователя:</strong> {{ assigneeName }}
               </v-card-text>
             </v-card>
@@ -102,7 +102,7 @@
                   :text="loading ? 'Загрузка...' : 'Готово'"
                 />
               </v-card-text>
-              
+
               <v-card-actions>
                 <v-btn
                   type="submit"
@@ -112,12 +112,7 @@
                 >
                   Отправить форму
                 </v-btn>
-                <v-btn
-                  variant="outlined"
-                  @click="resetForm"
-                >
-                  Сбросить
-                </v-btn>
+                <v-btn variant="outlined" @click="resetForm"> Сбросить </v-btn>
               </v-card-actions>
             </v-card>
           </v-col>
@@ -169,7 +164,7 @@ const priorityLabel = computed(() => {
     { value: 3, label: 'Средний' },
     { value: 4, label: 'Низкий' },
   ]
-  return options.find(opt => opt.value === formData.value.priority)?.label || 'Неизвестно'
+  return options.find((opt) => opt.value === formData.value.priority)?.label || 'Неизвестно'
 })
 
 const assigneeName = computed(() => {

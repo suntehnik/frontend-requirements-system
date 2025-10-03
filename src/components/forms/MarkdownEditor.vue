@@ -1,14 +1,35 @@
 <template>
   <div class="markdown-editor-wrapper">
     <label v-if="label" class="v-label mb-2">{{ label }}</label>
-    <MdEditor v-model="internalValue" :language="language" :theme="editorTheme" :preview-theme="previewTheme"
-      :code-theme="codeTheme" :placeholder="placeholder" :toolbars="toolbars" :footers="footers"
-      :scroll-auto="scrollAuto" :auto-focus="autoFocus" :disabled="disabled" :readonly="readonly"
-      :max-length="maxLength" :auto-detect-code="autoDetectCode" :tab-width="tabWidth"
-      :show-code-row-number="showCodeRowNumber" :preview-only="previewOnly" :html-preview="htmlPreview"
-      @on-upload-img="handleUploadImg" @on-html-changed="handleHtmlChanged" @on-get-catalog="handleGetCatalog"
-      @on-error="handleError" @on-blur="handleBlur" @on-focus="handleFocus" @on-input="handleInput"
-      @on-save="handleSave" :class="editorClass" />
+    <MdEditor
+      v-model="internalValue"
+      :language="language"
+      :theme="editorTheme"
+      :preview-theme="previewTheme"
+      :code-theme="codeTheme"
+      :placeholder="placeholder"
+      :toolbars="toolbars"
+      :footers="footers"
+      :scroll-auto="scrollAuto"
+      :auto-focus="autoFocus"
+      :disabled="disabled"
+      :readonly="readonly"
+      :max-length="maxLength"
+      :auto-detect-code="autoDetectCode"
+      :tab-width="tabWidth"
+      :show-code-row-number="showCodeRowNumber"
+      :preview-only="previewOnly"
+      :html-preview="htmlPreview"
+      @on-upload-img="handleUploadImg"
+      @on-html-changed="handleHtmlChanged"
+      @on-get-catalog="handleGetCatalog"
+      @on-error="handleError"
+      @on-blur="handleBlur"
+      @on-focus="handleFocus"
+      @on-input="handleInput"
+      @on-save="handleSave"
+      :class="editorClass"
+    />
     <div v-if="hasError" class="error-message">
       {{ validationResult.message }}
     </div>
@@ -124,7 +145,7 @@ const validationResult = computed(() => {
     if (result !== true) {
       return {
         isValid: false,
-        message: typeof result === 'string' ? result : 'Validation error'
+        message: typeof result === 'string' ? result : 'Validation error',
       }
     }
   }
@@ -139,9 +160,9 @@ const editorClass = computed(() => {
 })
 
 // Theme configuration based on Vuetify theme
-const editorTheme = computed(() => theme.global.name.value === 'dark' ? 'dark' : 'light')
-const previewTheme = computed(() => theme.global.name.value === 'dark' ? 'github' : 'default')
-const codeTheme = computed(() => theme.global.name.value === 'dark' ? 'atom' : 'github')
+const editorTheme = computed(() => (theme.global.name.value === 'dark' ? 'dark' : 'light'))
+const previewTheme = computed(() => (theme.global.name.value === 'dark' ? 'github' : 'default'))
+const codeTheme = computed(() => (theme.global.name.value === 'dark' ? 'atom' : 'github'))
 
 // Mermaid configuration is handled by the editor itself
 
@@ -185,16 +206,13 @@ watch(
     if (newValue !== internalValue.value) {
       internalValue.value = newValue
     }
-  }
+  },
 )
 
 // Watch for internal changes
-watch(
-  internalValue,
-  (newValue) => {
-    emit('update:modelValue', newValue)
-  }
-)
+watch(internalValue, (newValue) => {
+  emit('update:modelValue', newValue)
+})
 
 // Mermaid is built-in to md-editor-v3, no need to register separately
 </script>

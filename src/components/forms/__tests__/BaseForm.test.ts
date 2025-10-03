@@ -12,8 +12,8 @@ const mockVForm = {
   methods: {
     handleSubmit(event: Event) {
       event.preventDefault()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ; (this as any).$emit('submit')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(this as any).$emit('submit')
     },
     validate() {
       return Promise.resolve({ valid: true })

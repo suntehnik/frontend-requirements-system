@@ -15,7 +15,6 @@
 
     <!-- Content -->
     <div v-else-if="epic">
-
       <!-- Two-Column Layout -->
       <v-row class="fill-height">
         <!-- Left Column: Epic Content -->
@@ -29,14 +28,18 @@
           <EpicToolbar :epic="epic" @updated="handleEpicUpdate" />
 
           <!-- Epic Description (Markdown) -->
-          <EpicDescription 
-            :description="epic.description" 
-            @edit="editEpic" 
-            @edit-description="editDescription" 
+          <EpicDescription
+            :description="epic.description"
+            @edit="editEpic"
+            @edit-description="editDescription"
           />
 
           <!-- User Stories Panel -->
-          <UserStoriesPanel :user-stories="userStories" :loading="userStoriesLoading" @add-user-story="addUserStory" />
+          <UserStoriesPanel
+            :user-stories="userStories"
+            :loading="userStoriesLoading"
+            @add-user-story="addUserStory"
+          />
         </v-col>
 
         <!-- Right Column: Comments -->
@@ -45,7 +48,7 @@
             <v-card-title class="text-h6 pb-2">Комментарии</v-card-title>
 
             <!-- Comments List -->
-            <v-card-text class="flex-grow-1 overflow-y-auto" style="max-height: 60vh;">
+            <v-card-text class="flex-grow-1 overflow-y-auto" style="max-height: 60vh">
               <div v-if="commentsLoading" class="text-center py-4">
                 <v-progress-circular indeterminate size="32" color="primary" />
               </div>
@@ -57,7 +60,7 @@
                       size="small"
                       rounded="xl"
                       class="author-chip"
-                      style="margin-right: 8px;"
+                      style="margin-right: 8px"
                     >
                       <v-icon start size="small">mdi-account</v-icon>
                       {{ comment.author?.username || 'Unknown User' }}
@@ -79,15 +82,32 @@
             <v-divider />
             <v-card-text class="pt-3">
               <v-form ref="commentFormRef" @submit.prevent="submitComment">
-                <v-textarea v-model="newCommentContent" placeholder="Добавить комментарий..." rows="3"
-                  variant="outlined" density="compact" :rules="commentRules" counter="1000" class="mb-3" />
+                <v-textarea
+                  v-model="newCommentContent"
+                  placeholder="Добавить комментарий..."
+                  rows="3"
+                  variant="outlined"
+                  density="compact"
+                  :rules="commentRules"
+                  counter="1000"
+                  class="mb-3"
+                />
                 <div class="d-flex justify-space-between align-center">
                   <div class="text-caption text-grey-darken-1">
                     {{ newCommentContent.length }}/1000 символов
                   </div>
-                  <v-btn type="submit" color="primary" size="small"
-                    :disabled="!newCommentContent.trim() || commentSubmitting || newCommentContent.length > 1000"
-                    :loading="commentSubmitting" prepend-icon="mdi-send">
+                  <v-btn
+                    type="submit"
+                    color="primary"
+                    size="small"
+                    :disabled="
+                      !newCommentContent.trim() ||
+                      commentSubmitting ||
+                      newCommentContent.length > 1000
+                    "
+                    :loading="commentSubmitting"
+                    prepend-icon="mdi-send"
+                  >
                     Отправить
                   </v-btn>
                 </div>
@@ -108,8 +128,12 @@
 
     <!-- Edit Epic Modal -->
     <v-dialog v-model="showEditDialog" max-width="800px" persistent scrollable>
-      <EpicForm :epic="epic || undefined" :loading="formLoading" @submit="handleEpicSubmit"
-        @cancel="handleEpicCancel" />
+      <EpicForm
+        :epic="epic || undefined"
+        :loading="formLoading"
+        @submit="handleEpicSubmit"
+        @cancel="handleEpicCancel"
+      />
     </v-dialog>
 
     <!-- Fullscreen Markdown Editor for Description -->
@@ -126,9 +150,7 @@
     <v-snackbar v-model="showSuccessMessage" color="success" timeout="4000" location="top">
       {{ successMessage }}
       <template v-slot:actions>
-        <v-btn color="white" variant="text" @click="showSuccessMessage = false">
-          Закрыть
-        </v-btn>
+        <v-btn color="white" variant="text" @click="showSuccessMessage = false"> Закрыть </v-btn>
       </template>
     </v-snackbar>
 
@@ -136,9 +158,7 @@
     <v-snackbar v-model="showErrorMessage" color="error" timeout="6000" location="top">
       {{ errorMessage }}
       <template v-slot:actions>
-        <v-btn color="white" variant="text" @click="showErrorMessage = false">
-          Закрыть
-        </v-btn>
+        <v-btn color="white" variant="text" @click="showErrorMessage = false"> Закрыть </v-btn>
       </template>
     </v-snackbar>
   </div>
@@ -193,7 +213,7 @@ const commentRules = [
     if (!value || !value.trim()) return 'Комментарий не может быть пустым'
     if (value.length > 1000) return 'Комментарий не может быть длиннее 1000 символов'
     return true
-  }
+  },
 ]
 
 // Computed properties
@@ -389,10 +409,6 @@ const handleEpicUpdate = (updatedEpic: Epic) => {
   showSuccess('Эпик успешно обновлен')
 }
 
-
-
-
-
 const formatCommentDate = (dateString: string) => {
   const date = new Date(dateString)
   const now = new Date()
@@ -407,12 +423,10 @@ const formatCommentDate = (dateString: string) => {
     return date.toLocaleDateString('ru-RU', {
       day: 'numeric',
       month: 'short',
-      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
     })
   }
 }
-
-
 
 // Lifecycle
 onMounted(() => {
