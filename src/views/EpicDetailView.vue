@@ -29,7 +29,11 @@
           <EpicToolbar :epic="epic" @updated="handleEpicUpdate" />
 
           <!-- Epic Description (Markdown) -->
-          <EpicDescription :description="epic.description" @edit="editEpic" />
+          <EpicDescription 
+            :description="epic.description" 
+            @edit="editEpic" 
+            @edit-description="editDescription" 
+          />
 
           <!-- User Stories Panel -->
           <UserStoriesPanel :user-stories="userStories" :loading="userStoriesLoading" @add-user-story="addUserStory" />
@@ -108,6 +112,16 @@
         @cancel="handleEpicCancel" />
     </v-dialog>
 
+    <!-- Fullscreen Markdown Editor for Description -->
+    <FullscreenMarkdownEditor
+      v-model:show="showDescriptionEditor"
+      v-model="descriptionEditorValue"
+      :saving="descriptionSaving"
+      placeholder="Введите описание эпика в формате Markdown..."
+      @save="handleDescriptionSave"
+      @cancel="handleDescriptionCancel"
+    />
+
     <!-- Success Snackbar -->
     <v-snackbar v-model="showSuccessMessage" color="success" timeout="4000" location="top">
       {{ successMessage }}
@@ -136,7 +150,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { epicService } from '@/services/epic-service'
 import { commentService } from '@/services/comment-service'
 import { useEntitiesStore } from '@/stores/entities'
-import { EpicForm } from '@/components/forms'
+import { EpicForm, FullscreenMarkdownEditor } from '@/components/forms'
 import { EpicToolbar, EpicDescription, UserStoriesPanel } from '@/components/data-display'
 import type { Epic, UserStory, Comment, UpdateEpicRequest } from '@/types'
 
@@ -158,6 +172,11 @@ const newCommentContent = ref('')
 // Edit form state
 const showEditDialog = ref(false)
 const formLoading = ref(false)
+
+// Description editor state
+const showDescriptionEditor = ref(false)
+const descriptionEditorValue = ref('')
+const descriptionSaving = ref(false)
 
 // Success/Error messages
 const showSuccessMessage = ref(false)
@@ -289,6 +308,13 @@ const editEpic = () => {
   showEditDialog.value = true
 }
 
+const editDescription = () => {
+  if (epic.value) {
+    descriptionEditorValue.value = epic.value.description || ''
+    showDescriptionEditor.value = true
+  }
+}
+
 const handleEpicSubmit = async (data: UpdateEpicRequest) => {
   if (!epic.value) return
 
@@ -313,6 +339,34 @@ const handleEpicSubmit = async (data: UpdateEpicRequest) => {
 
 const handleEpicCancel = () => {
   showEditDialog.value = false
+}
+
+const handleDescriptionSave = async (newDescription: string) => {
+  if (!epic.value) return
+
+  try {
+    descriptionSaving.value = true
+
+    // Update only the description
+    await entitiesStore.updateEpic(epic.value.id, {
+      description: newDescription.trim() || undefined,
+    })
+
+    // Update local epic data
+    epic.value.description = newDescription.trim() || undefined
+
+    showDescriptionEditor.value = false
+    showSuccess('Описание успешно обновлено')
+  } catch (error) {
+    console.error('Failed to update description:', error)
+    showError('Не удалось обновить описание')
+  } finally {
+    descriptionSaving.value = false
+  }
+}
+
+const handleDescriptionCancel = () => {
+  showDescriptionEditor.value = false
 }
 
 // Utility functions for messages
