@@ -2,8 +2,8 @@
   <div class="epics-list-view">
     <!-- Epic List Component with wireframe layout -->
     <EpicList :epics="epics" :loading="isLoading" :total-count="totalCount" :current-page="currentPage"
-      :page-size="pageSize" @delete="handleDeleteEpic" @filter-change="handleFilterChange"
-      @options-change="handleOptionsChange" @search-change="handleSearchChange" />
+      :page-size="pageSize" @create="handleCreateEpic" @delete="handleDeleteEpic" @filter-change="handleFilterChange"
+      @options-change="handleOptionsChange" @search-change="handleSearchChange" @clear-filters="handleClearFilters" />
 
     <!-- Create/Edit Epic Modal -->
     <v-dialog v-model="showEpicDialog" max-width="800px" persistent scrollable>
@@ -230,6 +230,19 @@ const handleOptionsChange = (options: DataTableOptions) => {
 const handleSearchChange = (query: string) => {
   currentSearch.value = query
   // Reset to first page when search changes
+  entitiesStore.setEpicsPage(1)
+  loadEpics()
+}
+
+const handleCreateEpic = () => {
+  selectedEpic.value = undefined
+  showEpicDialog.value = true
+}
+
+const handleClearFilters = () => {
+  currentFilters.value = {}
+  currentSearch.value = ''
+  // Reset to first page when clearing filters
   entitiesStore.setEpicsPage(1)
   loadEpics()
 }

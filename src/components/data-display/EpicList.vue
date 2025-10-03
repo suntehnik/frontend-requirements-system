@@ -52,16 +52,42 @@
             </template>
 
             <template v-slot:no-data>
-              <div class="text-center pa-4">
-                <v-icon size="48" color="grey">mdi-folder-open-outline</v-icon>
-                <p class="text-h6 mt-2">Эпики не найдены</p>
-                <p class="text-body-2 text-grey">
-                  {{
-                    search || hasActiveFilters
-                      ? 'Попробуйте изменить критерии поиска'
-                      : 'Создайте первый эпик'
-                  }}
-                </p>
+              <div class="text-center pa-8">
+                <!-- Empty state for filtered results -->
+                <div v-if="search || hasActiveFilters">
+                  <v-icon size="64" color="grey-lighten-1">mdi-filter-remove-outline</v-icon>
+                  <p class="text-h6 mt-4 mb-2">Эпики не найдены</p>
+                  <p class="text-body-2 text-grey mb-4">
+                    По вашим критериям поиска ничего не найдено.
+                  </p>
+                  <v-btn 
+                    variant="outlined" 
+                    color="primary" 
+                    @click="clearFiltersAndSearch"
+                    prepend-icon="mdi-filter-off"
+                  >
+                    Очистить фильтры
+                  </v-btn>
+                </div>
+                
+                <!-- Empty state for no epics at all -->
+                <div v-else>
+                  <v-icon size="64" color="grey-lighten-1">mdi-rocket-launch-outline</v-icon>
+                  <p class="text-h6 mt-4 mb-2">Пока нет эпиков</p>
+                  <p class="text-body-2 text-grey mb-6">
+                    Создайте первый эпик, чтобы начать планирование проекта.
+                    Эпики помогают организовать пользовательские истории по функциональным областям.
+                  </p>
+                  <v-btn 
+                    variant="elevated" 
+                    color="primary" 
+                    size="large"
+                    @click="handleCreateEpic"
+                    prepend-icon="mdi-plus"
+                  >
+                    Создать первый эпик
+                  </v-btn>
+                </div>
               </div>
             </template>
           </v-data-table-server>
@@ -90,6 +116,7 @@ interface Emits {
   (e: 'filter-change', filters: FilterState): void
   (e: 'options-change', options: DataTableOptions): void
   (e: 'search-change', query: string): void
+  (e: 'clear-filters'): void
 }
 
 interface FilterState {
@@ -191,6 +218,21 @@ const handleOptionsChange = (options: DataTableOptions) => {
 
 const handleSearchChange = (query: string) => {
   emit('search-change', query)
+}
+
+const clearFiltersAndSearch = () => {
+  // Clear local state
+  search.value = ''
+  filters.value = {}
+  
+  // Emit events to parent to clear filters and search
+  emit('clear-filters')
+  emit('search-change', '')
+  emit('filter-change', {})
+}
+
+const handleCreateEpic = () => {
+  emit('create')
 }
 
 // Utility functions

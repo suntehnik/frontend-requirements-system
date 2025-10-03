@@ -30,7 +30,8 @@
                 :rules="descriptionRules"
                 :counter="5000"
                 rows="4"
-                placeholder="Подробное описание эпика (поддерживается Markdown)"
+                placeholder="Подробное описание эпика"
+                :disabled="loading"
               />
             </v-col>
           </v-row>
