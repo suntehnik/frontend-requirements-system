@@ -18,7 +18,7 @@
     <!-- Markdown content (Requirements 3.1-3.9) -->
     <div v-else class="markdown-content" :style="{ maxHeight }">
       <MdPreview :model-value="internalValue" :language="language" :theme="editorTheme" :preview-theme="previewTheme"
-        :code-theme="codeTheme" :editor-id="`markdown-viewer-${Math.random()}`" class="markdown-viewer"
+        :code-theme="codeTheme" :editor-id="`markdown-viewer-${Math.random().toString().replace('.', '')}`" class="markdown-viewer"
         @on-error="handleRenderError" />
     </div>
   </div>
