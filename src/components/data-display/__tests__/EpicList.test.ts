@@ -78,7 +78,7 @@ const createWrapper = (props: Record<string, unknown> = {}) => {
     currentPage: 1,
     pageSize: 25
   }
-  
+
   return mount(EpicList, {
     props: { ...defaultProps, ...props },
     global: {
@@ -99,11 +99,11 @@ describe('EpicList Component', () => {
 
       const headers = (wrapper.vm as unknown as EpicListComponent).headers
       const mandatoryColumns = headers.filter(h => h.key === 'reference_id' || h.key === 'title')
-      
+
       expect(mandatoryColumns).toHaveLength(2)
       expect(mandatoryColumns[0].key).toBe('reference_id')
       expect(mandatoryColumns[1].key).toBe('title')
-      
+
       // Mandatory columns should not have responsive classes that hide them
       mandatoryColumns.forEach(col => {
         expect(col.class).toBeUndefined()
@@ -113,17 +113,17 @@ describe('EpicList Component', () => {
     it('should hide optional columns on narrow screens using responsive classes', () => {
       const wrapper = createWrapper()
       const headers = (wrapper.vm as unknown as EpicListComponent).headers
-      
+
       // Status column should be hidden on small screens (d-none d-md-table-cell)
       const statusColumn = headers.find(h => h.key === 'status')
       expect(statusColumn?.class).toBe('d-none d-md-table-cell')
-      
+
       // Priority and assignee columns should be hidden on medium screens (d-none d-lg-table-cell)
       const priorityColumn = headers.find(h => h.key === 'priority')
       const assigneeColumn = headers.find(h => h.key === 'assignee')
       expect(priorityColumn?.class).toBe('d-none d-lg-table-cell')
       expect(assigneeColumn?.class).toBe('d-none d-lg-table-cell')
-      
+
       // Created date should be hidden on large screens (d-none d-xl-table-cell)
       const createdColumn = headers.find(h => h.key === 'created_at')
       expect(createdColumn?.class).toBe('d-none d-xl-table-cell')
@@ -135,7 +135,7 @@ describe('EpicList Component', () => {
 
       // Verify that the component accepts the epics prop
       expect(wrapper.props('epics')).toEqual(epics)
-      
+
       // Verify that headers are configured properly
       expect((wrapper.vm as unknown as EpicListComponent).headers).toBeDefined()
       expect((wrapper.vm as unknown as EpicListComponent).headers.length).toBeGreaterThan(0)
@@ -164,7 +164,7 @@ describe('EpicList Component', () => {
       // Verify filter options are configured
       expect((wrapper.vm as unknown as EpicListComponent).statusOptions).toBeDefined()
       expect((wrapper.vm as unknown as EpicListComponent).priorityOptions).toBeDefined()
-      
+
       // Check status options
       const statusOptions = (wrapper.vm as unknown as EpicListComponent).statusOptions
       expect(statusOptions).toEqual([
@@ -188,8 +188,8 @@ describe('EpicList Component', () => {
     it('should emit filter-change event when status filter changes (Requirement 1.13)', async () => {
       const wrapper = createWrapper()
 
-      // Simulate status filter change
-      ;(wrapper.vm as unknown as EpicListComponent).filters.status = 'In Progress'
+        // Simulate status filter change
+        ; (wrapper.vm as unknown as EpicListComponent).filters.status = 'In Progress'
       await (wrapper.vm as unknown as EpicListComponent).applyFilters()
 
       expect(wrapper.emitted('filter-change')).toBeTruthy()
@@ -199,8 +199,8 @@ describe('EpicList Component', () => {
     it('should emit filter-change event when priority filter changes (Requirement 1.13)', async () => {
       const wrapper = createWrapper()
 
-      // Simulate priority filter change
-      ;(wrapper.vm as unknown as EpicListComponent).filters.priority = 1
+        // Simulate priority filter change
+        ; (wrapper.vm as unknown as EpicListComponent).filters.priority = 1
       await (wrapper.vm as unknown as EpicListComponent).applyFilters()
 
       expect(wrapper.emitted('filter-change')).toBeTruthy()
@@ -224,19 +224,19 @@ describe('EpicList Component', () => {
       expect((wrapper.vm as unknown as EpicListComponent).filters).toEqual({})
       expect((wrapper.vm as unknown as EpicListComponent).hasActiveFilters).toBe(false)
 
-      // Test setting filters
-      ;(wrapper.vm as unknown as EpicListComponent).filters.status = 'Draft'
-      ;(wrapper.vm as unknown as EpicListComponent).filters.priority = 1
+        // Test setting filters
+        ; (wrapper.vm as unknown as EpicListComponent).filters.status = 'Draft'
+        ; (wrapper.vm as unknown as EpicListComponent).filters.priority = 1
       expect((wrapper.vm as unknown as EpicListComponent).hasActiveFilters).toBe(true)
     })
 
     it('should clear filters and search when clearFiltersAndSearch is called', async () => {
       const wrapper = createWrapper()
 
-      // Set some filters and search
-      ;(wrapper.vm as unknown as EpicListComponent).search = 'test'
-      ;(wrapper.vm as unknown as EpicListComponent).filters.status = 'Draft'
-      ;(wrapper.vm as unknown as EpicListComponent).filters.priority = 1
+        // Set some filters and search
+        ; (wrapper.vm as unknown as EpicListComponent).search = 'test'
+        ; (wrapper.vm as unknown as EpicListComponent).filters.status = 'Draft'
+        ; (wrapper.vm as unknown as EpicListComponent).filters.priority = 1
 
       // Clear filters
       await (wrapper.vm as unknown as EpicListComponent).clearFiltersAndSearch()
@@ -254,7 +254,7 @@ describe('EpicList Component', () => {
 
   describe('Pagination with Different Page Sizes (Requirement 1.9)', () => {
     it('should implement pagination when more than 50 epics exist', () => {
-      const wrapper = createWrapper({ 
+      const wrapper = createWrapper({
         totalCount: 100,
         pageSize: 25,
         currentPage: 1
@@ -266,16 +266,16 @@ describe('EpicList Component', () => {
     })
 
     it('should not show pagination when 50 or fewer epics exist', () => {
-      const wrapper = createWrapper({ 
+      const wrapper = createWrapper({
         totalCount: 30,
         pageSize: 25,
         currentPage: 1
       })
 
       expect((wrapper.vm as unknown as EpicListComponent).shouldShowPagination).toBe(true) // 30 > 25, so pagination should show
-      
+
       // Test with exactly 25 items
-      const wrapper2 = createWrapper({ 
+      const wrapper2 = createWrapper({
         totalCount: 25,
         pageSize: 25,
         currentPage: 1
@@ -365,8 +365,8 @@ describe('EpicList Component', () => {
     it('should detect filtered state correctly', async () => {
       const wrapper = createWrapper({ epics: [] })
 
-      // Set search to simulate filtered state
-      ;(wrapper.vm as unknown as EpicListComponent).search = 'nonexistent'
+        // Set search to simulate filtered state
+        ; (wrapper.vm as unknown as EpicListComponent).search = 'nonexistent'
       await wrapper.vm.$nextTick()
 
       // Check that filtered state is detected
@@ -385,9 +385,9 @@ describe('EpicList Component', () => {
     it('should clear filters when clear filters button is clicked', async () => {
       const wrapper = createWrapper({ epics: [] })
 
-      // Set filters to simulate filtered state
-      ;(wrapper.vm as unknown as EpicListComponent).search = 'test'
-      ;(wrapper.vm as unknown as EpicListComponent).filters.status = 'Draft'
+        // Set filters to simulate filtered state
+        ; (wrapper.vm as unknown as EpicListComponent).search = 'test'
+        ; (wrapper.vm as unknown as EpicListComponent).filters.status = 'Draft'
       await wrapper.vm.$nextTick()
 
       // Test the method directly
@@ -405,8 +405,8 @@ describe('EpicList Component', () => {
       expect((wrapper.vm as unknown as EpicListComponent).hasActiveFilters).toBe(false)
       expect((wrapper.vm as unknown as EpicListComponent).search).toBe('')
 
-      // Test filtered empty state
-      ;(wrapper.vm as unknown as EpicListComponent).filters.status = 'Draft'
+        // Test filtered empty state
+        ; (wrapper.vm as unknown as EpicListComponent).filters.status = 'Draft'
       await wrapper.vm.$nextTick()
 
       expect((wrapper.vm as unknown as EpicListComponent).hasActiveFilters).toBe(true)
@@ -488,7 +488,7 @@ describe('EpicList Component', () => {
       })
 
       const wrapper = createWrapper({ epics: [epicWithAssignee, epicWithoutAssignee] })
-      
+
       // Verify that both epics are accepted
       expect(wrapper.props('epics')).toHaveLength(2)
     })

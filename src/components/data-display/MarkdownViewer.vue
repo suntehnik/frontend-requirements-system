@@ -17,9 +17,16 @@
 
     <!-- Markdown content (Requirements 3.1-3.9) -->
     <div v-else class="markdown-content" :style="{ maxHeight }">
-      <MdPreview :model-value="internalValue" :language="language" :theme="editorTheme" :preview-theme="previewTheme"
-        :code-theme="codeTheme" :editor-id="`markdown-viewer-${Math.random().toString().replace('.', '')}`" class="markdown-viewer"
-        @on-error="handleRenderError" />
+      <MdPreview
+        :model-value="internalValue"
+        :language="language"
+        :theme="editorTheme"
+        :preview-theme="previewTheme"
+        :code-theme="codeTheme"
+        :editor-id="`markdown-viewer-${Math.random().toString().replace('.', '')}`"
+        class="markdown-viewer"
+        @on-error="handleRenderError"
+      />
     </div>
   </div>
 </template>
@@ -59,9 +66,9 @@ const isEmpty = computed(() => {
 })
 
 // Theme configuration based on Vuetify theme (Requirements 3.1, 3.3)
-const editorTheme = computed(() => theme.global.name.value === 'dark' ? 'dark' : 'light')
-const previewTheme = computed(() => theme.global.name.value === 'dark' ? 'github' : 'default')
-const codeTheme = computed(() => theme.global.name.value === 'dark' ? 'atom' : 'github')
+const editorTheme = computed(() => (theme.global.name.value === 'dark' ? 'dark' : 'light'))
+const previewTheme = computed(() => (theme.global.name.value === 'dark' ? 'github' : 'default'))
+const codeTheme = computed(() => (theme.global.name.value === 'dark' ? 'atom' : 'github'))
 
 // Error handling (Requirement 3.8)
 const handleRenderError = (error: { name: string; message: string }) => {
@@ -93,7 +100,7 @@ watch(
       internalValue.value = ''
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 // Setup copy buttons for code blocks (Requirement 3.4)
@@ -311,29 +318,29 @@ onMounted(() => {
 }
 
 /* External links styling (Requirement 3.7) */
-:deep(.md-preview a[href^="http"]) {
+:deep(.md-preview a[href^='http']) {
   color: rgb(var(--v-theme-primary));
   text-decoration: none;
 }
 
-:deep(.md-preview a[href^="http"]:hover) {
+:deep(.md-preview a[href^='http']:hover) {
   text-decoration: underline;
 }
 
-:deep(.md-preview a[href^="http"]:after) {
-  content: "↗";
+:deep(.md-preview a[href^='http']:after) {
+  content: '↗';
   font-size: 0.75em;
   margin-left: 0.25em;
   opacity: 0.7;
 }
 
 /* Internal links */
-:deep(.md-preview a:not([href^="http"])) {
+:deep(.md-preview a:not([href^='http'])) {
   color: rgb(var(--v-theme-primary));
   text-decoration: none;
 }
 
-:deep(.md-preview a:not([href^="http"]):hover) {
+:deep(.md-preview a:not([href^='http']):hover) {
   text-decoration: underline;
 }
 
@@ -397,7 +404,7 @@ onMounted(() => {
 }
 
 /* Task lists */
-:deep(.md-preview input[type="checkbox"]) {
+:deep(.md-preview input[type='checkbox']) {
   margin-right: 0.5rem;
   accent-color: rgb(var(--v-theme-primary));
 }
