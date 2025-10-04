@@ -21,6 +21,9 @@ import type {
   UpdateUserStoryRequest,
   UpdateRequirementRequest,
   UpdateAcceptanceCriteriaRequest,
+  PaginationState,
+  EpicStatus,
+  Priority,
 } from '@/types'
 
 export const useEntitiesStore = defineStore('entities', () => {
@@ -33,6 +36,13 @@ export const useEntitiesStore = defineStore('entities', () => {
   // Loading states
   const loading = ref<Record<string, boolean>>({})
   const errors = ref<Record<string, string>>({})
+
+  // Pagination state
+  const epicsPagination = ref<PaginationState>({
+    page: 1,
+    pageSize: 25, // Default page size as specified in requirements
+    totalCount: 0,
+  })
 
   // Computed
   const epicsList = computed(() => Array.from(epics.value.values()))
@@ -100,9 +110,7 @@ export const useEntitiesStore = defineStore('entities', () => {
     })
 
     // Sort by last modified and take top 10
-    return allEntities
-      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-      .slice(0, 10)
+    return allEntities.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()).slice(0, 10)
   })
 
   // Helper functions
@@ -125,24 +133,63 @@ export const useEntitiesStore = defineStore('entities', () => {
     clearError(key)
 
     try {
-      const response = await epicService.list(params)
+      // Calculate offset from page number if not provided
+      const offset =
+        params?.offset ?? (epicsPagination.value.page - 1) * epicsPagination.value.pageSize
+      const limit = params?.limit ?? epicsPagination.value.pageSize
+
+      const requestParams = {
+        ...params,
+        limit,
+        offset,
+      }
+
+      const response = await epicService.list(requestParams)
 
       // Debug logging
       console.log('Epics response:', response)
 
-      // Check if response has the expected structure
-      if (response && Array.isArray(response.data)) {
+      // Check if response has the expected ListResponse structure
+      if (
+        response &&
+        typeof response === 'object' &&
+        'data' in response &&
+        Array.isArray(response.data)
+      ) {
+        // Clear existing epics only for pagination (not accumulation)
+        epics.value.clear()
+
         // Update the map with fetched epics
         response.data.forEach((epic) => {
           epics.value.set(epic.id, epic)
         })
+
+        // Update pagination info from backend response
+        epicsPagination.value.totalCount = response.total_count || 0
+
+        // Update page size if provided in response
+        if (response.limit) {
+          epicsPagination.value.pageSize = response.limit
+        }
+
+        // Calculate and update current page from offset
+        if (response.offset !== undefined && response.limit && response.limit > 0) {
+          epicsPagination.value.page = Math.floor(response.offset / response.limit) + 1
+        }
       } else if (Array.isArray(response)) {
-        // Handle case where response is directly an array
+        // Handle case where response is directly an array (fallback for mock data)
+        epics.value.clear()
         response.forEach((epic) => {
           epics.value.set(epic.id, epic)
         })
+        // For direct array response, set totalCount to show pagination
+        epicsPagination.value.totalCount = response.length
+        epicsPagination.value.page = 1
       } else {
         console.warn('Unexpected epics response structure:', response)
+        // Handle unexpected response structure
+        epics.value.clear()
+        epicsPagination.value.totalCount = 0
       }
 
       return response
@@ -154,6 +201,16 @@ export const useEntitiesStore = defineStore('entities', () => {
     } finally {
       setLoading(key, false)
     }
+  }
+
+  // Pagination actions for epics
+  function setEpicsPage(page: number) {
+    epicsPagination.value.page = page
+  }
+
+  function setEpicsPageSize(pageSize: number) {
+    epicsPagination.value.pageSize = pageSize
+    epicsPagination.value.page = 1 // Reset to first page when changing page size
   }
 
   async function fetchEpic(id: string, include?: string) {
@@ -558,32 +615,25 @@ export const useEntitiesStore = defineStore('entities', () => {
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
 
-    // Mock epics
-    const mockEpics: Epic[] = [
-      {
-        id: '1',
-        reference_id: 'EP-001',
-        title: 'Система аутентификации',
-        description: 'Реализация безопасной системы входа пользователей',
-        status: 'In Progress',
-        priority: 1,
+    // Mock epics - создаем 75 эпиков для демонстрации пагинации
+    const mockEpics: Epic[] = []
+    const statuses: EpicStatus[] = ['Backlog', 'Draft', 'In Progress', 'Done', 'Cancelled']
+    const priorities: Priority[] = [1, 2, 3, 4]
+
+    for (let i = 1; i <= 75; i++) {
+      mockEpics.push({
+        id: `${i}`,
+        reference_id: `EP-${String(i).padStart(3, '0')}`,
+        title: `Эпик ${i}: ${i <= 25 ? 'Система аутентификации' : i <= 50 ? 'Управление требованиями' : 'Интеграция с внешними системами'}`,
+        description: `Описание эпика ${i} для демонстрации пагинации`,
+        status: statuses[i % statuses.length],
+        priority: priorities[i % priorities.length],
         creator_id: 'user1',
-        assignee_id: 'user2',
+        assignee_id: i % 3 === 0 ? 'user2' : undefined,
         created_at: twoDaysAgo,
-        updated_at: yesterday,
-      },
-      {
-        id: '2',
-        reference_id: 'EP-002',
-        title: 'Управление требованиями',
-        description: 'Функциональность для создания и редактирования требований',
-        status: 'Draft',
-        priority: 2,
-        creator_id: 'user1',
-        created_at: yesterday,
-        updated_at: now,
-      },
-    ]
+        updated_at: i % 2 === 0 ? yesterday : now,
+      })
+    }
 
     // Mock user stories
     const mockUserStories: UserStory[] = [
@@ -650,6 +700,11 @@ export const useEntitiesStore = defineStore('entities', () => {
     mockEpics.forEach((epic) => epics.value.set(epic.id, epic))
     mockUserStories.forEach((story) => userStories.value.set(story.id, story))
     mockRequirements.forEach((req) => requirements.value.set(req.id, req))
+
+    // Set pagination for mock data
+    epicsPagination.value.totalCount = mockEpics.length
+    epicsPagination.value.page = 1
+    epicsPagination.value.pageSize = 25
   }
 
   return {
@@ -660,6 +715,7 @@ export const useEntitiesStore = defineStore('entities', () => {
     acceptanceCriteria,
     loading,
     errors,
+    epicsPagination,
 
     // Computed
     epicsList,
@@ -675,6 +731,8 @@ export const useEntitiesStore = defineStore('entities', () => {
     createEpic,
     updateEpic,
     deleteEpic,
+    setEpicsPage,
+    setEpicsPageSize,
 
     // User Story actions
     fetchUserStories,

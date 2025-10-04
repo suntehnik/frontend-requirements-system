@@ -34,6 +34,7 @@
           variant="outlined"
           density="compact"
           clearable
+          @update:model-value="handleSearchChange"
         />
       </v-col>
     </v-row>
@@ -41,15 +42,23 @@
     <v-row>
       <v-col cols="12">
         <v-card>
-          <v-data-table
+          <v-data-table-server
             :headers="headers"
-            :items="filteredEpics"
-            :search="search"
+            :items="props.epics"
             :loading="loading"
             class="elevation-1"
-            :items-per-page="25"
-            :items-per-page-options="[10, 25, 50, 100]"
+            :items-per-page="pageSize"
+            :items-per-page-options="pageSizeOptions"
+            :page="currentPage"
+            :sort-by="sortBy"
+            @update:options="handleOptionsChange"
+            @click:row="handleRowClick"
+            :items-length="totalCount"
+            :multi-sort="false"
+            :must-sort="false"
+            :hide-default-footer="!shouldShowPagination"
           >
+            <!-- Table content templates -->
             <template v-slot:[`item.status`]="{ item }">
               <v-chip :color="getStatusColor(item.status)" size="small">
                 {{ getStatusText(item.status) }}
@@ -73,43 +82,55 @@
 
             <template v-slot:[`item.actions`]="{ item }">
               <v-btn
-                icon="mdi-eye"
-                size="small"
-                variant="text"
-                :to="`/epics/${item.id}`"
-                title="Просмотр"
-              />
-              <v-btn
-                icon="mdi-pencil"
-                size="small"
-                variant="text"
-                @click="$emit('edit', item)"
-                title="Редактировать"
-              />
-              <v-btn
                 icon="mdi-delete"
                 size="small"
                 variant="text"
                 color="error"
-                @click="$emit('delete', item)"
+                @click="handleDeleteClick($event, item)"
                 title="Удалить"
               />
             </template>
 
             <template v-slot:no-data>
-              <div class="text-center pa-4">
-                <v-icon size="48" color="grey">mdi-folder-open-outline</v-icon>
-                <p class="text-h6 mt-2">Эпики не найдены</p>
-                <p class="text-body-2 text-grey">
-                  {{
-                    search || hasActiveFilters
-                      ? 'Попробуйте изменить критерии поиска'
-                      : 'Создайте первый эпик'
-                  }}
-                </p>
+              <div class="text-center pa-8">
+                <!-- Empty state for filtered results -->
+                <div v-if="search || hasActiveFilters">
+                  <v-icon size="64" color="grey-lighten-1">mdi-filter-remove-outline</v-icon>
+                  <p class="text-h6 mt-4 mb-2">Эпики не найдены</p>
+                  <p class="text-body-2 text-grey mb-4">
+                    По вашим критериям поиска ничего не найдено.
+                  </p>
+                  <v-btn
+                    variant="outlined"
+                    color="primary"
+                    @click="clearFiltersAndSearch"
+                    prepend-icon="mdi-filter-off"
+                  >
+                    Очистить фильтры
+                  </v-btn>
+                </div>
+
+                <!-- Empty state for no epics at all -->
+                <div v-else>
+                  <v-icon size="64" color="grey-lighten-1">mdi-rocket-launch-outline</v-icon>
+                  <p class="text-h6 mt-4 mb-2">Пока нет эпиков</p>
+                  <p class="text-body-2 text-grey mb-6">
+                    Создайте первый эпик, чтобы начать планирование проекта. Эпики помогают
+                    организовать пользовательские истории по функциональным областям.
+                  </p>
+                  <v-btn
+                    variant="elevated"
+                    color="primary"
+                    size="large"
+                    @click="handleCreateEpic"
+                    prepend-icon="mdi-plus"
+                  >
+                    Создать первый эпик
+                  </v-btn>
+                </div>
               </div>
             </template>
-          </v-data-table>
+          </v-data-table-server>
         </v-card>
       </v-col>
     </v-row>
@@ -118,18 +139,24 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import type { Epic, EpicStatus, Priority } from '@/types'
 
 interface Props {
   epics: Epic[]
   loading?: boolean
+  totalCount?: number
+  currentPage?: number
+  pageSize?: number
 }
 
 interface Emits {
   (e: 'create'): void
-  (e: 'edit', epic: Epic): void
   (e: 'delete', epic: Epic): void
   (e: 'filter-change', filters: FilterState): void
+  (e: 'options-change', options: DataTableOptions): void
+  (e: 'search-change', query: string): void
+  (e: 'clear-filters'): void
 }
 
 interface FilterState {
@@ -137,25 +164,43 @@ interface FilterState {
   priority?: Priority
 }
 
+interface SortItem {
+  key: string
+  order: 'asc' | 'desc'
+}
+
+interface DataTableOptions {
+  page: number
+  itemsPerPage: number
+  sortBy: { key: string; order: 'asc' | 'desc' }[]
+}
+
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
+  totalCount: 0,
+  currentPage: 1,
+  pageSize: 25,
 })
 
 const emit = defineEmits<Emits>()
 
+// Router
+const router = useRouter()
+
 // State
 const search = ref('')
 const filters = ref<FilterState>({})
+const sortBy = ref<SortItem[]>([])
 
 // Table configuration
 const headers = [
   { title: 'ID', key: 'reference_id', sortable: true },
   { title: 'Название', key: 'title', sortable: true },
-  { title: 'Статус', key: 'status', sortable: true },
-  { title: 'Приоритет', key: 'priority', sortable: true },
-  { title: 'Ответственный', key: 'assignee', sortable: true },
-  { title: 'Создан', key: 'created_at', sortable: true },
-  { title: 'Действия', key: 'actions', sortable: false },
+  { title: 'Статус', key: 'status', sortable: true, class: 'd-none d-md-table-cell' },
+  { title: 'Приоритет', key: 'priority', sortable: true, class: 'd-none d-lg-table-cell' },
+  { title: 'Ответственный', key: 'assignee', sortable: true, class: 'd-none d-lg-table-cell' },
+  { title: 'Создан', key: 'created_at', sortable: true, class: 'd-none d-xl-table-cell' },
+  { title: '', key: 'actions', sortable: false },
 ]
 
 // Filter options
@@ -175,29 +220,59 @@ const priorityOptions = [
 ]
 
 // Computed
-const filteredEpics = computed(() => {
-  let result = props.epics
-
-  // Apply status filter
-  if (filters.value.status) {
-    result = result.filter((epic) => epic.status === filters.value.status)
-  }
-
-  // Apply priority filter
-  if (filters.value.priority) {
-    result = result.filter((epic) => epic.priority === filters.value.priority)
-  }
-
-  return result
-})
-
 const hasActiveFilters = computed(() => {
   return Boolean(filters.value.status || filters.value.priority)
 })
 
+const totalCount = computed(() => props.totalCount || 0)
+const pageSize = computed(() => props.pageSize || 25)
+const currentPage = computed(() => props.currentPage || 1)
+
+// Show pagination when there are more than one page of results
+const shouldShowPagination = computed(() => totalCount.value > pageSize.value)
+
+// Page size options as specified in requirements (10, 25-default, 50, 100)
+const pageSizeOptions = [10, 25, 50, 100]
+
 // Methods
 const applyFilters = () => {
   emit('filter-change', { ...filters.value })
+}
+
+const handleRowClick = (_event: Event, { item }: { item: Epic }) => {
+  router.push(`/epics/${item.reference_id}`)
+}
+
+const handleDeleteClick = (event: Event, item: Epic) => {
+  event.stopPropagation() // Prevent row click event
+  emit('delete', item)
+}
+
+const handleOptionsChange = (options: DataTableOptions) => {
+  // Update local sortBy state
+  sortBy.value = options.sortBy
+
+  // Emit the options change to parent
+  emit('options-change', options)
+}
+
+const handleSearchChange = (query: string) => {
+  emit('search-change', query)
+}
+
+const clearFiltersAndSearch = () => {
+  // Clear local state
+  search.value = ''
+  filters.value = {}
+
+  // Emit events to parent to clear filters and search
+  emit('clear-filters')
+  emit('search-change', '')
+  emit('filter-change', {})
+}
+
+const handleCreateEpic = () => {
+  emit('create')
 }
 
 // Utility functions
@@ -252,3 +327,38 @@ const formatDate = (dateString: string) => {
   })
 }
 </script>
+
+<style scoped>
+/* Простой responsive дизайн с использованием Vuetify классов */
+.v-data-table {
+  overflow-x: auto;
+}
+
+/* Обрезка длинных заголовков */
+:deep(.v-data-table td) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* Заголовок всегда виден полностью */
+:deep(.v-data-table td:nth-child(2)) {
+  max-width: 300px;
+}
+
+/* Hover эффект для строк таблицы */
+:deep(.v-data-table tbody tr) {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+:deep(.v-data-table tbody tr:hover) {
+  background-color: rgba(var(--v-theme-primary), 0.08) !important;
+}
+
+/* Убираем hover эффект с кнопок действий */
+:deep(.v-data-table tbody tr:hover td:last-child) {
+  background-color: transparent;
+}
+</style>

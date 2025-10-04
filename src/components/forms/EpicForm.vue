@@ -30,7 +30,8 @@
                 :rules="descriptionRules"
                 :counter="5000"
                 rows="4"
-                placeholder="Подробное описание эпика (поддерживается Markdown)"
+                placeholder="Подробное описание эпика"
+                :disabled="loading"
               />
             </v-col>
           </v-row>
@@ -100,7 +101,15 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { PrioritySelector, StatusSelector, UserSelector } from '@/components/forms'
-import type { Epic, CreateEpicRequest, UpdateEpicRequest, EpicStatus, UserStoryStatus, RequirementStatus, Priority } from '@/types'
+import type {
+  Epic,
+  CreateEpicRequest,
+  UpdateEpicRequest,
+  EpicStatus,
+  UserStoryStatus,
+  RequirementStatus,
+  Priority,
+} from '@/types'
 
 type StatusValue = EpicStatus | UserStoryStatus | RequirementStatus
 
@@ -153,9 +162,7 @@ const descriptionRules = [
   (v: string) => !v || v.length <= 5000 || 'Описание не должно превышать 5000 символов',
 ]
 
-const priorityRules = [
-  (v: Priority | null) => v !== null || 'Приоритет обязателен',
-]
+const priorityRules = [(v: Priority | null) => v !== null || 'Приоритет обязателен']
 
 // Methods
 const initializeForm = () => {
@@ -219,7 +226,7 @@ watch(
   () => {
     initializeForm()
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 // Lifecycle

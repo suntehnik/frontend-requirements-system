@@ -28,5 +28,8 @@ export type * from './hierarchy'
 // Type guards (exported separately to avoid circular imports)
 // Import guards directly: import { isUser, isEpic, ... } from './types/guards';
 
+// Status types
+export type * from './status'
+
 // Utility types and functions
 export * from './utils'
