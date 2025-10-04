@@ -1,35 +1,13 @@
 <template>
   <div class="epic-toolbar d-flex align-center ga-3 mb-4">
     <!-- Status Chip -->
-    <div class="position-relative">
-      <v-chip
-        v-if="!showStatusDropdown"
-        :color="getStatusColor(localStatus)"
-        size="large"
-        :loading="updating"
-        @click="toggleStatusDropdown"
-        class="toolbar-chip"
-        rounded="xl"
-      >
-        {{ getStatusText(localStatus) }}
-      </v-chip>
-
-      <v-select
-        v-else
-        v-model="localStatus"
-        :items="statusOptions"
-        item-title="text"
-        item-value="value"
-        variant="outlined"
-        density="compact"
-        hide-details
-        style="min-width: 140px"
-        :loading="updating"
-        @update:model-value="updateStatus"
-        @blur="hideStatusDropdown"
-        ref="statusSelectRef"
-      />
-    </div>
+    <WorkflowStatusChip
+      :status="localStatus"
+      size="large"
+      :loading="updating"
+      @status-change="updateStatus"
+      @error="handleStatusError"
+    />
 
     <!-- Priority Chip -->
     <div class="position-relative">
@@ -100,7 +78,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { epicService } from '@/services/epic-service'
-import type { Epic, User, EpicStatus, Priority } from '@/types'
+import { WorkflowStatusChip } from '@/components/data-display'
+import type { Epic, User, EpicStatus, Priority, WorkflowStatus } from '@/types'
 
 interface Props {
   epic: Epic
@@ -113,7 +92,7 @@ const emit = defineEmits<{
 }>()
 
 // Local state for inline editing
-const localStatus = ref(props.epic.status)
+const localStatus = ref<WorkflowStatus>(props.epic.status as WorkflowStatus)
 const localPriority = ref(props.epic.priority)
 const localAssigneeId = ref(props.epic.assignee_id || null)
 const updating = ref(false)
@@ -121,23 +100,12 @@ const usersLoading = ref(false)
 const users = ref<User[]>([])
 
 // Dropdown visibility states
-const showStatusDropdown = ref(false)
 const showPriorityDropdown = ref(false)
 const showAssigneeDropdown = ref(false)
 
 // Refs for select components
-const statusSelectRef = ref()
 const prioritySelectRef = ref()
 const assigneeSelectRef = ref()
-
-// Status options
-const statusOptions = [
-  { text: 'Бэклог', value: 'Backlog' },
-  { text: 'Черновик', value: 'Draft' },
-  { text: 'В работе', value: 'In Progress' },
-  { text: 'Выполнено', value: 'Done' },
-  { text: 'Отменено', value: 'Cancelled' },
-]
 
 // Priority options
 const priorityOptions = [
@@ -160,7 +128,7 @@ const assigneeOptions = computed(() => [
 watch(
   () => props.epic,
   (newEpic) => {
-    localStatus.value = newEpic.status
+    localStatus.value = newEpic.status as WorkflowStatus
     localPriority.value = newEpic.priority
     localAssigneeId.value = newEpic.assignee_id || null
   },
@@ -192,12 +160,6 @@ const loadUsers = async () => {
 }
 
 // Dropdown toggle methods
-const toggleStatusDropdown = async () => {
-  showStatusDropdown.value = true
-  await nextTick()
-  statusSelectRef.value?.focus()
-}
-
 const togglePriorityDropdown = async () => {
   showPriorityDropdown.value = true
   await nextTick()
@@ -211,10 +173,6 @@ const toggleAssigneeDropdown = async () => {
 }
 
 // Dropdown hide methods
-const hideStatusDropdown = () => {
-  showStatusDropdown.value = false
-}
-
 const hidePriorityDropdown = () => {
   showPriorityDropdown.value = false
 }
@@ -224,25 +182,30 @@ const hideAssigneeDropdown = () => {
 }
 
 // Update methods with auto-save
-const updateStatus = async (newStatus: string) => {
+const updateStatus = async (newStatus: WorkflowStatus) => {
   if (newStatus === props.epic.status) {
-    hideStatusDropdown()
     return
   }
 
   try {
     updating.value = true
     const updatedEpic = await epicService.changeStatus(props.epic.id, newStatus as EpicStatus)
+    localStatus.value = newStatus
     emit('updated', updatedEpic)
-    hideStatusDropdown()
   } catch (error) {
     console.error('Failed to update status:', error)
     // Revert local state on error
-    localStatus.value = props.epic.status
-    hideStatusDropdown()
+    localStatus.value = props.epic.status as WorkflowStatus
+    throw error // Re-throw to let WorkflowStatusChip handle the error display
   } finally {
     updating.value = false
   }
+}
+
+// Handle status change errors from WorkflowStatusChip
+const handleStatusError = (error: Error) => {
+  console.error('Status change error:', error)
+  // The WorkflowStatusChip will handle the error display
 }
 
 const updatePriority = async (newPriority: number) => {
@@ -290,28 +253,6 @@ const updateAssignee = async (newAssigneeId: string | null) => {
 }
 
 // Utility functions for display
-const getStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    Backlog: 'grey',
-    Draft: 'orange',
-    'In Progress': 'blue',
-    Done: 'green',
-    Cancelled: 'red',
-  }
-  return colors[status] || 'grey'
-}
-
-const getStatusText = (status: string) => {
-  const texts: Record<string, string> = {
-    Backlog: 'Бэклог',
-    Draft: 'Черновик',
-    'In Progress': 'В работе',
-    Done: 'Выполнено',
-    Cancelled: 'Отменено',
-  }
-  return texts[status] || status
-}
-
 const getPriorityColor = (priority: number) => {
   const colors: Record<number, string> = {
     1: 'red',

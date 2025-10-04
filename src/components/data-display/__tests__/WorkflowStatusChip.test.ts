@@ -12,32 +12,60 @@ const mockFocus = vi.fn()
 const globalStubs = {
   'v-chip': {
     template: '<div class="v-chip-stub"><slot /></div>',
-    props: ['color', 'size', 'variant', 'loading', 'disabled', 'class', 'aria-label', 'aria-describedby', 'role', 'tabindex']
+    props: [
+      'color',
+      'size',
+      'variant',
+      'loading',
+      'disabled',
+      'class',
+      'aria-label',
+      'aria-describedby',
+      'role',
+      'tabindex',
+    ],
   },
   'v-select': {
     template: '<div class="v-select-stub" />',
-    props: ['modelValue', 'items', 'disabled', 'loading', 'error', 'style', 'class', 'item-title', 'item-value', 'variant', 'density', 'hide-details', 'auto-select-first', 'aria-label', 'aria-describedby', 'role'],
+    props: [
+      'modelValue',
+      'items',
+      'disabled',
+      'loading',
+      'error',
+      'style',
+      'class',
+      'item-title',
+      'item-value',
+      'variant',
+      'density',
+      'hide-details',
+      'auto-select-first',
+      'aria-label',
+      'aria-describedby',
+      'role',
+    ],
     emits: ['update:modelValue', 'blur'],
     methods: {
-      focus: mockFocus
-    }
+      focus: mockFocus,
+    },
   },
   'v-progress-circular': true,
   'v-icon': true,
-  'v-list-item': true
+  'v-list-item': true,
 }
 
 describe('WorkflowStatusChip', () => {
   const defaultProps = {
-    status: 'Draft' as WorkflowStatus
+    status: 'Draft' as WorkflowStatus,
   }
 
   const createWrapper = (props = {}) => {
     return mount(WorkflowStatusChip, {
       props: { ...defaultProps, ...props },
       global: {
-        stubs: globalStubs
-      }
+        stubs: globalStubs,
+      },
     })
   }
 
@@ -55,7 +83,7 @@ describe('WorkflowStatusChip', () => {
     it('has correct status text mapping', () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       expect(vm.getStatusText('Backlog')).toBe('Бэклог')
       expect(vm.getStatusText('Draft')).toBe('Черновик')
       expect(vm.getStatusText('In Progress')).toBe('В работе')
@@ -66,7 +94,7 @@ describe('WorkflowStatusChip', () => {
     it('has correct status color mapping', () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       expect(vm.getStatusColor('Backlog')).toBe('grey')
       expect(vm.getStatusColor('Draft')).toBe('orange')
       expect(vm.getStatusColor('In Progress')).toBe('blue')
@@ -77,14 +105,14 @@ describe('WorkflowStatusChip', () => {
     it('computes correct status text for current status', () => {
       const wrapper = createWrapper({ status: 'Draft' })
       const vm = wrapper.vm as any
-      
+
       expect(vm.getStatusText('Draft')).toBe('Черновик')
     })
 
     it('computes correct status color for current status', () => {
       const wrapper = createWrapper({ status: 'Draft' })
       const vm = wrapper.vm as any
-      
+
       expect(vm.getStatusColor('Draft')).toBe('orange')
     })
   })
@@ -93,14 +121,14 @@ describe('WorkflowStatusChip', () => {
     it('initializes with editing state closed', () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       expect(vm.isEditing).toBe(false)
     })
 
     it('opens editing mode when handleChipClick is called and not readonly', async () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       await vm.handleChipClick()
       expect(vm.isEditing).toBe(true)
     })
@@ -108,7 +136,7 @@ describe('WorkflowStatusChip', () => {
     it('does not open editing mode when readonly', async () => {
       const wrapper = createWrapper({ readonly: true })
       const vm = wrapper.vm as any
-      
+
       await vm.handleChipClick()
       expect(vm.isEditing).toBe(false)
     })
@@ -116,7 +144,7 @@ describe('WorkflowStatusChip', () => {
     it('does not open editing mode when disabled', async () => {
       const wrapper = createWrapper({ disabled: true })
       const vm = wrapper.vm as any
-      
+
       await vm.handleChipClick()
       expect(vm.isEditing).toBe(false)
     })
@@ -124,7 +152,7 @@ describe('WorkflowStatusChip', () => {
     it('does not open editing mode when loading', async () => {
       const wrapper = createWrapper({ loading: true })
       const vm = wrapper.vm as any
-      
+
       await vm.handleChipClick()
       expect(vm.isEditing).toBe(false)
     })
@@ -132,13 +160,21 @@ describe('WorkflowStatusChip', () => {
     it('has correct workflow status options', () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       expect(vm.workflowStatusOptions).toHaveLength(5)
       expect(vm.workflowStatusOptions.map((item: any) => item.value)).toEqual([
-        'Backlog', 'Draft', 'In Progress', 'Done', 'Cancelled'
+        'Backlog',
+        'Draft',
+        'In Progress',
+        'Done',
+        'Cancelled',
       ])
       expect(vm.workflowStatusOptions.map((item: any) => item.text)).toEqual([
-        'Бэклог', 'Черновик', 'В работе', 'Выполнено', 'Отменено'
+        'Бэклог',
+        'Черновик',
+        'В работе',
+        'Выполнено',
+        'Отменено',
       ])
     })
   })
@@ -147,7 +183,7 @@ describe('WorkflowStatusChip', () => {
     it('emits status-change event when status is changed', async () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       vm.handleStatusChange('In Progress')
       await nextTick()
 
@@ -158,7 +194,7 @@ describe('WorkflowStatusChip', () => {
     it('does not emit status-change event when same status is selected', async () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       vm.handleStatusChange('Draft')
       await nextTick()
 
@@ -168,7 +204,7 @@ describe('WorkflowStatusChip', () => {
     it('closes editing mode after status change', async () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       // Open editing mode first
       await vm.handleChipClick()
       expect(vm.isEditing).toBe(true)
@@ -183,7 +219,7 @@ describe('WorkflowStatusChip', () => {
     it('validates status values by checking if they exist in status options', () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       const validStatuses = vm.workflowStatusOptions.map((option: any) => option.value)
       expect(validStatuses).toContain('Draft')
       expect(validStatuses).not.toContain('InvalidStatus')
@@ -192,7 +228,7 @@ describe('WorkflowStatusChip', () => {
     it('handles status change without emitting error for valid status', async () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       vm.handleStatusChange('In Progress')
       await nextTick()
 
@@ -205,7 +241,7 @@ describe('WorkflowStatusChip', () => {
     it('closes editing mode on escape key', async () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       // Open editing mode first
       await vm.handleChipClick()
       expect(vm.isEditing).toBe(true)
@@ -220,17 +256,17 @@ describe('WorkflowStatusChip', () => {
     it('closes editing mode on blur after timeout', async () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       // Open editing mode first
       await vm.handleChipClick()
       expect(vm.isEditing).toBe(true)
 
       // Close with blur (uses setTimeout, so we need to wait)
       vm.handleDropdownBlur()
-      
+
       // Wait for the timeout in handleDropdownBlur (150ms)
-      await new Promise(resolve => setTimeout(resolve, 200))
-      
+      await new Promise((resolve) => setTimeout(resolve, 200))
+
       expect(vm.isEditing).toBe(false)
     })
   })
@@ -239,7 +275,7 @@ describe('WorkflowStatusChip', () => {
     it('computes correct ARIA label for normal chip', () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       expect(vm.chipAriaLabel).toContain('Статус: Черновик')
       expect(vm.chipAriaLabel).toContain('нажмите для изменения')
     })
@@ -247,14 +283,14 @@ describe('WorkflowStatusChip', () => {
     it('computes correct ARIA label for readonly chip', () => {
       const wrapper = createWrapper({ readonly: true })
       const vm = wrapper.vm as any
-      
+
       expect(vm.chipAriaLabel).toBe('Статус: Черновик')
     })
 
     it('computes correct ARIA label for disabled chip', () => {
       const wrapper = createWrapper({ disabled: true })
       const vm = wrapper.vm as any
-      
+
       // Disabled chips still show the action text in current implementation
       expect(vm.chipAriaLabel).toContain('Статус: Черновик')
     })
@@ -262,7 +298,7 @@ describe('WorkflowStatusChip', () => {
     it('computes correct ARIA label for loading chip', () => {
       const wrapper = createWrapper({ loading: true })
       const vm = wrapper.vm as any
-      
+
       // Loading chips still show the action text in current implementation
       expect(vm.chipAriaLabel).toContain('Статус: Черновик')
     })
@@ -270,7 +306,7 @@ describe('WorkflowStatusChip', () => {
     it('computes correct ARIA label for dropdown', () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       expect(vm.selectAriaLabel).toContain('Выберите статус')
       expect(vm.selectAriaLabel).toContain('текущий: Черновик')
     })
@@ -280,21 +316,21 @@ describe('WorkflowStatusChip', () => {
     it('computes correct chip size for small', () => {
       const wrapper = createWrapper({ size: 'small' })
       const vm = wrapper.vm as any
-      
+
       expect(vm.chipSize).toBe('x-small')
     })
 
     it('computes correct chip size for medium', () => {
       const wrapper = createWrapper({ size: 'medium' })
       const vm = wrapper.vm as any
-      
+
       expect(vm.chipSize).toBe('small')
     })
 
     it('computes correct chip size for large', () => {
       const wrapper = createWrapper({ size: 'large' })
       const vm = wrapper.vm as any
-      
+
       expect(vm.chipSize).toBe('large')
     })
 
@@ -302,13 +338,13 @@ describe('WorkflowStatusChip', () => {
       const sizes = [
         { size: 'small', width: '120px' },
         { size: 'medium', width: '140px' },
-        { size: 'large', width: '160px' }
+        { size: 'large', width: '160px' },
       ] as const
 
       sizes.forEach(({ size, width }) => {
         const wrapper = createWrapper({ size })
         const vm = wrapper.vm as any
-        
+
         expect(vm.selectWidth).toBe(width)
       })
     })
@@ -318,22 +354,22 @@ describe('WorkflowStatusChip', () => {
     it('initializes without error for valid status', () => {
       const wrapper = createWrapper({ status: 'Draft' })
       const vm = wrapper.vm as any
-      
+
       expect(vm.hasError).toBe(false)
     })
 
     it('resets error state when valid status is provided', async () => {
       const wrapper = createWrapper({ status: 'Draft' })
       const vm = wrapper.vm as any
-      
+
       // Simulate an error state
       vm.hasError = true
       vm.errorMessage = 'Test error'
-      
+
       // Trigger status change which should reset error (the watcher does this)
       await wrapper.setProps({ status: 'In Progress' })
       await nextTick()
-      
+
       expect(vm.hasError).toBe(false)
       expect(vm.errorMessage).toBe('')
     })
@@ -341,18 +377,18 @@ describe('WorkflowStatusChip', () => {
     it('can set error state manually for testing error display', async () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
-      
+
       // Manually set error state to test error display functionality
       vm.hasError = true
       vm.errorMessage = 'Test error message'
-      
+
       expect(vm.hasError).toBe(true)
       expect(vm.errorMessage).toBe('Test error message')
-      
+
       // Test that error state can be cleared
       vm.hasError = false
       vm.errorMessage = ''
-      
+
       expect(vm.hasError).toBe(false)
       expect(vm.errorMessage).toBe('')
     })

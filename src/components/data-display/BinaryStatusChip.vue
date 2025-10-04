@@ -9,12 +9,12 @@
       :disabled="disabled"
       :class="[
         'binary-status-chip__display',
-        { 
+        {
           'binary-status-chip__display--clickable': !readonly && !disabled && !loading,
           'binary-status-chip__display--error': hasError,
           'binary-status-chip__display--loading': loading,
-          'binary-status-chip__display--disabled': disabled
-        }
+          'binary-status-chip__display--disabled': disabled,
+        },
       ]"
       :aria-label="chipAriaLabel"
       :aria-describedby="hasError ? 'status-error' : undefined"
@@ -39,11 +39,11 @@
       :class="[
         'binary-status-select',
         `binary-status-select--${size}`,
-        { 
+        {
           'binary-status-select--error': hasError,
           'binary-status-select--loading': loading,
-          'binary-status-select--disabled': disabled
-        }
+          'binary-status-select--disabled': disabled,
+        },
       ]"
       item-title="text"
       item-value="value"
@@ -74,12 +74,12 @@
 
 <script setup lang="ts">
 import { computed, ref, nextTick, watch } from 'vue'
-import type { 
-  BinaryStatus, 
-  BinaryStatusChipProps, 
+import type {
+  BinaryStatus,
+  BinaryStatusChipProps,
   BinaryStatusChipEmits,
   StatusOption,
-  SizeConfig
+  SizeConfig,
 } from '@/types/status'
 
 const props = withDefaults(defineProps<BinaryStatusChipProps>(), {
@@ -87,7 +87,7 @@ const props = withDefaults(defineProps<BinaryStatusChipProps>(), {
   readonly: false,
   loading: false,
   disabled: false,
-  variant: 'flat'
+  variant: 'flat',
 })
 
 // Emits definition
@@ -105,24 +105,24 @@ const errorMessage = ref('')
 // Status configuration
 const binaryStatusOptions: StatusOption<BinaryStatus>[] = [
   { text: 'Активный', value: 'Active' },
-  { text: 'Неактивный', value: 'Inactive' }
+  { text: 'Неактивный', value: 'Inactive' },
 ]
 
 const statusColorMap: Record<BinaryStatus, string> = {
-  'Active': 'success',
-  'Inactive': 'grey'
+  Active: 'success',
+  Inactive: 'grey',
 }
 
 const statusTextMap: Record<BinaryStatus, string> = {
-  'Active': 'Активный',
-  'Inactive': 'Неактивный'
+  Active: 'Активный',
+  Inactive: 'Неактивный',
 }
 
 // Size configuration
 const sizeConfigMap: Record<string, SizeConfig> = {
   small: { chipSize: 'x-small', selectWidth: '120px' },
   medium: { chipSize: 'small', selectWidth: '140px' },
-  large: { chipSize: 'large', selectWidth: '160px' }
+  large: { chipSize: 'large', selectWidth: '160px' },
 }
 
 // Computed properties
@@ -135,8 +135,8 @@ const chipAriaLabel = computed(() => {
   return `Бинарный статус: ${statusText}${action}`
 })
 
-const selectAriaLabel = computed(() => 
-  `Выберите бинарный статус, текущий: ${getStatusText(props.status)}`
+const selectAriaLabel = computed(
+  () => `Выберите бинарный статус, текущий: ${getStatusText(props.status)}`,
 )
 
 // Status utility functions
@@ -153,10 +153,10 @@ const handleChipClick = (): void => {
   if (props.readonly || props.disabled || props.loading) {
     return
   }
-  
+
   isEditing.value = true
   selectedStatus.value = props.status
-  
+
   nextTick(() => {
     selectRef.value?.focus()
   })
@@ -194,11 +194,14 @@ const handleEscapeKey = (): void => {
 }
 
 // Watch for prop changes
-watch(() => props.status, (newStatus) => {
-  selectedStatus.value = newStatus
-  hasError.value = false
-  errorMessage.value = ''
-})
+watch(
+  () => props.status,
+  (newStatus) => {
+    selectedStatus.value = newStatus
+    hasError.value = false
+    errorMessage.value = ''
+  },
+)
 </script>
 
 <style scoped>

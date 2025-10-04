@@ -1,35 +1,72 @@
 <template>
   <div class="lifecycle-status-chip">
-    <v-chip v-if="readonly || !isEditing" :color="getStatusColor(status)" :size="chipSize" :variant="variant"
-      :loading="loading" :disabled="disabled" :class="[
+    <v-chip
+      v-if="readonly || !isEditing"
+      :color="getStatusColor(status)"
+      :size="chipSize"
+      :variant="variant"
+      :loading="loading"
+      :disabled="disabled"
+      :class="[
         'lifecycle-status-chip__display',
         {
           'lifecycle-status-chip__display--clickable': !readonly && !disabled && !loading,
           'lifecycle-status-chip__display--error': hasError,
           'lifecycle-status-chip__display--loading': loading,
-          'lifecycle-status-chip__display--disabled': disabled
-        }
-      ]" :aria-label="chipAriaLabel" :aria-describedby="hasError ? 'status-error' : undefined" role="button"
-      :tabindex="readonly || disabled || loading ? -1 : 0" @click="handleChipClick" @keydown.enter="handleChipClick"
-      @keydown.space.prevent="handleChipClick">
+          'lifecycle-status-chip__display--disabled': disabled,
+        },
+      ]"
+      :aria-label="chipAriaLabel"
+      :aria-describedby="hasError ? 'status-error' : undefined"
+      role="button"
+      :tabindex="readonly || disabled || loading ? -1 : 0"
+      @click="handleChipClick"
+      @keydown.enter="handleChipClick"
+      @keydown.space.prevent="handleChipClick"
+    >
       {{ getStatusText(status) }}
     </v-chip>
 
-    <v-select v-else ref="selectRef" v-model="selectedStatus" :items="lifecycleStatusOptions" :disabled="disabled"
-      :loading="loading" :error="hasError" :style="{ width: selectWidth }" :class="[
+    <v-select
+      v-else
+      ref="selectRef"
+      v-model="selectedStatus"
+      :items="lifecycleStatusOptions"
+      :disabled="disabled"
+      :loading="loading"
+      :error="hasError"
+      :style="{ width: selectWidth }"
+      :class="[
         'lifecycle-status-select',
         `lifecycle-status-select--${size}`,
         {
           'lifecycle-status-select--error': hasError,
           'lifecycle-status-select--loading': loading,
-          'lifecycle-status-select--disabled': disabled
-        }
-      ]" item-title="text" item-value="value" variant="outlined" density="compact" hide-details auto-select-first
-      :aria-label="selectAriaLabel" :aria-describedby="hasError ? 'status-error' : undefined" role="combobox"
-      @update:model-value="handleStatusChange" @blur="handleDropdownBlur" @keydown.escape="handleEscapeKey" />
+          'lifecycle-status-select--disabled': disabled,
+        },
+      ]"
+      item-title="text"
+      item-value="value"
+      variant="outlined"
+      density="compact"
+      hide-details
+      auto-select-first
+      :aria-label="selectAriaLabel"
+      :aria-describedby="hasError ? 'status-error' : undefined"
+      role="combobox"
+      @update:model-value="handleStatusChange"
+      @blur="handleDropdownBlur"
+      @keydown.escape="handleEscapeKey"
+    />
 
     <!-- Error message for accessibility -->
-    <div v-if="hasError" id="status-error" class="lifecycle-status-chip__error sr-only" role="alert" aria-live="polite">
+    <div
+      v-if="hasError"
+      id="status-error"
+      class="lifecycle-status-chip__error sr-only"
+      role="alert"
+      aria-live="polite"
+    >
       {{ errorMessage }}
     </div>
   </div>
@@ -42,7 +79,7 @@ import type {
   LifecycleStatusChipProps,
   LifecycleStatusChipEmits,
   StatusOption,
-  SizeConfig
+  SizeConfig,
 } from '@/types/status'
 
 const props = withDefaults(defineProps<LifecycleStatusChipProps>(), {
@@ -50,7 +87,7 @@ const props = withDefaults(defineProps<LifecycleStatusChipProps>(), {
   readonly: false,
   loading: false,
   disabled: false,
-  variant: 'flat'
+  variant: 'flat',
 })
 
 // Emits definition
@@ -69,26 +106,26 @@ const errorMessage = ref('')
 const lifecycleStatusOptions: StatusOption<LifecycleStatus>[] = [
   { text: 'Черновик', value: 'Draft' },
   { text: 'Активный', value: 'Active' },
-  { text: 'Устаревший', value: 'Obsolete' }
+  { text: 'Устаревший', value: 'Obsolete' },
 ]
 
 const statusColorMap: Record<LifecycleStatus, string> = {
-  'Draft': 'grey',
-  'Active': 'success',
-  'Obsolete': 'warning'
+  Draft: 'grey',
+  Active: 'success',
+  Obsolete: 'warning',
 }
 
 const statusTextMap: Record<LifecycleStatus, string> = {
-  'Draft': 'Черновик',
-  'Active': 'Активный',
-  'Obsolete': 'Устаревший'
+  Draft: 'Черновик',
+  Active: 'Активный',
+  Obsolete: 'Устаревший',
 }
 
 // Size configuration
 const sizeConfigMap: Record<string, SizeConfig> = {
   small: { chipSize: 'x-small', selectWidth: '120px' },
   medium: { chipSize: 'small', selectWidth: '140px' },
-  large: { chipSize: 'large', selectWidth: '160px' }
+  large: { chipSize: 'large', selectWidth: '160px' },
 }
 
 // Computed properties
@@ -101,8 +138,8 @@ const chipAriaLabel = computed(() => {
   return `Статус жизненного цикла: ${statusText}${action}`
 })
 
-const selectAriaLabel = computed(() =>
-  `Выберите статус жизненного цикла, текущий: ${getStatusText(props.status)}`
+const selectAriaLabel = computed(
+  () => `Выберите статус жизненного цикла, текущий: ${getStatusText(props.status)}`,
 )
 
 // Status utility functions
@@ -160,11 +197,14 @@ const handleEscapeKey = (): void => {
 }
 
 // Watch for prop changes
-watch(() => props.status, (newStatus) => {
-  selectedStatus.value = newStatus
-  hasError.value = false
-  errorMessage.value = ''
-})
+watch(
+  () => props.status,
+  (newStatus) => {
+    selectedStatus.value = newStatus
+    hasError.value = false
+    errorMessage.value = ''
+  },
+)
 </script>
 
 <style scoped>
