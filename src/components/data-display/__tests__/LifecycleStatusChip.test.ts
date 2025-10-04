@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
@@ -87,7 +88,6 @@ describe('LifecycleStatusChip', () => {
 
     it('uses default readonly state when not specified', () => {
       const wrapper = createWrapper()
-      const vm = wrapper.vm as any
       expect(wrapper.props('readonly')).toBe(false)
     })
 
