@@ -89,6 +89,13 @@ const router = createRouter({
           component: () => import('@/views/MarkdownViewerDemo.vue'),
         },
 
+        // Status Components Playground (for development)
+        {
+          path: '/demo/status-components',
+          name: 'status-components-playground',
+          component: () => import('@/views/StatusComponentPlaygroundView.vue'),
+        },
+
         // Admin routes
         {
           path: '/admin/users',
