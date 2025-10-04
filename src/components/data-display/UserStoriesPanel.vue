@@ -31,9 +31,7 @@
 
           <v-list-item-subtitle>
             <div class="d-flex align-center gap-3 flex-wrap">
-              <v-chip :color="getStatusColor(story.status)" size="x-small" variant="flat">
-                {{ getStatusText(story.status) }}
-              </v-chip>
+              <WorkflowStatusChip :status="story.status" size="small" readonly variant="flat" />
 
               <v-chip :color="getPriorityColor(story.priority)" size="x-small" variant="outlined">
                 {{ getPriorityText(story.priority) }}
@@ -78,6 +76,7 @@
 
 <script setup lang="ts">
 import type { UserStory } from '@/types'
+import { WorkflowStatusChip } from '@/components/data-display'
 
 interface Props {
   userStories?: UserStory[] | null
@@ -92,29 +91,7 @@ defineEmits<{
   'add-user-story': []
 }>()
 
-// Utility functions for status and priority display
-const getStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    Backlog: 'grey',
-    Draft: 'orange',
-    'In Progress': 'blue',
-    Done: 'green',
-    Cancelled: 'red',
-  }
-  return colors[status] || 'grey'
-}
-
-const getStatusText = (status: string) => {
-  const texts: Record<string, string> = {
-    Backlog: 'Бэклог',
-    Draft: 'Черновик',
-    'In Progress': 'В работе',
-    Done: 'Выполнено',
-    Cancelled: 'Отменено',
-  }
-  return texts[status] || status
-}
-
+// Utility functions for priority display
 const getPriorityColor = (priority: number) => {
   const colors: Record<number, string> = {
     1: 'red',
