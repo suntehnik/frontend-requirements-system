@@ -9,12 +9,12 @@
       :disabled="disabled"
       :class="[
         'review-status-chip__display',
-        { 
+        {
           'review-status-chip__display--clickable': !readonly && !disabled && !loading,
           'review-status-chip__display--error': hasError,
           'review-status-chip__display--loading': loading,
-          'review-status-chip__display--disabled': disabled
-        }
+          'review-status-chip__display--disabled': disabled,
+        },
       ]"
       :aria-label="chipAriaLabel"
       :aria-describedby="hasError ? 'status-error' : undefined"
@@ -39,11 +39,11 @@
       :class="[
         'review-status-select',
         `review-status-select--${size}`,
-        { 
+        {
           'review-status-select--error': hasError,
           'review-status-select--loading': loading,
-          'review-status-select--disabled': disabled
-        }
+          'review-status-select--disabled': disabled,
+        },
       ]"
       item-title="text"
       item-value="value"
@@ -74,12 +74,12 @@
 
 <script setup lang="ts">
 import { computed, ref, nextTick, watch } from 'vue'
-import type { 
-  ReviewStatus, 
-  ReviewStatusChipProps, 
+import type {
+  ReviewStatus,
+  ReviewStatusChipProps,
   ReviewStatusChipEmits,
   StatusOption,
-  SizeConfig
+  SizeConfig,
 } from '@/types/status'
 
 const props = withDefaults(defineProps<ReviewStatusChipProps>(), {
@@ -87,7 +87,7 @@ const props = withDefaults(defineProps<ReviewStatusChipProps>(), {
   readonly: false,
   loading: false,
   disabled: false,
-  variant: 'flat'
+  variant: 'flat',
 })
 
 // Emits definition
@@ -107,28 +107,28 @@ const reviewStatusOptions: StatusOption<ReviewStatus>[] = [
   { text: 'На рассмотрении', value: 'Under Review' },
   { text: 'Одобрено', value: 'Approved' },
   { text: 'Отклонено', value: 'Rejected' },
-  { text: 'Требует изменений', value: 'Needs Changes' }
+  { text: 'Требует изменений', value: 'Needs Changes' },
 ]
 
 const statusColorMap: Record<ReviewStatus, string> = {
   'Under Review': 'orange',
-  'Approved': 'success',
-  'Rejected': 'error',
-  'Needs Changes': 'warning'
+  Approved: 'success',
+  Rejected: 'error',
+  'Needs Changes': 'warning',
 }
 
 const statusTextMap: Record<ReviewStatus, string> = {
   'Under Review': 'На рассмотрении',
-  'Approved': 'Одобрено',
-  'Rejected': 'Отклонено',
-  'Needs Changes': 'Требует изменений'
+  Approved: 'Одобрено',
+  Rejected: 'Отклонено',
+  'Needs Changes': 'Требует изменений',
 }
 
 // Size configuration
 const sizeConfigMap: Record<string, SizeConfig> = {
   small: { chipSize: 'x-small', selectWidth: '160px' },
   medium: { chipSize: 'small', selectWidth: '180px' },
-  large: { chipSize: 'large', selectWidth: '200px' }
+  large: { chipSize: 'large', selectWidth: '200px' },
 }
 
 // Computed properties
@@ -141,8 +141,8 @@ const chipAriaLabel = computed(() => {
   return `Статус рассмотрения: ${statusText}${action}`
 })
 
-const selectAriaLabel = computed(() => 
-  `Выберите статус рассмотрения, текущий: ${getStatusText(props.status)}`
+const selectAriaLabel = computed(
+  () => `Выберите статус рассмотрения, текущий: ${getStatusText(props.status)}`,
 )
 
 // Status utility functions
@@ -159,10 +159,10 @@ const handleChipClick = (): void => {
   if (props.readonly || props.disabled || props.loading) {
     return
   }
-  
+
   isEditing.value = true
   selectedStatus.value = props.status
-  
+
   nextTick(() => {
     selectRef.value?.focus()
   })
@@ -200,11 +200,14 @@ const handleEscapeKey = (): void => {
 }
 
 // Watch for prop changes
-watch(() => props.status, (newStatus) => {
-  selectedStatus.value = newStatus
-  hasError.value = false
-  errorMessage.value = ''
-})
+watch(
+  () => props.status,
+  (newStatus) => {
+    selectedStatus.value = newStatus
+    hasError.value = false
+    errorMessage.value = ''
+  },
+)
 </script>
 
 <style scoped>

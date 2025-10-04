@@ -9,12 +9,12 @@
       :disabled="disabled"
       :class="[
         'workflow-status-chip__display',
-        { 
+        {
           'workflow-status-chip__display--clickable': !readonly && !disabled && !loading,
           'workflow-status-chip__display--error': hasError,
           'workflow-status-chip__display--loading': loading,
-          'workflow-status-chip__display--disabled': disabled
-        }
+          'workflow-status-chip__display--disabled': disabled,
+        },
       ]"
       :aria-label="chipAriaLabel"
       :aria-describedby="hasError ? 'status-error' : undefined"
@@ -39,11 +39,11 @@
       :class="[
         'workflow-status-select',
         `workflow-status-select--${size}`,
-        { 
+        {
           'workflow-status-select--error': hasError,
           'workflow-status-select--loading': loading,
-          'workflow-status-select--disabled': disabled
-        }
+          'workflow-status-select--disabled': disabled,
+        },
       ]"
       item-title="text"
       item-value="value"
@@ -74,12 +74,12 @@
 
 <script setup lang="ts">
 import { computed, ref, nextTick, watch } from 'vue'
-import type { 
-  WorkflowStatus, 
-  WorkflowStatusChipProps, 
+import type {
+  WorkflowStatus,
+  WorkflowStatusChipProps,
   WorkflowStatusChipEmits,
   StatusOption,
-  SizeConfig
+  SizeConfig,
 } from '@/types/status'
 
 const props = withDefaults(defineProps<WorkflowStatusChipProps>(), {
@@ -87,7 +87,7 @@ const props = withDefaults(defineProps<WorkflowStatusChipProps>(), {
   readonly: false,
   loading: false,
   disabled: false,
-  variant: 'flat'
+  variant: 'flat',
 })
 
 // Emits definition
@@ -108,30 +108,30 @@ const workflowStatusOptions: StatusOption<WorkflowStatus>[] = [
   { text: 'Черновик', value: 'Draft' },
   { text: 'В работе', value: 'In Progress' },
   { text: 'Выполнено', value: 'Done' },
-  { text: 'Отменено', value: 'Cancelled' }
+  { text: 'Отменено', value: 'Cancelled' },
 ]
 
 const statusColorMap: Record<WorkflowStatus, string> = {
-  'Backlog': 'grey',
-  'Draft': 'orange',
+  Backlog: 'grey',
+  Draft: 'orange',
   'In Progress': 'blue',
-  'Done': 'success',
-  'Cancelled': 'error'
+  Done: 'success',
+  Cancelled: 'error',
 }
 
 const statusTextMap: Record<WorkflowStatus, string> = {
-  'Backlog': 'Бэклог',
-  'Draft': 'Черновик',
+  Backlog: 'Бэклог',
+  Draft: 'Черновик',
   'In Progress': 'В работе',
-  'Done': 'Выполнено',
-  'Cancelled': 'Отменено'
+  Done: 'Выполнено',
+  Cancelled: 'Отменено',
 }
 
 // Size configuration
 const sizeConfigMap: Record<string, SizeConfig> = {
   small: { chipSize: 'x-small', selectWidth: '120px' },
   medium: { chipSize: 'small', selectWidth: '140px' },
-  large: { chipSize: 'large', selectWidth: '160px' }
+  large: { chipSize: 'large', selectWidth: '160px' },
 }
 
 // Computed properties
@@ -144,9 +144,7 @@ const chipAriaLabel = computed(() => {
   return `Статус: ${statusText}${action}`
 })
 
-const selectAriaLabel = computed(() => 
-  `Выберите статус, текущий: ${getStatusText(props.status)}`
-)
+const selectAriaLabel = computed(() => `Выберите статус, текущий: ${getStatusText(props.status)}`)
 
 // Status utility functions
 const getStatusColor = (status: WorkflowStatus): string => {
@@ -162,10 +160,10 @@ const handleChipClick = (): void => {
   if (props.readonly || props.disabled || props.loading) {
     return
   }
-  
+
   isEditing.value = true
   selectedStatus.value = props.status
-  
+
   nextTick(() => {
     selectRef.value?.focus()
   })
@@ -203,11 +201,14 @@ const handleEscapeKey = (): void => {
 }
 
 // Watch for prop changes
-watch(() => props.status, (newStatus) => {
-  selectedStatus.value = newStatus
-  hasError.value = false
-  errorMessage.value = ''
-})
+watch(
+  () => props.status,
+  (newStatus) => {
+    selectedStatus.value = newStatus
+    hasError.value = false
+    errorMessage.value = ''
+  },
+)
 </script>
 
 <style scoped>
