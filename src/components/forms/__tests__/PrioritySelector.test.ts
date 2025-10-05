@@ -72,7 +72,7 @@ describe('PrioritySelector', () => {
       value: 4,
       label: 'Низкий',
       description: 'Может быть отложена',
-      color: 'grey',
+      color: 'green',
     })
   })
 
@@ -113,7 +113,7 @@ describe('PrioritySelector', () => {
     expect(wrapper.vm.getPriorityLabel(1)).toBe('Критический')
     expect(wrapper.vm.getPriorityLabel(4)).toBe('Низкий')
     expect(wrapper.vm.getPriorityColor(1)).toBe('red')
-    expect(wrapper.vm.getPriorityColor(4)).toBe('grey')
+    expect(wrapper.vm.getPriorityColor(4)).toBe('green')
   })
 
   it('handles custom props correctly', () => {

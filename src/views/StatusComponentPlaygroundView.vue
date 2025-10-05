@@ -167,6 +167,23 @@
                   />
                 </div>
 
+                <!-- PriorityChip Demo -->
+                <div v-else-if="selectedComponentType === 'PriorityChip'">
+                  <PriorityChip
+                    :priority="currentPriority"
+                    :size="selectedSize"
+                    :readonly="isReadonly"
+                    :loading="isLoading"
+                    :disabled="isDisabled"
+                    @priority-change="
+                      simulateError
+                        ? handlePriorityChangeWithError
+                        : handlePriorityChange
+                    "
+                    @error="handleError"
+                  />
+                </div>
+
                 <!-- Placeholder for other components -->
                 <div v-else>
                   <v-chip
@@ -250,6 +267,22 @@
                   </div>
                 </template>
 
+                <!-- PriorityChip Size Examples -->
+                <template v-else-if="selectedComponentType === 'PriorityChip'">
+                  <div class="text-center">
+                    <div class="mb-2">Small</div>
+                    <PriorityChip :priority="currentPriority" size="small" readonly />
+                  </div>
+                  <div class="text-center">
+                    <div class="mb-2">Medium</div>
+                    <PriorityChip :priority="currentPriority" size="medium" readonly />
+                  </div>
+                  <div class="text-center">
+                    <div class="mb-2">Large</div>
+                    <PriorityChip :priority="currentPriority" size="large" readonly />
+                  </div>
+                </template>
+
                 <!-- Generic size examples for other components -->
                 <template v-else>
                   <div class="text-center">
@@ -316,14 +349,25 @@
                   />
                 </template>
 
+                <!-- PriorityChip Examples -->
+                <template v-else-if="selectedComponentType === 'PriorityChip'">
+                  <PriorityChip
+                    v-for="priority in priorityOptions"
+                    :key="priority.value"
+                    :priority="priority.value"
+                    :size="selectedSize"
+                    readonly
+                  />
+                </template>
+
                 <!-- Placeholder for other component types -->
                 <template v-else>
                   <v-chip
                     v-for="status in getCurrentStatusOptions()"
                     :key="status.value"
-                    :color="getStatusColor(status.value)"
+                    :color="getStatusColor(String(status.value))"
                     :size="getSizeMapping(selectedSize).chipSize"
-                    @click="handleStatusChange(status.value)"
+                    @click="handleStatusChange(String(status.value))"
                   >
                     {{ status.text }}
                   </v-chip>
@@ -455,6 +499,42 @@
                   </div>
                 </template>
 
+                <!-- PriorityChip State Examples -->
+                <template v-else-if="selectedComponentType === 'PriorityChip'">
+                  <div class="text-center">
+                    <div class="mb-2">Normal</div>
+                    <PriorityChip
+                      :priority="currentPriority"
+                      :size="selectedSize"
+                      @priority-change="handlePriorityChange"
+                    />
+                  </div>
+                  <div class="text-center">
+                    <div class="mb-2">Loading</div>
+                    <PriorityChip
+                      :priority="currentPriority"
+                      :size="selectedSize"
+                      loading
+                    />
+                  </div>
+                  <div class="text-center">
+                    <div class="mb-2">Disabled</div>
+                    <PriorityChip
+                      :priority="currentPriority"
+                      :size="selectedSize"
+                      disabled
+                    />
+                  </div>
+                  <div class="text-center">
+                    <div class="mb-2">Readonly</div>
+                    <PriorityChip
+                      :priority="currentPriority"
+                      :size="selectedSize"
+                      readonly
+                    />
+                  </div>
+                </template>
+
                 <!-- Generic state examples for other components -->
                 <template v-else>
                   <div class="text-center">
@@ -576,6 +656,30 @@
                     </v-btn>
                   </div>
                 </template>
+
+                <!-- PriorityChip Error Examples -->
+                <template v-else-if="selectedComponentType === 'PriorityChip'">
+                  <div class="text-center">
+                    <div class="mb-2">Network Error Simulation</div>
+                    <PriorityChip
+                      :priority="currentPriority"
+                      :size="selectedSize"
+                      @priority-change="handlePriorityChangeWithError"
+                      @error="handleError"
+                    />
+                  </div>
+                  <div class="text-center">
+                    <div class="mb-2">Validation Error</div>
+                    <v-btn
+                      size="small"
+                      color="error"
+                      variant="outlined"
+                      @click="triggerValidationError('PriorityChip')"
+                    >
+                      Trigger Error
+                    </v-btn>
+                  </div>
+                </template>
               </div>
             </div>
 
@@ -651,6 +755,7 @@ import WorkflowStatusChip from '@/components/data-display/WorkflowStatusChip.vue
 import LifecycleStatusChip from '@/components/data-display/LifecycleStatusChip.vue'
 import BinaryStatusChip from '@/components/data-display/BinaryStatusChip.vue'
 import ReviewStatusChip from '@/components/data-display/ReviewStatusChip.vue'
+import PriorityChip from '@/components/data-display/PriorityChip.vue'
 import type {
   WorkflowStatus,
   LifecycleStatus,
@@ -660,6 +765,8 @@ import type {
   StatusOption,
   SizeConfig,
 } from '@/types/status'
+import type { Priority } from '@/types'
+import { getAllPriorityOptions, getPriorityLabel } from '@/utils/priority-utils'
 
 // Component state
 const selectedComponentType = ref<string>('WorkflowStatusChip')
@@ -674,6 +781,7 @@ const currentWorkflowStatus = ref<WorkflowStatus>('Draft')
 const currentLifecycleStatus = ref<LifecycleStatus>('Draft')
 const currentBinaryStatus = ref<BinaryStatus>('Active')
 const currentReviewStatus = ref<ReviewStatus>('Under Review')
+const currentPriority = ref<Priority>(3)
 
 // Event logging
 interface EventLogEntry {
@@ -696,6 +804,7 @@ const componentTypeOptions = [
   { title: 'LifecycleStatusChip', value: 'LifecycleStatusChip' },
   { title: 'BinaryStatusChip', value: 'BinaryStatusChip' },
   { title: 'ReviewStatusChip', value: 'ReviewStatusChip' },
+  { title: 'PriorityChip', value: 'PriorityChip' },
 ]
 
 const sizeOptions = [
@@ -730,6 +839,12 @@ const reviewStatusOptions: StatusOption<ReviewStatus>[] = [
   { text: 'Отклонено', value: 'Rejected' },
   { text: 'Требует изменений', value: 'Needs Changes' },
 ]
+
+// Priority options using shared utilities
+const priorityOptions = getAllPriorityOptions().map(option => ({
+  text: option.label,
+  value: option.value,
+}))
 
 // Status color mapping
 const statusColors: Record<string, string> = {
@@ -779,6 +894,8 @@ const getCurrentStatusOptions = () => {
       return binaryStatusOptions
     case 'ReviewStatusChip':
       return reviewStatusOptions
+    case 'PriorityChip':
+      return priorityOptions
     default:
       return workflowStatusOptions
   }
@@ -880,6 +997,27 @@ const handleReviewStatusChangeWithError = (newStatus: ReviewStatus) => {
     return
   }
   handleReviewStatusChange(newStatus)
+}
+
+const handlePriorityChange = (newPriority: Priority) => {
+  currentPriority.value = newPriority
+  statusChangeCount.value++
+  logEvent('priority-change', `Priority changed to: ${newPriority} (${getPriorityLabel(newPriority)})`, {
+    componentType: 'PriorityChip',
+    newPriority,
+    priorityLabel: getPriorityLabel(newPriority),
+    size: selectedSize.value,
+    readonly: isReadonly.value,
+  })
+}
+
+const handlePriorityChangeWithError = (newPriority: Priority) => {
+  if (simulateError.value) {
+    const error = new Error('Simulated network error: Failed to update priority')
+    handleError(error)
+    return
+  }
+  handlePriorityChange(newPriority)
 }
 
 const handleError = (error: Error) => {
@@ -986,6 +1124,10 @@ const runStressTest = async () => {
             'Needs Changes',
           ]
           currentReviewStatus.value = reviewStatuses[i % reviewStatuses.length]
+          break
+        case 'PriorityChip':
+          const priorities: Priority[] = [1, 2, 3, 4]
+          currentPriority.value = priorities[i % priorities.length]
           break
       }
 
@@ -1124,6 +1266,8 @@ const getCurrentStatus = () => {
       return currentBinaryStatus.value
     case 'ReviewStatusChip':
       return currentReviewStatus.value
+    case 'PriorityChip':
+      return currentPriority.value
     default:
       return 'Unknown'
   }
