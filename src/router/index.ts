@@ -75,6 +75,13 @@ const router = createRouter({
           component: () => import('@/views/SearchView.vue'),
         },
 
+        // Demo Index (for development)
+        {
+          path: '/demo',
+          name: 'demo-index',
+          component: () => import('@/views/DemoIndexView.vue'),
+        },
+
         // Form Components Demo (for development)
         {
           path: '/demo/forms',
@@ -94,6 +101,13 @@ const router = createRouter({
           path: '/demo/status-components',
           name: 'status-components-playground',
           component: () => import('@/views/StatusComponentPlaygroundView.vue'),
+        },
+
+        // Priority Component Playground (for development)
+        {
+          path: '/demo/priority-component',
+          name: 'priority-component-playground',
+          component: () => import('@/views/PriorityComponentPlaygroundView.vue'),
         },
 
         // Admin routes
