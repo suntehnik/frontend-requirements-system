@@ -28,7 +28,7 @@
                 label="Описание"
                 variant="outlined"
                 :rules="descriptionRules"
-                :counter="5000"
+                :counter="50000"
                 rows="4"
                 placeholder="Подробное описание эпика"
                 :disabled="loading"
@@ -159,7 +159,7 @@ const titleRules = [
 ]
 
 const descriptionRules = [
-  (v: string) => !v || v.length <= 5000 || 'Описание не должно превышать 5000 символов',
+  (v: string) => !v || v.length <= 50000 || 'Описание не должно превышать 50000 символов',
 ]
 
 const priorityRules = [(v: Priority | null) => v !== null || 'Приоритет обязателен']

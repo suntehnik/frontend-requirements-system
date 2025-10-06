@@ -41,13 +41,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Priority } from '@/types'
-
-interface PriorityOption {
-  value: Priority
-  label: string
-  description: string
-  color: string
-}
+import { getAllPriorityOptions, getPriorityLabel, getPriorityColor, type PriorityOption } from '@/utils/priority-utils'
 
 interface Props {
   modelValue?: Priority | null
@@ -87,49 +81,12 @@ withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// Priority options with Russian labels
-const priorityOptions = computed<PriorityOption[]>(() => [
-  {
-    value: 1 as Priority,
-    label: 'Критический',
-    description: 'Требует немедленного внимания',
-    color: 'red',
-  },
-  {
-    value: 2 as Priority,
-    label: 'Высокий',
-    description: 'Важная задача',
-    color: 'orange',
-  },
-  {
-    value: 3 as Priority,
-    label: 'Средний',
-    description: 'Обычная задача',
-    color: 'blue',
-  },
-  {
-    value: 4 as Priority,
-    label: 'Низкий',
-    description: 'Может быть отложена',
-    color: 'grey',
-  },
-])
+// Priority options using shared utilities
+const priorityOptions = computed<PriorityOption[]>(() => getAllPriorityOptions())
 
 // Methods
 const handleUpdate = (value: Priority | null): void => {
   emit('update:modelValue', value)
-}
-
-// Helper function to get priority label by value
-const getPriorityLabel = (priority: Priority): string => {
-  const option = priorityOptions.value.find((opt) => opt.value === priority)
-  return option?.label || `Приоритет ${priority}`
-}
-
-// Helper function to get priority color by value
-const getPriorityColor = (priority: Priority): string => {
-  const option = priorityOptions.value.find((opt) => opt.value === priority)
-  return option?.color || 'grey'
 }
 
 // Expose helper functions for external use

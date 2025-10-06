@@ -1,4 +1,5 @@
 // Status type definitions for status components
+import type { Priority } from './common'
 
 export type WorkflowStatus = 'Backlog' | 'Draft' | 'In Progress' | 'Done' | 'Cancelled'
 
@@ -45,6 +46,10 @@ export interface ReviewStatusChipProps extends BaseStatusChipProps {
   status: ReviewStatus
 }
 
+export interface PriorityChipProps extends BaseStatusChipProps {
+  priority: Priority
+}
+
 // Emits interfaces
 export interface WorkflowStatusChipEmits {
   'status-change': [newStatus: WorkflowStatus]
@@ -66,6 +71,11 @@ export interface ReviewStatusChipEmits {
   error: [error: Error]
 }
 
+export interface PriorityChipEmits {
+  'priority-change': [newPriority: Priority]
+  error: [error: Error]
+}
+
 // Status configuration mappings
 export interface StatusOption<T = AllStatusTypes> {
   text: string
@@ -82,7 +92,7 @@ export interface StatusTextMapping {
 
 // Size configuration mapping
 export interface SizeConfig {
-  chipSize: 'x-small' | 'small' | 'large'
+  chipSize: 'x-small' | 'small' | 'default' | 'large'
   selectWidth: string
 }
 

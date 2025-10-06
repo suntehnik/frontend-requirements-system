@@ -29,9 +29,7 @@
             </template>
 
             <template v-slot:[`item.priority`]="{ item }">
-              <v-chip :color="getPriorityColor(item.priority)" size="small">
-                {{ getPriorityText(item.priority) }}
-              </v-chip>
+              <PriorityChip :priority="item.priority" size="medium" readonly />
             </template>
 
             <template v-slot:[`item.assignee`]="{ item }">
@@ -90,6 +88,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Epic, EpicStatus, Priority } from '@/types'
 import WorkflowStatusChip from '@/components/data-display/WorkflowStatusChip.vue'
+import PriorityChip from '@/components/data-display/PriorityChip.vue'
 
 interface Props {
   epics: Epic[]
@@ -225,26 +224,6 @@ const handleCreateEpic = () => {
 }
 
 // Utility functions
-
-const getPriorityColor = (priority: Priority) => {
-  const colors: Record<Priority, string> = {
-    1: 'red',
-    2: 'orange',
-    3: 'yellow',
-    4: 'green',
-  }
-  return colors[priority] || 'grey'
-}
-
-const getPriorityText = (priority: Priority) => {
-  const texts: Record<Priority, string> = {
-    1: 'Критический',
-    2: 'Высокий',
-    3: 'Средний',
-    4: 'Низкий',
-  }
-  return texts[priority] || 'Неизвестно'
-}
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)

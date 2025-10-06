@@ -324,7 +324,7 @@ describe('WorkflowStatusChip', () => {
       const wrapper = createWrapper({ size: 'medium' })
       const vm = wrapper.vm as any
 
-      expect(vm.chipSize).toBe('small')
+      expect(vm.chipSize).toBe('default')
     })
 
     it('computes correct chip size for large', () => {

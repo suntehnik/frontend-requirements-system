@@ -10,6 +10,7 @@ export { default as WorkflowStatusChip } from './WorkflowStatusChip.vue'
 export { default as LifecycleStatusChip } from './LifecycleStatusChip.vue'
 export { default as BinaryStatusChip } from './BinaryStatusChip.vue'
 export { default as ReviewStatusChip } from './ReviewStatusChip.vue'
+export { default as PriorityChip } from './PriorityChip.vue'
 
 // Status component TypeScript interfaces re-exports
 export type {
@@ -24,10 +25,12 @@ export type {
   LifecycleStatusChipProps,
   BinaryStatusChipProps,
   ReviewStatusChipProps,
+  PriorityChipProps,
   WorkflowStatusChipEmits,
   LifecycleStatusChipEmits,
   BinaryStatusChipEmits,
   ReviewStatusChipEmits,
+  PriorityChipEmits,
   StatusOption,
   StatusColorMapping,
   StatusTextMapping,

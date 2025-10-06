@@ -32,13 +32,28 @@
             />
           </v-col>
           <v-col cols="12" md="2">
-            <v-switch v-model="isReadonly" label="Readonly" color="primary" density="compact" />
+            <v-switch
+              v-model="isReadonly"
+              label="Readonly"
+              color="primary"
+              density="compact"
+            />
           </v-col>
           <v-col cols="12" md="2">
-            <v-switch v-model="isLoading" label="Loading" color="primary" density="compact" />
+            <v-switch
+              v-model="isLoading"
+              label="Loading"
+              color="primary"
+              density="compact"
+            />
           </v-col>
           <v-col cols="12" md="2">
-            <v-switch v-model="isDisabled" label="Disabled" color="primary" density="compact" />
+            <v-switch
+              v-model="isDisabled"
+              label="Disabled"
+              color="primary"
+              density="compact"
+            />
           </v-col>
           <v-col cols="12" md="2">
             <v-switch
@@ -49,7 +64,12 @@
             />
           </v-col>
           <v-col cols="12" md="1">
-            <v-btn @click="clearEventLog" color="error" variant="outlined" size="small">
+            <v-btn
+              @click="clearEventLog"
+              color="error"
+              variant="outlined"
+              size="small"
+            >
               Clear Log
             </v-btn>
           </v-col>
@@ -74,17 +94,32 @@
             </v-btn>
           </v-col>
           <v-col cols="12" md="3">
-            <v-btn @click="testAllSizes" color="secondary" variant="outlined" block>
+            <v-btn
+              @click="testAllSizes"
+              color="secondary"
+              variant="outlined"
+              block
+            >
               Test All Sizes
             </v-btn>
           </v-col>
           <v-col cols="12" md="3">
-            <v-btn @click="testAllStates" color="info" variant="outlined" block>
+            <v-btn
+              @click="testAllStates"
+              color="info"
+              variant="outlined"
+              block
+            >
               Test All States
             </v-btn>
           </v-col>
           <v-col cols="12" md="3">
-            <v-btn @click="exportEventLog" color="success" variant="outlined" block>
+            <v-btn
+              @click="exportEventLog"
+              color="success"
+              variant="outlined"
+              block
+            >
               Export Event Log
             </v-btn>
           </v-col>
@@ -111,15 +146,11 @@
                     :readonly="isReadonly"
                     :loading="isLoading"
                     :disabled="isDisabled"
-                    @status-change="
-                      simulateError
-                        ? handleWorkflowStatusChangeWithError
-                        : handleWorkflowStatusChange
-                    "
+                    @status-change="simulateError ? handleWorkflowStatusChangeWithError : handleWorkflowStatusChange"
                     @error="handleError"
                   />
                 </div>
-
+                
                 <!-- LifecycleStatusChip Demo -->
                 <div v-else-if="selectedComponentType === 'LifecycleStatusChip'">
                   <LifecycleStatusChip
@@ -128,15 +159,11 @@
                     :readonly="isReadonly"
                     :loading="isLoading"
                     :disabled="isDisabled"
-                    @status-change="
-                      simulateError
-                        ? handleLifecycleStatusChangeWithError
-                        : handleLifecycleStatusChange
-                    "
+                    @status-change="simulateError ? handleLifecycleStatusChangeWithError : handleLifecycleStatusChange"
                     @error="handleError"
                   />
                 </div>
-
+                
                 <!-- BinaryStatusChip Demo -->
                 <div v-else-if="selectedComponentType === 'BinaryStatusChip'">
                   <BinaryStatusChip
@@ -145,13 +172,11 @@
                     :readonly="isReadonly"
                     :loading="isLoading"
                     :disabled="isDisabled"
-                    @status-change="
-                      simulateError ? handleBinaryStatusChangeWithError : handleBinaryStatusChange
-                    "
+                    @status-change="simulateError ? handleBinaryStatusChangeWithError : handleBinaryStatusChange"
                     @error="handleError"
                   />
                 </div>
-
+                
                 <!-- ReviewStatusChip Demo -->
                 <div v-else-if="selectedComponentType === 'ReviewStatusChip'">
                   <ReviewStatusChip
@@ -160,13 +185,11 @@
                     :readonly="isReadonly"
                     :loading="isLoading"
                     :disabled="isDisabled"
-                    @status-change="
-                      simulateError ? handleReviewStatusChangeWithError : handleReviewStatusChange
-                    "
+                    @status-change="simulateError ? handleReviewStatusChangeWithError : handleReviewStatusChange"
                     @error="handleError"
                   />
                 </div>
-
+                
                 <!-- Placeholder for other components -->
                 <div v-else>
                   <v-chip
@@ -190,66 +213,114 @@
                 <template v-if="selectedComponentType === 'WorkflowStatusChip'">
                   <div class="text-center">
                     <div class="mb-2">Small</div>
-                    <WorkflowStatusChip :status="currentWorkflowStatus" size="small" readonly />
+                    <WorkflowStatusChip
+                      :status="currentWorkflowStatus"
+                      size="small"
+                      readonly
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Medium</div>
-                    <WorkflowStatusChip :status="currentWorkflowStatus" size="medium" readonly />
+                    <WorkflowStatusChip
+                      :status="currentWorkflowStatus"
+                      size="medium"
+                      readonly
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Large</div>
-                    <WorkflowStatusChip :status="currentWorkflowStatus" size="large" readonly />
+                    <WorkflowStatusChip
+                      :status="currentWorkflowStatus"
+                      size="large"
+                      readonly
+                    />
                   </div>
                 </template>
-
+                
                 <!-- LifecycleStatusChip Size Examples -->
                 <template v-else-if="selectedComponentType === 'LifecycleStatusChip'">
                   <div class="text-center">
                     <div class="mb-2">Small</div>
-                    <LifecycleStatusChip :status="currentLifecycleStatus" size="small" readonly />
+                    <LifecycleStatusChip
+                      :status="currentLifecycleStatus"
+                      size="small"
+                      readonly
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Medium</div>
-                    <LifecycleStatusChip :status="currentLifecycleStatus" size="medium" readonly />
+                    <LifecycleStatusChip
+                      :status="currentLifecycleStatus"
+                      size="medium"
+                      readonly
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Large</div>
-                    <LifecycleStatusChip :status="currentLifecycleStatus" size="large" readonly />
+                    <LifecycleStatusChip
+                      :status="currentLifecycleStatus"
+                      size="large"
+                      readonly
+                    />
                   </div>
                 </template>
-
+                
                 <!-- BinaryStatusChip Size Examples -->
                 <template v-else-if="selectedComponentType === 'BinaryStatusChip'">
                   <div class="text-center">
                     <div class="mb-2">Small</div>
-                    <BinaryStatusChip :status="currentBinaryStatus" size="small" readonly />
+                    <BinaryStatusChip
+                      :status="currentBinaryStatus"
+                      size="small"
+                      readonly
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Medium</div>
-                    <BinaryStatusChip :status="currentBinaryStatus" size="medium" readonly />
+                    <BinaryStatusChip
+                      :status="currentBinaryStatus"
+                      size="medium"
+                      readonly
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Large</div>
-                    <BinaryStatusChip :status="currentBinaryStatus" size="large" readonly />
+                    <BinaryStatusChip
+                      :status="currentBinaryStatus"
+                      size="large"
+                      readonly
+                    />
                   </div>
                 </template>
-
+                
                 <!-- ReviewStatusChip Size Examples -->
                 <template v-else-if="selectedComponentType === 'ReviewStatusChip'">
                   <div class="text-center">
                     <div class="mb-2">Small</div>
-                    <ReviewStatusChip :status="currentReviewStatus" size="small" readonly />
+                    <ReviewStatusChip
+                      :status="currentReviewStatus"
+                      size="small"
+                      readonly
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Medium</div>
-                    <ReviewStatusChip :status="currentReviewStatus" size="medium" readonly />
+                    <ReviewStatusChip
+                      :status="currentReviewStatus"
+                      size="medium"
+                      readonly
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Large</div>
-                    <ReviewStatusChip :status="currentReviewStatus" size="large" readonly />
+                    <ReviewStatusChip
+                      :status="currentReviewStatus"
+                      size="large"
+                      readonly
+                    />
                   </div>
                 </template>
-
+                
                 <!-- Generic size examples for other components -->
                 <template v-else>
                   <div class="text-center">
@@ -282,7 +353,7 @@
                     readonly
                   />
                 </template>
-
+                
                 <!-- LifecycleStatusChip Examples -->
                 <template v-else-if="selectedComponentType === 'LifecycleStatusChip'">
                   <LifecycleStatusChip
@@ -293,7 +364,7 @@
                     readonly
                   />
                 </template>
-
+                
                 <!-- BinaryStatusChip Examples -->
                 <template v-else-if="selectedComponentType === 'BinaryStatusChip'">
                   <BinaryStatusChip
@@ -304,7 +375,7 @@
                     readonly
                   />
                 </template>
-
+                
                 <!-- ReviewStatusChip Examples -->
                 <template v-else-if="selectedComponentType === 'ReviewStatusChip'">
                   <ReviewStatusChip
@@ -315,7 +386,7 @@
                     readonly
                   />
                 </template>
-
+                
                 <!-- Placeholder for other component types -->
                 <template v-else>
                   <v-chip
@@ -370,7 +441,7 @@
                     />
                   </div>
                 </template>
-
+                
                 <!-- LifecycleStatusChip State Examples -->
                 <template v-else-if="selectedComponentType === 'LifecycleStatusChip'">
                   <div class="text-center">
@@ -406,7 +477,7 @@
                     />
                   </div>
                 </template>
-
+                
                 <!-- BinaryStatusChip State Examples -->
                 <template v-else-if="selectedComponentType === 'BinaryStatusChip'">
                   <div class="text-center">
@@ -419,18 +490,30 @@
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Loading</div>
-                    <BinaryStatusChip :status="currentBinaryStatus" :size="selectedSize" loading />
+                    <BinaryStatusChip
+                      :status="currentBinaryStatus"
+                      :size="selectedSize"
+                      loading
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Disabled</div>
-                    <BinaryStatusChip :status="currentBinaryStatus" :size="selectedSize" disabled />
+                    <BinaryStatusChip
+                      :status="currentBinaryStatus"
+                      :size="selectedSize"
+                      disabled
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Readonly</div>
-                    <BinaryStatusChip :status="currentBinaryStatus" :size="selectedSize" readonly />
+                    <BinaryStatusChip
+                      :status="currentBinaryStatus"
+                      :size="selectedSize"
+                      readonly
+                    />
                   </div>
                 </template>
-
+                
                 <!-- ReviewStatusChip State Examples -->
                 <template v-else-if="selectedComponentType === 'ReviewStatusChip'">
                   <div class="text-center">
@@ -443,18 +526,30 @@
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Loading</div>
-                    <ReviewStatusChip :status="currentReviewStatus" :size="selectedSize" loading />
+                    <ReviewStatusChip
+                      :status="currentReviewStatus"
+                      :size="selectedSize"
+                      loading
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Disabled</div>
-                    <ReviewStatusChip :status="currentReviewStatus" :size="selectedSize" disabled />
+                    <ReviewStatusChip
+                      :status="currentReviewStatus"
+                      :size="selectedSize"
+                      disabled
+                    />
                   </div>
                   <div class="text-center">
                     <div class="mb-2">Readonly</div>
-                    <ReviewStatusChip :status="currentReviewStatus" :size="selectedSize" readonly />
+                    <ReviewStatusChip
+                      :status="currentReviewStatus"
+                      :size="selectedSize"
+                      readonly
+                    />
                   </div>
                 </template>
-
+                
                 <!-- Generic state examples for other components -->
                 <template v-else>
                   <div class="text-center">
@@ -504,7 +599,7 @@
                     </v-btn>
                   </div>
                 </template>
-
+                
                 <!-- LifecycleStatusChip Error Examples -->
                 <template v-else-if="selectedComponentType === 'LifecycleStatusChip'">
                   <div class="text-center">
@@ -528,7 +623,7 @@
                     </v-btn>
                   </div>
                 </template>
-
+                
                 <!-- BinaryStatusChip Error Examples -->
                 <template v-else-if="selectedComponentType === 'BinaryStatusChip'">
                   <div class="text-center">
@@ -552,7 +647,7 @@
                     </v-btn>
                   </div>
                 </template>
-
+                
                 <!-- ReviewStatusChip Error Examples -->
                 <template v-else-if="selectedComponentType === 'ReviewStatusChip'">
                   <div class="text-center">
@@ -658,7 +753,7 @@ import type {
   ReviewStatus,
   StatusChipSize,
   StatusOption,
-  SizeConfig,
+  SizeConfig
 } from '@/types/status'
 
 // Component state
@@ -695,13 +790,13 @@ const componentTypeOptions = [
   { title: 'WorkflowStatusChip', value: 'WorkflowStatusChip' },
   { title: 'LifecycleStatusChip', value: 'LifecycleStatusChip' },
   { title: 'BinaryStatusChip', value: 'BinaryStatusChip' },
-  { title: 'ReviewStatusChip', value: 'ReviewStatusChip' },
+  { title: 'ReviewStatusChip', value: 'ReviewStatusChip' }
 ]
 
 const sizeOptions = [
   { title: 'Small', value: 'small' },
   { title: 'Medium', value: 'medium' },
-  { title: 'Large', value: 'large' },
+  { title: 'Large', value: 'large' }
 ]
 
 // Status options by component type
@@ -710,25 +805,25 @@ const workflowStatusOptions: StatusOption<WorkflowStatus>[] = [
   { text: 'Черновик', value: 'Draft' },
   { text: 'В работе', value: 'In Progress' },
   { text: 'Выполнено', value: 'Done' },
-  { text: 'Отменено', value: 'Cancelled' },
+  { text: 'Отменено', value: 'Cancelled' }
 ]
 
 const lifecycleStatusOptions: StatusOption<LifecycleStatus>[] = [
   { text: 'Черновик', value: 'Draft' },
   { text: 'Активно', value: 'Active' },
-  { text: 'Устарело', value: 'Obsolete' },
+  { text: 'Устарело', value: 'Obsolete' }
 ]
 
 const binaryStatusOptions: StatusOption<BinaryStatus>[] = [
   { text: 'Активно', value: 'Active' },
-  { text: 'Неактивно', value: 'Inactive' },
+  { text: 'Неактивно', value: 'Inactive' }
 ]
 
 const reviewStatusOptions: StatusOption<ReviewStatus>[] = [
   { text: 'На рассмотрении', value: 'Under Review' },
   { text: 'Одобрено', value: 'Approved' },
   { text: 'Отклонено', value: 'Rejected' },
-  { text: 'Требует изменений', value: 'Needs Changes' },
+  { text: 'Требует изменений', value: 'Needs Changes' }
 ]
 
 // Status color mapping
@@ -739,33 +834,33 @@ const statusColors: Record<string, string> = {
   'In Progress': 'blue',
   Done: 'green',
   Cancelled: 'red',
-
+  
   // Lifecycle statuses
   Active: 'green',
   Inactive: 'grey',
   Obsolete: 'orange',
-
+  
   // Review statuses
   'Under Review': 'orange',
   Approved: 'green',
   Rejected: 'red',
-  'Needs Changes': 'yellow',
+  'Needs Changes': 'yellow'
 }
 
 // Size configuration mapping
 const sizeConfigMapping: Record<StatusChipSize, SizeConfig> = {
   small: {
     chipSize: 'x-small',
-    selectWidth: '120px',
+    selectWidth: '120px'
   },
   medium: {
     chipSize: 'small',
-    selectWidth: '140px',
+    selectWidth: '140px'
   },
   large: {
     chipSize: 'large',
-    selectWidth: '160px',
-  },
+    selectWidth: '160px'
+  }
 }
 
 // Computed properties
@@ -798,7 +893,7 @@ const handleStatusChange = (newStatus: string) => {
     componentType: selectedComponentType.value,
     newStatus,
     size: selectedSize.value,
-    readonly: isReadonly.value,
+    readonly: isReadonly.value
   })
 }
 
@@ -809,7 +904,7 @@ const handleWorkflowStatusChange = (newStatus: WorkflowStatus) => {
     componentType: 'WorkflowStatusChip',
     newStatus,
     size: selectedSize.value,
-    readonly: isReadonly.value,
+    readonly: isReadonly.value
   })
 }
 
@@ -829,7 +924,7 @@ const handleLifecycleStatusChange = (newStatus: LifecycleStatus) => {
     componentType: 'LifecycleStatusChip',
     newStatus,
     size: selectedSize.value,
-    readonly: isReadonly.value,
+    readonly: isReadonly.value
   })
 }
 
@@ -849,7 +944,7 @@ const handleBinaryStatusChange = (newStatus: BinaryStatus) => {
     componentType: 'BinaryStatusChip',
     newStatus,
     size: selectedSize.value,
-    readonly: isReadonly.value,
+    readonly: isReadonly.value
   })
 }
 
@@ -869,7 +964,7 @@ const handleReviewStatusChange = (newStatus: ReviewStatus) => {
     componentType: 'ReviewStatusChip',
     newStatus,
     size: selectedSize.value,
-    readonly: isReadonly.value,
+    readonly: isReadonly.value
   })
 }
 
@@ -887,7 +982,7 @@ const handleError = (error: Error) => {
   logEvent('error', `Component error: ${error.message}`, {
     componentType: selectedComponentType.value,
     error: error.message,
-    stack: error.stack,
+    stack: error.stack
   })
 }
 
@@ -909,17 +1004,17 @@ const logEvent = (type: string, message: string, data?: Record<string, unknown>)
       isReadonly: isReadonly.value,
       isLoading: isLoading.value,
       isDisabled: isDisabled.value,
-      simulateError: simulateError.value,
-    },
+      simulateError: simulateError.value
+    }
   }
-
+  
   eventLog.value.unshift(eventEntry)
-
+  
   // Keep only last 100 events for better debugging
   if (eventLog.value.length > 100) {
     eventLog.value = eventLog.value.slice(0, 100)
   }
-
+  
   // Enhanced console logging with structured data
   const logLevel = type === 'error' ? 'error' : type === 'system' ? 'info' : 'log'
   console[logLevel](`[StatusPlayground:${type}] ${message}`, eventEntry.data)
@@ -953,21 +1048,15 @@ const getEventClass = (type: string): string => {
 const runStressTest = async () => {
   stressTestRunning.value = true
   logEvent('system', 'Starting stress test', { testType: 'stress' })
-
+  
   try {
     // Test rapid status changes
     for (let i = 0; i < 10; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 100))
-
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
       switch (selectedComponentType.value) {
         case 'WorkflowStatusChip':
-          const workflowStatuses: WorkflowStatus[] = [
-            'Backlog',
-            'Draft',
-            'In Progress',
-            'Done',
-            'Cancelled',
-          ]
+          const workflowStatuses: WorkflowStatus[] = ['Backlog', 'Draft', 'In Progress', 'Done', 'Cancelled']
           currentWorkflowStatus.value = workflowStatuses[i % workflowStatuses.length]
           break
         case 'LifecycleStatusChip':
@@ -979,32 +1068,23 @@ const runStressTest = async () => {
           currentBinaryStatus.value = binaryStatuses[i % binaryStatuses.length]
           break
         case 'ReviewStatusChip':
-          const reviewStatuses: ReviewStatus[] = [
-            'Under Review',
-            'Approved',
-            'Rejected',
-            'Needs Changes',
-          ]
+          const reviewStatuses: ReviewStatus[] = ['Under Review', 'Approved', 'Rejected', 'Needs Changes']
           currentReviewStatus.value = reviewStatuses[i % reviewStatuses.length]
           break
       }
-
+      
       logEvent('stress-test', `Rapid status change ${i + 1}/10`, {
         iteration: i + 1,
-        newStatus: getCurrentStatus(),
+        newStatus: getCurrentStatus()
       })
     }
-
+    
     logEvent('system', 'Stress test completed successfully', { testType: 'stress', iterations: 10 })
   } catch (error) {
-    logEvent(
-      'error',
-      `Stress test failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      {
-        testType: 'stress',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
-    )
+    logEvent('error', `Stress test failed: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+      testType: 'stress',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
   } finally {
     stressTestRunning.value = false
   }
@@ -1012,17 +1092,17 @@ const runStressTest = async () => {
 
 const testAllSizes = () => {
   logEvent('system', 'Testing all size variants', { testType: 'size-test' })
-
+  
   const sizes: StatusChipSize[] = ['small', 'medium', 'large']
   let currentIndex = 0
-
+  
   const testNextSize = () => {
     if (currentIndex < sizes.length) {
       selectedSize.value = sizes[currentIndex]
       logEvent('size-test', `Testing size: ${sizes[currentIndex]}`, {
         size: sizes[currentIndex],
         iteration: currentIndex + 1,
-        total: sizes.length,
+        total: sizes.length
       })
       currentIndex++
       setTimeout(testNextSize, 1000)
@@ -1030,38 +1110,38 @@ const testAllSizes = () => {
       logEvent('system', 'Size test completed', { testType: 'size-test' })
     }
   }
-
+  
   testNextSize()
 }
 
 const testAllStates = () => {
   logEvent('system', 'Testing all component states', { testType: 'state-test' })
-
+  
   const states = [
     { readonly: false, loading: false, disabled: false, name: 'normal' },
     { readonly: true, loading: false, disabled: false, name: 'readonly' },
     { readonly: false, loading: true, disabled: false, name: 'loading' },
-    { readonly: false, loading: false, disabled: true, name: 'disabled' },
+    { readonly: false, loading: false, disabled: true, name: 'disabled' }
   ]
-
+  
   let currentIndex = 0
-
+  
   const testNextState = () => {
     if (currentIndex < states.length) {
       const state = states[currentIndex]
       isReadonly.value = state.readonly
       isLoading.value = state.loading
       isDisabled.value = state.disabled
-
+      
       logEvent('state-test', `Testing state: ${state.name}`, {
         state: state.name,
         readonly: state.readonly,
         loading: state.loading,
         disabled: state.disabled,
         iteration: currentIndex + 1,
-        total: states.length,
+        total: states.length
       })
-
+      
       currentIndex++
       setTimeout(testNextState, 1500)
     } else {
@@ -1072,7 +1152,7 @@ const testAllStates = () => {
       logEvent('system', 'State test completed', { testType: 'state-test' })
     }
   }
-
+  
   testNextState()
 }
 
@@ -1086,17 +1166,17 @@ const exportEventLog = () => {
         readonly: isReadonly.value,
         loading: isLoading.value,
         disabled: isDisabled.value,
-        simulateError: simulateError.value,
-      },
+        simulateError: simulateError.value
+      }
     },
     metrics: {
       totalEvents: eventLog.value.length,
       statusChanges: statusChangeCount.value,
-      errors: errorCount.value,
+      errors: errorCount.value
     },
-    events: eventLog.value,
+    events: eventLog.value
   }
-
+  
   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -1106,11 +1186,11 @@ const exportEventLog = () => {
   a.click()
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
-
-  logEvent('system', 'Event log exported', {
+  
+  logEvent('system', 'Event log exported', { 
     exportType: 'json',
     eventCount: eventLog.value.length,
-    filename: a.download,
+    filename: a.download
   })
 }
 
@@ -1131,9 +1211,9 @@ const getCurrentStatus = () => {
 
 // Initialize with a welcome message
 logEvent('system', 'Status Components Playground initialized', {
-  availableComponents: componentTypeOptions.map((opt) => opt.value),
+  availableComponents: componentTypeOptions.map(opt => opt.value),
   version: '1.0.0',
-  features: ['error-simulation', 'stress-testing', 'event-logging', 'performance-metrics'],
+  features: ['error-simulation', 'stress-testing', 'event-logging', 'performance-metrics']
 })
 </script>
 

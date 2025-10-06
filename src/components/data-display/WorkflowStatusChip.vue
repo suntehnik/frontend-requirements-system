@@ -130,7 +130,7 @@ const statusTextMap: Record<WorkflowStatus, string> = {
 // Size configuration
 const sizeConfigMap: Record<string, SizeConfig> = {
   small: { chipSize: 'x-small', selectWidth: '120px' },
-  medium: { chipSize: 'small', selectWidth: '140px' },
+  medium: { chipSize: 'default', selectWidth: '140px' },
   large: { chipSize: 'large', selectWidth: '160px' },
 }
 

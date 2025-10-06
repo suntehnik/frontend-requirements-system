@@ -10,36 +10,14 @@
     />
 
     <!-- Priority Chip -->
-    <div class="position-relative">
-      <v-chip
-        v-if="!showPriorityDropdown"
-        :color="getPriorityColor(localPriority)"
-        variant="outlined"
-        size="large"
-        :loading="updating"
-        @click="togglePriorityDropdown"
-        class="toolbar-chip"
-        rounded="xl"
-      >
-        {{ getPriorityText(localPriority) }}
-      </v-chip>
-
-      <v-select
-        v-else
-        v-model="localPriority"
-        :items="priorityOptions"
-        item-title="text"
-        item-value="value"
-        variant="outlined"
-        density="compact"
-        hide-details
-        style="min-width: 140px"
-        :loading="updating"
-        @update:model-value="updatePriority"
-        @blur="hidePriorityDropdown"
-        ref="prioritySelectRef"
-      />
-    </div>
+    <PriorityChip
+      :priority="localPriority"
+      size="large"
+      variant="outlined"
+      :loading="updating"
+      @priority-change="updatePriority"
+      @error="handlePriorityError"
+    />
 
     <!-- Assignee Chip -->
     <div class="position-relative">
@@ -79,6 +57,7 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { epicService } from '@/services/epic-service'
 import { WorkflowStatusChip } from '@/components/data-display'
+import PriorityChip from '@/components/data-display/PriorityChip.vue'
 import type { Epic, User, EpicStatus, Priority, WorkflowStatus } from '@/types'
 
 interface Props {
@@ -100,20 +79,12 @@ const usersLoading = ref(false)
 const users = ref<User[]>([])
 
 // Dropdown visibility states
-const showPriorityDropdown = ref(false)
 const showAssigneeDropdown = ref(false)
 
 // Refs for select components
-const prioritySelectRef = ref()
 const assigneeSelectRef = ref()
 
-// Priority options
-const priorityOptions = [
-  { text: 'Критический', value: 1 },
-  { text: 'Высокий', value: 2 },
-  { text: 'Средний', value: 3 },
-  { text: 'Низкий', value: 4 },
-]
+
 
 // Assignee options
 const assigneeOptions = computed(() => [
@@ -160,12 +131,6 @@ const loadUsers = async () => {
 }
 
 // Dropdown toggle methods
-const togglePriorityDropdown = async () => {
-  showPriorityDropdown.value = true
-  await nextTick()
-  prioritySelectRef.value?.focus()
-}
-
 const toggleAssigneeDropdown = async () => {
   showAssigneeDropdown.value = true
   await nextTick()
@@ -173,10 +138,6 @@ const toggleAssigneeDropdown = async () => {
 }
 
 // Dropdown hide methods
-const hidePriorityDropdown = () => {
-  showPriorityDropdown.value = false
-}
-
 const hideAssigneeDropdown = () => {
   showAssigneeDropdown.value = false
 }
@@ -208,24 +169,29 @@ const handleStatusError = (error: Error) => {
   // The WorkflowStatusChip will handle the error display
 }
 
-const updatePriority = async (newPriority: number) => {
+// Handle priority change errors from PriorityChip
+const handlePriorityError = (error: Error) => {
+  console.error('Priority change error:', error)
+  // The PriorityChip will handle the error display
+}
+
+const updatePriority = async (newPriority: Priority) => {
   if (newPriority === props.epic.priority) {
-    hidePriorityDropdown()
     return
   }
 
   try {
     updating.value = true
     const updatedEpic = await epicService.update(props.epic.id, {
-      priority: newPriority as Priority,
+      priority: newPriority,
     })
+    localPriority.value = newPriority
     emit('updated', updatedEpic)
-    hidePriorityDropdown()
   } catch (error) {
     console.error('Failed to update priority:', error)
     // Revert local state on error
     localPriority.value = props.epic.priority
-    hidePriorityDropdown()
+    throw error // Re-throw to let PriorityChip handle the error display
   } finally {
     updating.value = false
   }
@@ -253,26 +219,6 @@ const updateAssignee = async (newAssigneeId: string | null) => {
 }
 
 // Utility functions for display
-const getPriorityColor = (priority: number) => {
-  const colors: Record<number, string> = {
-    1: 'red',
-    2: 'orange',
-    3: 'blue',
-    4: 'green',
-  }
-  return colors[priority] || 'grey'
-}
-
-const getPriorityText = (priority: number) => {
-  const texts: Record<number, string> = {
-    1: 'Критический',
-    2: 'Высокий',
-    3: 'Средний',
-    4: 'Низкий',
-  }
-  return texts[priority] || 'Неизвестно'
-}
-
 const getAssigneeText = () => {
   const assignee = users.value.find((u) => u.id === localAssigneeId.value)
   return assignee?.username || 'Не назначен'
