@@ -26,7 +26,7 @@
           </template>
 
           <v-list-item-title class="text-body-1 font-weight-medium mb-1">
-            {{ story.reference_id }}: {{ story.description }}
+            {{ story.reference_id }}: {{ story.title }}
           </v-list-item-title>
 
           <v-list-item-subtitle>
