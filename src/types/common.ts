@@ -81,3 +81,64 @@ export interface StatusChangeRequest {
 export interface AssignmentRequest {
   assignee_id?: string // null to unassign
 }
+
+// Data Table Types for components
+export interface DataTableOptions {
+  page: number
+  itemsPerPage: number
+  sortBy: { key: string; order: 'asc' | 'desc' }[]
+}
+
+export interface SortItem {
+  key: string
+  order: 'asc' | 'desc'
+}
+
+// Filter State Types
+export interface FilterState {
+  status?: string
+  priority?: Priority
+  epic_id?: string
+}
+
+// Component Props Types
+export interface BaseListComponentProps {
+  loading?: boolean
+  totalCount?: number
+  currentPage?: number
+  pageSize?: number
+}
+
+export interface BaseFormComponentProps {
+  loading?: boolean
+}
+
+// Component Emits Types
+export interface BaseListComponentEmits {
+  (e: 'create'): void
+  (e: 'filter-change', filters: FilterState): void
+  (e: 'options-change', options: DataTableOptions): void
+  (e: 'search-change', query: string): void
+  (e: 'clear-filters'): void
+}
+
+export interface BaseFormComponentEmits {
+  (e: 'cancel'): void
+}
+
+// Table and Filter Configuration Types
+export interface TableHeader {
+  title: string
+  key: string
+  sortable?: boolean
+  class?: string
+  width?: string | number
+}
+
+export interface FilterOption {
+  title: string
+  value: string | number
+}
+
+// Form Validation Types
+export type ValidationRule = (value: unknown) => boolean | string

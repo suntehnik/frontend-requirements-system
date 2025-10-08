@@ -26,6 +26,16 @@ import type {
   Priority,
 } from '@/types'
 
+// Import component interfaces
+import type { UserStoryFilterState } from '@/types/components'
+
+// TypeScript interfaces for user stories store state
+export interface UserStoriesStoreState {
+  pagination: PaginationState
+  filters: UserStoryFilterState
+  search: string
+}
+
 export const useEntitiesStore = defineStore('entities', () => {
   // State
   const epics = ref<Map<string, Epic>>(new Map())
@@ -43,6 +53,17 @@ export const useEntitiesStore = defineStore('entities', () => {
     pageSize: 25, // Default page size as specified in requirements
     totalCount: 0,
   })
+
+  const userStoriesPagination = ref<PaginationState>({
+    page: 1,
+    pageSize: 25, // Default page size as specified in requirements
+    totalCount: 0,
+  })
+
+  // Filter and search state for user stories
+  const userStoriesFilters = ref<UserStoryFilterState>({})
+
+  const userStoriesSearch = ref<string>('')
 
   // Computed
   const epicsList = computed(() => Array.from(epics.value.values()))
@@ -291,24 +312,74 @@ export const useEntitiesStore = defineStore('entities', () => {
     clearError(key)
 
     try {
-      const response = await userStoryService.list(params)
+      // Calculate offset from page number if not provided
+      const offset =
+        params?.offset ??
+        (userStoriesPagination.value.page - 1) * userStoriesPagination.value.pageSize
+      const limit = params?.limit ?? userStoriesPagination.value.pageSize
+
+      // Merge current filters and search with provided params
+      const requestParams: UserStoryListParams = {
+        ...params,
+        limit,
+        offset,
+        // Apply current filters if not overridden by params
+        status: params?.status ?? userStoriesFilters.value.status,
+        priority: params?.priority ?? userStoriesFilters.value.priority,
+        epic_id: params?.epic_id ?? userStoriesFilters.value.epic_id,
+      }
+
+      // Add search parameter if search is active
+      if (userStoriesSearch.value.trim()) {
+        requestParams.search = userStoriesSearch.value.trim()
+      }
+
+      const response = await userStoryService.list(requestParams)
 
       // Debug logging
       console.log('User stories response:', response)
 
-      // Check if response has the expected structure
-      if (response && Array.isArray(response.data)) {
+      // Check if response has the expected ListResponse structure
+      if (
+        response &&
+        typeof response === 'object' &&
+        'data' in response &&
+        Array.isArray(response.data)
+      ) {
+        // Clear existing user stories only for pagination (not accumulation)
+        userStories.value.clear()
+
         // Update the map with fetched user stories
         response.data.forEach((story) => {
           userStories.value.set(story.id, story)
         })
+
+        // Update pagination info from backend response
+        userStoriesPagination.value.totalCount = response.total_count || 0
+
+        // Update page size if provided in response
+        if (response.limit) {
+          userStoriesPagination.value.pageSize = response.limit
+        }
+
+        // Calculate and update current page from offset
+        if (response.offset !== undefined && response.limit && response.limit > 0) {
+          userStoriesPagination.value.page = Math.floor(response.offset / response.limit) + 1
+        }
       } else if (Array.isArray(response)) {
-        // Handle case where response is directly an array
+        // Handle case where response is directly an array (fallback for mock data)
+        userStories.value.clear()
         response.forEach((story) => {
           userStories.value.set(story.id, story)
         })
+        // For direct array response, set totalCount to show pagination
+        userStoriesPagination.value.totalCount = response.length
+        userStoriesPagination.value.page = 1
       } else {
         console.warn('Unexpected user stories response structure:', response)
+        // Handle unexpected response structure
+        userStories.value.clear()
+        userStoriesPagination.value.totalCount = 0
       }
 
       return response
@@ -348,6 +419,10 @@ export const useEntitiesStore = defineStore('entities', () => {
     try {
       const story = await userStoryService.create(request)
       userStories.value.set(story.id, story)
+
+      // Update total count after creation
+      userStoriesPagination.value.totalCount += 1
+
       return story
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to create user story'
@@ -384,6 +459,11 @@ export const useEntitiesStore = defineStore('entities', () => {
     try {
       await userStoryService.delete(id)
       userStories.value.delete(id)
+
+      // Update total count after deletion
+      if (userStoriesPagination.value.totalCount > 0) {
+        userStoriesPagination.value.totalCount -= 1
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete user story'
       setError(key, errorMessage)
@@ -391,6 +471,44 @@ export const useEntitiesStore = defineStore('entities', () => {
     } finally {
       setLoading(key, false)
     }
+  }
+
+  // Pagination actions for user stories
+  function setUserStoriesPage(page: number) {
+    userStoriesPagination.value.page = page
+  }
+
+  function setUserStoriesPageSize(pageSize: number) {
+    userStoriesPagination.value.pageSize = pageSize
+    userStoriesPagination.value.page = 1 // Reset to first page when changing page size
+  }
+
+  // Filter and search actions for user stories
+  function setUserStoriesFilters(filters: UserStoryFilterState) {
+    userStoriesFilters.value = { ...filters }
+    userStoriesPagination.value.page = 1 // Reset to first page when filters change
+  }
+
+  function clearUserStoriesFilters() {
+    userStoriesFilters.value = {}
+    userStoriesPagination.value.page = 1 // Reset to first page when clearing filters
+  }
+
+  function setUserStoriesSearch(search: string) {
+    userStoriesSearch.value = search
+    userStoriesPagination.value.page = 1 // Reset to first page when search changes
+  }
+
+  function clearUserStoriesSearch() {
+    userStoriesSearch.value = ''
+    userStoriesPagination.value.page = 1 // Reset to first page when clearing search
+  }
+
+  // Combined filter and search reset
+  function resetUserStoriesFiltersAndSearch() {
+    userStoriesFilters.value = {}
+    userStoriesSearch.value = ''
+    userStoriesPagination.value.page = 1
   }
 
   // Requirement actions
@@ -716,6 +834,9 @@ export const useEntitiesStore = defineStore('entities', () => {
     loading,
     errors,
     epicsPagination,
+    userStoriesPagination,
+    userStoriesFilters,
+    userStoriesSearch,
 
     // Computed
     epicsList,
@@ -740,6 +861,13 @@ export const useEntitiesStore = defineStore('entities', () => {
     createUserStory,
     updateUserStory,
     deleteUserStory,
+    setUserStoriesPage,
+    setUserStoriesPageSize,
+    setUserStoriesFilters,
+    clearUserStoriesFilters,
+    setUserStoriesSearch,
+    clearUserStoriesSearch,
+    resetUserStoriesFiltersAndSearch,
 
     // Requirement actions
     fetchRequirements,

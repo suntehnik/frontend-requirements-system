@@ -51,6 +51,7 @@ export interface UserStoryListParams {
   assignee_id?: string
   status?: UserStoryStatus
   priority?: Priority
+  search?: string
   order_by?: string
   limit?: number
   offset?: number
