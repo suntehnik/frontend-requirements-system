@@ -41,7 +41,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Priority } from '@/types'
-import { getAllPriorityOptions, getPriorityLabel, getPriorityColor, type PriorityOption } from '@/utils/priority-utils'
+import {
+  getAllPriorityOptions,
+  getPriorityLabel,
+  getPriorityColor,
+  type PriorityOption,
+} from '@/utils/priority-utils'
 
 interface Props {
   modelValue?: Priority | null

@@ -3,26 +3,61 @@
     <!-- Filters -->
     <v-row>
       <v-col cols="12" md="3">
-        <v-select v-model="filters.status" :items="statusOptions" label="Статус" variant="outlined" density="compact"
-          clearable @update:model-value="applyFilters" />
+        <v-select
+          v-model="filters.status"
+          :items="statusOptions"
+          label="Статус"
+          variant="outlined"
+          density="compact"
+          clearable
+          @update:model-value="applyFilters"
+        />
       </v-col>
       <v-col cols="12" md="3">
-        <v-select v-model="filters.priority" :items="priorityOptions" label="Приоритет" variant="outlined"
-          density="compact" clearable @update:model-value="applyFilters" />
+        <v-select
+          v-model="filters.priority"
+          :items="priorityOptions"
+          label="Приоритет"
+          variant="outlined"
+          density="compact"
+          clearable
+          @update:model-value="applyFilters"
+        />
       </v-col>
       <v-col cols="12" md="6">
-        <v-text-field v-model="search" append-icon="mdi-magnify" label="Поиск эпиков" single-line hide-details
-          variant="outlined" density="compact" clearable @update:model-value="handleSearchChange" />
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Поиск эпиков"
+          single-line
+          hide-details
+          variant="outlined"
+          density="compact"
+          clearable
+          @update:model-value="handleSearchChange"
+        />
       </v-col>
     </v-row>
 
     <v-row>
       <v-col cols="12">
         <v-card>
-          <v-data-table-server :headers="headers" :items="props.epics" :loading="loading" class="elevation-1"
-            :items-per-page="pageSize" :items-per-page-options="pageSizeOptions" :page="currentPage" :sort-by="sortBy"
-            @update:options="handleOptionsChange" @click:row="handleRowClick" :items-length="totalCount"
-            :multi-sort="false" :must-sort="false" :hide-default-footer="!shouldShowPagination">
+          <v-data-table-server
+            :headers="headers"
+            :items="props.epics"
+            :loading="loading"
+            class="elevation-1"
+            :items-per-page="pageSize"
+            :items-per-page-options="pageSizeOptions"
+            :page="currentPage"
+            :sort-by="sortBy"
+            @update:options="handleOptionsChange"
+            @click:row="handleRowClick"
+            :items-length="totalCount"
+            :multi-sort="false"
+            :must-sort="false"
+            :hide-default-footer="!shouldShowPagination"
+          >
             <!-- Table content templates -->
             <template v-slot:[`item.status`]="{ item }">
               <WorkflowStatusChip :status="item.status" size="medium" readonly />
@@ -42,8 +77,14 @@
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
-              <v-btn icon="mdi-delete" size="small" variant="text" color="error"
-                @click="handleDeleteClick($event, item)" title="Удалить" />
+              <v-btn
+                icon="mdi-delete"
+                size="small"
+                variant="text"
+                color="error"
+                @click="handleDeleteClick($event, item)"
+                title="Удалить"
+              />
             </template>
 
             <template v-slot:no-data>
@@ -55,8 +96,12 @@
                   <p class="text-body-2 text-grey mb-4">
                     По вашим критериям поиска ничего не найдено.
                   </p>
-                  <v-btn variant="outlined" color="primary" @click="clearFiltersAndSearch"
-                    prepend-icon="mdi-filter-off">
+                  <v-btn
+                    variant="outlined"
+                    color="primary"
+                    @click="clearFiltersAndSearch"
+                    prepend-icon="mdi-filter-off"
+                  >
                     Очистить фильтры
                   </v-btn>
                 </div>
@@ -69,8 +114,13 @@
                     Создайте первый эпик, чтобы начать планирование проекта. Эпики помогают
                     организовать пользовательские истории по функциональным областям.
                   </p>
-                  <v-btn variant="elevated" color="primary" size="large" @click="handleCreateEpic"
-                    prepend-icon="mdi-plus">
+                  <v-btn
+                    variant="elevated"
+                    color="primary"
+                    size="large"
+                    @click="handleCreateEpic"
+                    prepend-icon="mdi-plus"
+                  >
                     Создать первый эпик
                   </v-btn>
                 </div>

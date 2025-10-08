@@ -19,7 +19,8 @@
           </v-card-title>
           <v-card-text>
             <p class="text-body-1 mb-3">
-              Interactive testing environment for all status chip components including workflow, lifecycle, binary, and review status chips.
+              Interactive testing environment for all status chip components including workflow,
+              lifecycle, binary, and review status chips.
             </p>
             <v-chip-group>
               <v-chip size="small" color="primary" variant="outlined">WorkflowStatusChip</v-chip>
@@ -51,7 +52,8 @@
           </v-card-title>
           <v-card-text>
             <p class="text-body-1 mb-3">
-              Dedicated testing environment for the Priority Chip component with all priority levels, sizes, and states.
+              Dedicated testing environment for the Priority Chip component with all priority
+              levels, sizes, and states.
             </p>
             <v-chip-group>
               <v-chip size="small" color="red" variant="outlined">Критический</v-chip>
@@ -83,7 +85,8 @@
           </v-card-title>
           <v-card-text>
             <p class="text-body-1 mb-3">
-              Demonstration of various form components including inputs, selects, checkboxes, and validation examples.
+              Demonstration of various form components including inputs, selects, checkboxes, and
+              validation examples.
             </p>
             <v-chip-group>
               <v-chip size="small" color="green" variant="outlined">Text Inputs</v-chip>
@@ -92,12 +95,7 @@
             </v-chip-group>
           </v-card-text>
           <v-card-actions>
-            <v-btn
-              color="green"
-              variant="elevated"
-              :to="{ name: 'forms-demo' }"
-              block
-            >
+            <v-btn color="green" variant="elevated" :to="{ name: 'forms-demo' }" block>
               Open Form Components Demo
               <v-icon class="ml-2">mdi-arrow-right</v-icon>
             </v-btn>
@@ -114,7 +112,8 @@
           </v-card-title>
           <v-card-text>
             <p class="text-body-1 mb-3">
-              Interactive markdown viewer and editor with syntax highlighting, live preview, and various markdown features.
+              Interactive markdown viewer and editor with syntax highlighting, live preview, and
+              various markdown features.
             </p>
             <v-chip-group>
               <v-chip size="small" color="purple" variant="outlined">Live Preview</v-chip>
@@ -123,12 +122,7 @@
             </v-chip-group>
           </v-card-text>
           <v-card-actions>
-            <v-btn
-              color="purple"
-              variant="elevated"
-              :to="{ name: 'markdown-viewer-demo' }"
-              block
-            >
+            <v-btn color="purple" variant="elevated" :to="{ name: 'markdown-viewer-demo' }" block>
               Open Markdown Viewer Demo
               <v-icon class="ml-2">mdi-arrow-right</v-icon>
             </v-btn>
@@ -145,7 +139,8 @@
           </v-card-title>
           <v-card-text>
             <p class="text-body-1 mb-3">
-              These demo pages are designed for development and testing purposes. They provide interactive environments to test components and features.
+              These demo pages are designed for development and testing purposes. They provide
+              interactive environments to test components and features.
             </p>
             <v-list density="compact">
               <v-list-item>

@@ -108,8 +108,8 @@ describe('BinaryStatusChip', () => {
 
     it('accepts all valid binary status values', () => {
       const validStatuses: BinaryStatus[] = ['Active', 'Inactive']
-      
-      validStatuses.forEach(status => {
+
+      validStatuses.forEach((status) => {
         const wrapper = createWrapper({ status })
         expect(wrapper.props('status')).toBe(status)
       })
@@ -117,8 +117,8 @@ describe('BinaryStatusChip', () => {
 
     it('accepts all valid size values', () => {
       const validSizes = ['small', 'medium', 'large']
-      
-      validSizes.forEach(size => {
+
+      validSizes.forEach((size) => {
         const wrapper = createWrapper({ size })
         expect(wrapper.props('size')).toBe(size)
       })
@@ -273,10 +273,7 @@ describe('BinaryStatusChip', () => {
       const vm = wrapper.vm as any
 
       expect(vm.binaryStatusOptions).toHaveLength(2)
-      expect(vm.binaryStatusOptions.map((item: any) => item.value)).toEqual([
-        'Active',
-        'Inactive',
-      ])
+      expect(vm.binaryStatusOptions.map((item: any) => item.value)).toEqual(['Active', 'Inactive'])
       expect(vm.binaryStatusOptions.map((item: any) => item.text)).toEqual([
         'Активный',
         'Неактивный',
