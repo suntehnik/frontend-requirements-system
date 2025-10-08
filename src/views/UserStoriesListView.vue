@@ -1,464 +1,300 @@
 <template>
-  <div>
-    <v-row>
-      <v-col cols="12">
-        <div class="d-flex justify-space-between align-center mb-4">
-          <h1 class="text-h4">Пользовательские истории</h1>
-          <v-btn
-            color="primary"
-            prepend-icon="mdi-plus"
-            @click="createUserStory"
-            :disabled="loading"
-          >
-            Создать историю
-          </v-btn>
-        </div>
-      </v-col>
-    </v-row>
+  <div class="user-stories-list-view">
+    <!-- User Story List Component -->
+    <UserStoryList
+      :user-stories="userStories"
+      :loading="isLoading"
+      :total-count="totalCount"
+      :current-page="currentPage"
+      :page-size="pageSize"
+      :epics="epics"
+      @create="handleCreateUserStory"
+      @delete="handleDeleteUserStory"
+      @filter-change="handleFilterChange"
+      @options-change="handleOptionsChange"
+      @search-change="handleSearchChange"
+      @clear-filters="handleClearFilters"
+    />
 
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title>
-            <v-row>
-              <v-col cols="12" md="4">
-                <v-text-field
-                  v-model="search"
-                  append-icon="mdi-magnify"
-                  label="Поиск историй"
-                  single-line
-                  hide-details
-                  variant="outlined"
-                  density="compact"
-                  @input="debouncedSearch"
-                />
-              </v-col>
-              <v-col cols="12" md="3">
-                <v-select
-                  v-model="selectedEpic"
-                  :items="epicOptions"
-                  :loading="epicsLoading"
-                  label="Фильтр по эпику"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                  @update:model-value="applyFilters"
-                />
-              </v-col>
-              <v-col cols="12" md="2">
-                <v-select
-                  v-model="selectedStatus"
-                  :items="statusOptions"
-                  label="Статус"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                  @update:model-value="applyFilters"
-                />
-              </v-col>
-              <v-col cols="12" md="2">
-                <v-select
-                  v-model="selectedPriority"
-                  :items="priorityOptions"
-                  label="Приоритет"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                  @update:model-value="applyFilters"
-                />
-              </v-col>
-              <v-col cols="12" md="1">
-                <v-btn
-                  icon="mdi-refresh"
-                  variant="text"
-                  @click="refreshData"
-                  :loading="loading"
-                  title="Обновить"
-                />
-              </v-col>
-            </v-row>
-          </v-card-title>
+    <!-- Create User Story Modal -->
+    <v-dialog v-model="showUserStoryDialog" max-width="800px" persistent scrollable>
+      <UserStoryForm
+        :loading="formLoading"
+        @submit="handleUserStorySubmit"
+        @cancel="handleUserStoryCancel"
+      />
+    </v-dialog>
 
-          <!-- Loading State -->
-          <div v-if="loading" class="text-center py-8">
-            <v-progress-circular indeterminate size="64" color="primary" />
-            <div class="mt-4">Загрузка пользовательских историй...</div>
-          </div>
-
-          <!-- Error State -->
-          <v-alert v-else-if="error" type="error" class="ma-4">
-            {{ error }}
-            <template v-slot:append>
-              <v-btn @click="loadUserStories" variant="text" size="small">Повторить</v-btn>
-            </template>
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="showDeleteDialog" max-width="500px">
+      <v-card>
+        <v-card-title class="text-h5"> Подтверждение удаления </v-card-title>
+        <v-card-text>
+          <p>Вы уверены, что хотите удалить пользовательскую историю?</p>
+          <v-alert v-if="userStoryToDelete" type="warning" variant="tonal" class="mt-4">
+            <strong>{{ userStoryToDelete.reference_id }}: {{ userStoryToDelete.title }}</strong>
           </v-alert>
-
-          <!-- Data Table -->
-          <v-data-table
-            v-else
-            :headers="headers"
-            :items="userStories"
-            :items-length="totalCount"
-            :loading="loading"
-            :items-per-page="itemsPerPage"
-            :page="currentPage"
-            @update:page="handlePageChange"
-            @update:items-per-page="handleItemsPerPageChange"
-            @update:sort-by="handleSortChange"
-            class="elevation-1"
+          <p class="mt-4 text-body-2 text-grey">
+            Это действие нельзя отменить. Все связанные критерии приемки и требования также будут
+            удалены.
+          </p>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="grey-darken-1"
+            variant="text"
+            @click="handleDeleteCancel"
+            :disabled="deleteLoading"
           >
-            <template v-slot:[`item.epic`]="{ item }">
-              <router-link
-                v-if="item.epic"
-                :to="`/epics/${item.epic_id}`"
-                class="text-decoration-none"
-              >
-                {{ item.epic.reference_id }}: {{ item.epic.title }}
-              </router-link>
-              <span v-else class="text-grey">Эпик не указан</span>
-            </template>
+            Отмена
+          </v-btn>
+          <v-btn
+            color="error"
+            variant="elevated"
+            @click="handleDeleteConfirm"
+            :loading="deleteLoading"
+          >
+            Удалить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-            <template v-slot:[`item.status`]="{ item }">
-              <v-chip :color="getStatusColor(item.status)" size="small">
-                {{ item.status }}
-              </v-chip>
-            </template>
+    <!-- Success Snackbar -->
+    <v-snackbar v-model="showSuccessMessage" color="success" timeout="4000" location="top">
+      {{ successMessage }}
+      <template v-slot:actions>
+        <v-btn color="white" variant="text" @click="showSuccessMessage = false"> Закрыть </v-btn>
+      </template>
+    </v-snackbar>
 
-            <template v-slot:[`item.priority`]="{ item }">
-              <v-chip :color="getPriorityColor(item.priority)" size="small">
-                {{ getPriorityText(item.priority) }}
-              </v-chip>
-            </template>
-
-            <template v-slot:[`item.assignee`]="{ item }">
-              <span v-if="item.assignee">{{ item.assignee.username }}</span>
-              <span v-else class="text-grey">Не назначен</span>
-            </template>
-
-            <template v-slot:[`item.created_at`]="{ item }">
-              {{ formatDate(item.created_at) }}
-            </template>
-
-            <template v-slot:[`item.actions`]="{ item }">
-              <v-btn
-                icon="mdi-eye"
-                size="small"
-                variant="text"
-                :to="`/user-stories/${item.id}`"
-                title="Просмотр"
-              />
-              <v-btn
-                icon="mdi-pencil"
-                size="small"
-                variant="text"
-                @click="editUserStory(item.id)"
-                title="Редактировать"
-              />
-              <v-btn
-                icon="mdi-delete"
-                size="small"
-                variant="text"
-                color="error"
-                @click="deleteUserStory(item)"
-                title="Удалить"
-              />
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-col>
-    </v-row>
+    <!-- Error Snackbar -->
+    <v-snackbar v-model="showErrorMessage" color="error" timeout="6000" location="top">
+      {{ errorMessage }}
+      <template v-slot:actions>
+        <v-btn color="white" variant="text" @click="showErrorMessage = false"> Закрыть </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { userStoryService } from '@/services/user-story-service'
-import { epicService } from '@/services/epic-service'
-import type { UserStory, Epic, UserStoryListParams, UserStoryStatus, Priority } from '@/types'
+import { ref, computed, onMounted } from 'vue'
+import { useEntitiesStore } from '@/stores/entities'
+import { UserStoryList } from '@/components/data-display'
+import { UserStoryForm } from '@/components/forms'
+import type {
+  UserStory,
+  CreateUserStoryRequest,
+  UserStoryListParams,
+  DataTableOptions,
+  UserStoryFilterState,
+} from '@/types'
 
-const router = useRouter()
+const entitiesStore = useEntitiesStore()
 
-// Reactive state
-const userStories = ref<UserStory[]>([])
-const epics = ref<Epic[]>([])
-const loading = ref(true)
-const epicsLoading = ref(false)
-const error = ref<string | null>(null)
+// State
+const showUserStoryDialog = ref(false)
+const showDeleteDialog = ref(false)
+const userStoryToDelete = ref<UserStory | undefined>()
+const formLoading = ref(false)
+const deleteLoading = ref(false)
 
-// Filters and search
-const search = ref('')
-const selectedEpic = ref<string>('')
-const selectedStatus = ref<string>('')
-const selectedPriority = ref<number | ''>('')
-
-// Pagination
-const currentPage = ref(1)
-const itemsPerPage = ref(25)
-const totalCount = ref(0)
-
-// Sorting
-const sortBy = ref<string>('updated_at')
-const sortOrder = ref<'asc' | 'desc'>('desc')
-
-// Table headers
-const headers = [
-  { title: 'ID', key: 'reference_id', sortable: true },
-  { title: 'Название', key: 'title', sortable: true },
-  { title: 'Эпик', key: 'epic', sortable: false },
-  { title: 'Статус', key: 'status', sortable: true },
-  { title: 'Приоритет', key: 'priority', sortable: true },
-  { title: 'Ответственный', key: 'assignee', sortable: false },
-  { title: 'Создана', key: 'created_at', sortable: true },
-  { title: 'Действия', key: 'actions', sortable: false },
-]
-
-// Filter options
-const statusOptions = [
-  { title: 'Backlog', value: 'Backlog' },
-  { title: 'Draft', value: 'Draft' },
-  { title: 'In Progress', value: 'In Progress' },
-  { title: 'Done', value: 'Done' },
-  { title: 'Cancelled', value: 'Cancelled' },
-]
-
-const priorityOptions = [
-  { title: 'Критический', value: 1 },
-  { title: 'Высокий', value: 2 },
-  { title: 'Средний', value: 3 },
-  { title: 'Низкий', value: 4 },
-]
-
-// Computed
-const epicOptions = computed(() => {
-  return epics.value.map((epic) => ({
-    title: `${epic.reference_id}: ${epic.title}`,
-    value: epic.id,
-  }))
+// Filter, search, and sort state
+const currentFilters = ref<UserStoryFilterState>({})
+const currentSearch = ref('')
+const currentSort = ref<{ key: string; order: 'asc' | 'desc' }>({
+  key: 'created_at',
+  order: 'desc',
 })
+
+// Success/Error messages
+const showSuccessMessage = ref(false)
+const showErrorMessage = ref(false)
+const successMessage = ref('')
+const errorMessage = ref('')
+
+// Computed properties
+const isLoading = computed(() => entitiesStore.loading['user-stories'] || false)
+const userStories = computed(() => entitiesStore.userStoriesList)
+const totalCount = computed(() => entitiesStore.userStoriesPagination.totalCount)
+const currentPage = computed(() => entitiesStore.userStoriesPagination.page)
+const pageSize = computed(() => entitiesStore.userStoriesPagination.pageSize)
+const epics = computed(() => entitiesStore.epicsList)
 
 // Methods
 const loadUserStories = async () => {
   try {
-    loading.value = true
-    error.value = null
-
-    // Start with no parameters to test basic API
-    let params: UserStoryListParams | undefined = undefined
-
-    // If no filters are applied, try without any parameters
-    if (!selectedEpic.value && !selectedStatus.value && !selectedPriority.value) {
-      console.log('Trying API call without parameters first')
-      params = undefined
-    } else {
-      // Only add parameters if filters are applied
-      params = {}
-      if (selectedEpic.value) {
-        params.epic_id = selectedEpic.value
-      }
-      if (selectedStatus.value) {
-        params.status = selectedStatus.value as UserStoryStatus
-      }
-      if (selectedPriority.value) {
-        params.priority = selectedPriority.value as Priority
-      }
+    const params: UserStoryListParams = {
+      include: 'epic,creator,assignee',
+      order_by: `${currentSort.value.key} ${currentSort.value.order}`,
     }
 
-    console.log('Loading user stories with params:', params)
-    const response = await userStoryService.list(params)
-    console.log('Raw API response:', response)
-
-    // Handle different response formats
-    if (response && response.data && Array.isArray(response.data)) {
-      // Standard format: {data: Array, total_count: number}
-      userStories.value = response.data
-      totalCount.value = response.total_count || response.data.length
-      console.log(
-        'Loaded user stories (standard format):',
-        response.data.length,
-        'total:',
-        totalCount.value,
-      )
-    } else if (
-      response &&
-      'user_stories' in response &&
-      Array.isArray((response as { user_stories: UserStory[] }).user_stories)
-    ) {
-      // Alternative format: {user_stories: Array, count: number}
-      const altResponse = response as { user_stories: UserStory[]; count?: number }
-      userStories.value = altResponse.user_stories
-      totalCount.value = altResponse.count || altResponse.user_stories.length
-      console.log(
-        'Loaded user stories (alternative format):',
-        altResponse.user_stories.length,
-        'total:',
-        totalCount.value,
-      )
-    } else if (Array.isArray(response)) {
-      // Direct array response
-      userStories.value = response
-      totalCount.value = response.length
-      console.log('Loaded user stories (direct array):', response.length)
-    } else {
-      console.warn('Unexpected response format:', response)
-      userStories.value = []
-      totalCount.value = 0
+    // Add filters if they exist
+    if (currentFilters.value.status) {
+      params.status = currentFilters.value.status
     }
-  } catch (err) {
-    console.error('Failed to load user stories:', err)
-    error.value =
-      err instanceof Error ? err.message : 'Не удалось загрузить пользовательские истории'
-  } finally {
-    loading.value = false
+    if (currentFilters.value.priority) {
+      params.priority = currentFilters.value.priority
+    }
+    if (currentFilters.value.epic_id) {
+      params.epic_id = currentFilters.value.epic_id
+    }
+    if (currentSearch.value) {
+      params.search = currentSearch.value
+    }
+
+    await entitiesStore.fetchUserStories(params)
+  } catch (error) {
+    console.error('Failed to load user stories:', error)
+    showError('Не удалось загрузить список пользовательских историй')
   }
 }
 
 const loadEpics = async () => {
   try {
-    epicsLoading.value = true
-
-    // Try without parameters first
-    const params = undefined
-
-    console.log('Loading epics with params:', params)
-    const response = await epicService.list(params)
-    console.log('Raw epics response:', response)
-
-    // Handle different response formats
-    if (response && response.data && Array.isArray(response.data)) {
-      epics.value = response.data
-      console.log('Loaded epics:', response.data.length)
-    } else if (Array.isArray(response)) {
-      // Direct array response
-      epics.value = response
-      console.log('Loaded epics (direct array):', response.length)
-    } else {
-      console.warn('Unexpected epics response format:', response)
-      epics.value = []
+    // Load epics if not already loaded or if the list is empty
+    if (entitiesStore.epicsList.length === 0) {
+      await entitiesStore.fetchEpics({ limit: 100, order_by: 'title' })
     }
-  } catch (err) {
-    console.error('Failed to load epics:', err)
+  } catch (error) {
+    console.error('Failed to load epics:', error)
     // Don't show error for epics, just keep empty array
-    epics.value = []
+  }
+}
+
+const handleUserStorySubmit = async (data: CreateUserStoryRequest) => {
+  formLoading.value = true
+
+  try {
+    await entitiesStore.createUserStory(data)
+    showSuccess('Пользовательская история успешно создана')
+    showUserStoryDialog.value = false
+
+    // Refresh the list to show the new user story
+    await loadUserStories()
+  } catch (error) {
+    console.error('Failed to create user story:', error)
+    showError('Не удалось создать пользовательскую историю')
   } finally {
-    epicsLoading.value = false
+    formLoading.value = false
   }
 }
 
-const refreshData = async () => {
-  await Promise.all([loadUserStories(), loadEpics()])
+const handleUserStoryCancel = () => {
+  showUserStoryDialog.value = false
 }
 
-const applyFilters = () => {
-  currentPage.value = 1
-  loadUserStories()
+const handleDeleteUserStory = (userStory: UserStory) => {
+  userStoryToDelete.value = userStory
+  showDeleteDialog.value = true
 }
 
-// Debounced search
-let searchTimeout: NodeJS.Timeout
-const debouncedSearch = () => {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    applyFilters()
-  }, 500)
-}
+const handleDeleteConfirm = async () => {
+  if (!userStoryToDelete.value) return
 
-// Pagination handlers
-const handlePageChange = (page: number) => {
-  currentPage.value = page
-  loadUserStories()
-}
+  deleteLoading.value = true
 
-const handleItemsPerPageChange = (items: number) => {
-  itemsPerPage.value = items
-  currentPage.value = 1
-  loadUserStories()
-}
+  try {
+    await entitiesStore.deleteUserStory(userStoryToDelete.value.id)
+    showSuccess('Пользовательская история успешно удалена')
+    showDeleteDialog.value = false
+    userStoryToDelete.value = undefined
 
-const handleSortChange = (sortItems: { key: string; order: 'asc' | 'desc' }[]) => {
-  if (sortItems.length > 0) {
-    const sortItem = sortItems[0]
-    sortBy.value = sortItem.key
-    sortOrder.value = sortItem.order
-    loadUserStories()
+    // Refresh the list to reflect the deletion
+    await loadUserStories()
+  } catch (error) {
+    console.error('Failed to delete user story:', error)
+    showError('Не удалось удалить пользовательскую историю')
+  } finally {
+    deleteLoading.value = false
   }
 }
 
-// Actions
-const createUserStory = () => {
-  router.push('/user-stories/new')
+const handleDeleteCancel = () => {
+  showDeleteDialog.value = false
+  userStoryToDelete.value = undefined
 }
 
-const editUserStory = (id: string) => {
-  router.push(`/user-stories/${id}/edit`)
+const handleFilterChange = (filters: UserStoryFilterState) => {
+  currentFilters.value = { ...filters }
+  // Reset to first page when filters change
+  entitiesStore.setUserStoriesPage(1)
+  loadUserStories()
 }
 
-const deleteUserStory = async (userStory: UserStory) => {
-  if (
-    confirm(
-      `Вы уверены, что хотите удалить историю "${userStory.reference_id}: ${userStory.title}"?`,
-    )
-  ) {
-    try {
-      await userStoryService.delete(userStory.id)
-      await loadUserStories()
-    } catch (err) {
-      console.error('Failed to delete user story:', err)
-      alert('Не удалось удалить пользовательскую историю')
-    }
+const handleOptionsChange = (options: DataTableOptions) => {
+  // Handle sorting changes
+  if (options.sortBy.length > 0) {
+    currentSort.value = { ...options.sortBy[0] }
+  } else {
+    currentSort.value = { key: 'created_at', order: 'desc' }
   }
+
+  // Handle page changes
+  entitiesStore.setUserStoriesPage(options.page)
+
+  // Handle page size changes
+  if (options.itemsPerPage !== pageSize.value) {
+    entitiesStore.setUserStoriesPageSize(options.itemsPerPage)
+  }
+
+  // Reload data with new options
+  loadUserStories()
+}
+
+const handleSearchChange = (query: string) => {
+  currentSearch.value = query
+  // Reset to first page when search changes
+  entitiesStore.setUserStoriesPage(1)
+  loadUserStories()
+}
+
+const handleCreateUserStory = () => {
+  showUserStoryDialog.value = true
+}
+
+const handleClearFilters = () => {
+  currentFilters.value = {}
+  currentSearch.value = ''
+  // Reset to first page when clearing filters
+  entitiesStore.setUserStoriesPage(1)
+  loadUserStories()
 }
 
 // Utility functions
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('ru-RU', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
+const showSuccess = (message: string) => {
+  successMessage.value = message
+  showSuccessMessage.value = true
 }
 
-const getStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    Backlog: 'grey',
-    Draft: 'orange',
-    'In Progress': 'blue',
-    Done: 'green',
-    Cancelled: 'red',
-  }
-  return colors[status] || 'grey'
-}
-
-const getPriorityColor = (priority: number) => {
-  const colors: Record<number, string> = {
-    1: 'red',
-    2: 'orange',
-    3: 'yellow',
-    4: 'green',
-  }
-  return colors[priority] || 'grey'
-}
-
-const getPriorityText = (priority: number) => {
-  const texts: Record<number, string> = {
-    1: 'Критический',
-    2: 'Высокий',
-    3: 'Средний',
-    4: 'Низкий',
-  }
-  return texts[priority] || 'Неизвестно'
+const showError = (message: string) => {
+  errorMessage.value = message
+  showErrorMessage.value = true
 }
 
 // Lifecycle
-onMounted(() => {
-  refreshData()
-})
-
-// Watch for search changes
-watch(search, () => {
-  debouncedSearch()
+onMounted(async () => {
+  // Load both epics and user stories
+  await Promise.all([loadEpics(), loadUserStories()])
 })
 </script>
+
+<style scoped>
+.user-stories-list-view {
+  padding: 24px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* Ensure proper spacing and layout matching wireframe design */
+.page-header h1 {
+  color: rgba(0, 0, 0, 0.87);
+  line-height: 1.2;
+}
+</style>

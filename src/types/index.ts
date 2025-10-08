@@ -33,3 +33,6 @@ export type * from './status'
 
 // Utility types and functions
 export * from './utils'
+
+// Component types
+export type * from './components'

@@ -7,3 +7,14 @@ export { default as MarkdownEditor } from './MarkdownEditor.vue'
 export { default as PrioritySelector } from './PrioritySelector.vue'
 export { default as StatusSelector } from './StatusSelector.vue'
 export { default as UserSelector } from './UserSelector.vue'
+export { default as UserStoryForm } from './UserStoryForm.vue'
+
+// Form component TypeScript interfaces re-exports
+export type {
+  UserStoryFormProps,
+  UserStoryFormEmits,
+  EpicFormProps,
+  EpicFormEmits,
+  BaseFormProps,
+  FormValidationRules,
+} from '@/types/components'

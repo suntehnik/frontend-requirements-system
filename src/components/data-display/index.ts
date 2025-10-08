@@ -4,6 +4,7 @@ export { default as EpicToolbar } from './EpicToolbar.vue'
 export { default as EpicDescription } from './EpicDescription.vue'
 export { default as MarkdownViewer } from './MarkdownViewer.vue'
 export { default as UserStoriesPanel } from './UserStoriesPanel.vue'
+export { default as UserStoryList } from './UserStoryList.vue'
 
 // Status components exports
 export { default as WorkflowStatusChip } from './WorkflowStatusChip.vue'
@@ -37,3 +38,14 @@ export type {
   SizeConfig,
   SizeConfigMapping,
 } from '@/types/status'
+
+// Component-specific TypeScript interfaces re-exports
+export type {
+  UserStoryListProps,
+  UserStoryListEmits,
+  UserStoryFilterState,
+  EpicListProps,
+  EpicListEmits,
+  EpicFilterState,
+  BaseListProps,
+} from '@/types/components'
