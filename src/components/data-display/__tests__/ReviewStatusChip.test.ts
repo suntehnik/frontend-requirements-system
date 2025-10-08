@@ -107,9 +107,14 @@ describe('ReviewStatusChip', () => {
     })
 
     it('accepts all valid review status values', () => {
-      const validStatuses: ReviewStatus[] = ['Under Review', 'Approved', 'Rejected', 'Needs Changes']
-      
-      validStatuses.forEach(status => {
+      const validStatuses: ReviewStatus[] = [
+        'Under Review',
+        'Approved',
+        'Rejected',
+        'Needs Changes',
+      ]
+
+      validStatuses.forEach((status) => {
         const wrapper = createWrapper({ status })
         expect(wrapper.props('status')).toBe(status)
       })
@@ -117,8 +122,8 @@ describe('ReviewStatusChip', () => {
 
     it('accepts all valid size values', () => {
       const validSizes = ['small', 'medium', 'large']
-      
-      validSizes.forEach(size => {
+
+      validSizes.forEach((size) => {
         const wrapper = createWrapper({ size })
         expect(wrapper.props('size')).toBe(size)
       })

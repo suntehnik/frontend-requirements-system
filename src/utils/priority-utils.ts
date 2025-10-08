@@ -18,7 +18,7 @@ export interface PriorityOption {
 export const getPriorityColor = (priority: Priority): string => {
   const colors: Record<Priority, string> = {
     1: 'red',
-    2: 'orange', 
+    2: 'orange',
     3: 'blue',
     4: 'green',
   }
@@ -74,5 +74,5 @@ export const getPriorityOption = (priority: Priority): PriorityOption => {
  * @returns Array of all priority options (1-4)
  */
 export const getAllPriorityOptions = (): PriorityOption[] => {
-  return [1, 2, 3, 4].map(p => getPriorityOption(p as Priority))
+  return [1, 2, 3, 4].map((p) => getPriorityOption(p as Priority))
 }

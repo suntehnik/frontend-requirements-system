@@ -27,6 +27,7 @@ export class UserStoryService extends BaseApiService {
           assignee_id: params.assignee_id,
           status: params.status,
           priority: params.priority,
+          search: params.search,
           order_by: params.order_by,
           limit: params.limit,
           offset: params.offset,

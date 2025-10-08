@@ -1,14 +1,11 @@
 <template>
   <div class="priority-chip-wrapper">
     <!-- Screen reader description -->
-    <div 
-      v-if="!readonly"
-      :id="`priority-chip-${priority}-description`" 
-      class="sr-only"
-    >
-      {{ getPriorityDescription(priority) }}. Используйте Enter или пробел для открытия списка приоритетов.
+    <div v-if="!readonly" :id="`priority-chip-${priority}-description`" class="sr-only">
+      {{ getPriorityDescription(priority) }}. Используйте Enter или пробел для открытия списка
+      приоритетов.
     </div>
-    
+
     <!-- Display Mode -->
     <v-chip
       v-if="!showDropdown"
@@ -66,11 +63,7 @@
 import { computed, ref, nextTick, watch, type ComponentPublicInstance } from 'vue'
 import type { Priority } from '@/types'
 import type { PriorityChipProps, PriorityChipEmits } from '@/types/status'
-import { 
-  getPriorityColor, 
-  getPriorityLabel, 
-  getPriorityDescription
-} from '@/utils/priority-utils'
+import { getPriorityColor, getPriorityLabel, getPriorityDescription } from '@/utils/priority-utils'
 
 // Define props with defaults
 const props = withDefaults(defineProps<PriorityChipProps>(), {
@@ -78,7 +71,7 @@ const props = withDefaults(defineProps<PriorityChipProps>(), {
   readonly: false,
   loading: false,
   disabled: false,
-  variant: 'flat'
+  variant: 'flat',
 })
 
 // Define emits
@@ -91,27 +84,31 @@ const selectRef = ref<ComponentPublicInstance | null>(null)
 const isUpdating = ref(false)
 
 // Watch for priority prop changes
-watch(() => props.priority, (newPriority) => {
-  localPriority.value = newPriority
-}, { immediate: true })
+watch(
+  () => props.priority,
+  (newPriority) => {
+    localPriority.value = newPriority
+  },
+  { immediate: true },
+)
 
 // Size configuration mapping
 const sizeConfig = {
   small: {
     chipSize: 'x-small',
     selectWidth: '120px',
-    selectDensity: 'compact'
+    selectDensity: 'compact',
   },
   medium: {
-    chipSize: 'default', 
+    chipSize: 'default',
     selectWidth: '140px',
-    selectDensity: 'compact'
+    selectDensity: 'compact',
   },
   large: {
     chipSize: 'large',
     selectWidth: '160px',
-    selectDensity: 'default'
-  }
+    selectDensity: 'default',
+  },
 } as const
 
 // Computed properties
@@ -147,11 +144,11 @@ const chipClasses = computed(() => ({
   'priority-chip': true,
   [`priority-chip--${props.size}`]: true,
   'priority-chip--readonly': props.readonly,
-  'priority-chip--interactive': !props.readonly && !props.disabled
+  'priority-chip--interactive': !props.readonly && !props.disabled,
 }))
 
-const ariaLabel = computed(() => 
-  `Приоритет: ${priorityLabel.value}${props.readonly ? '' : ', нажмите для изменения'}`
+const ariaLabel = computed(
+  () => `Приоритет: ${priorityLabel.value}${props.readonly ? '' : ', нажмите для изменения'}`,
 )
 
 // Priority options for dropdown
@@ -170,7 +167,7 @@ const handleChipClick = () => {
   if (props.readonly || props.disabled || props.loading || isUpdating.value) return
   showDropdown.value = true
   localPriority.value = props.priority
-  
+
   nextTick(() => {
     if (selectRef.value && '$el' in selectRef.value) {
       const element = selectRef.value.$el as HTMLElement
@@ -209,7 +206,7 @@ const handlePriorityChange = (newPriority: Priority) => {
     isUpdating.value = true
     emit('priority-change', newPriority)
     showDropdown.value = false
-    
+
     // Reset updating state after a short delay
     setTimeout(() => {
       isUpdating.value = false
@@ -224,7 +221,7 @@ const handlePriorityChange = (newPriority: Priority) => {
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (props.readonly || props.disabled || props.loading || isUpdating.value) return
-  
+
   switch (event.key) {
     case 'Enter':
     case ' ':

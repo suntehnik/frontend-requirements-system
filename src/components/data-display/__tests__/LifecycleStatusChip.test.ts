@@ -108,8 +108,8 @@ describe('LifecycleStatusChip', () => {
 
     it('accepts all valid lifecycle status values', () => {
       const validStatuses: LifecycleStatus[] = ['Draft', 'Active', 'Obsolete']
-      
-      validStatuses.forEach(status => {
+
+      validStatuses.forEach((status) => {
         const wrapper = createWrapper({ status })
         expect(wrapper.props('status')).toBe(status)
       })
@@ -117,8 +117,8 @@ describe('LifecycleStatusChip', () => {
 
     it('accepts all valid size values', () => {
       const validSizes = ['small', 'medium', 'large']
-      
-      validSizes.forEach(size => {
+
+      validSizes.forEach((size) => {
         const wrapper = createWrapper({ size })
         expect(wrapper.props('size')).toBe(size)
       })

@@ -16,7 +16,9 @@
           <v-col cols="12" md="2">
             <v-select
               v-model="currentPriority"
-              :items="priorityOptions.map(p => ({ title: `${p.value}: ${p.text}`, value: p.value }))"
+              :items="
+                priorityOptions.map((p) => ({ title: `${p.value}: ${p.text}`, value: p.value }))
+              "
               label="Current Priority"
               variant="outlined"
               density="compact"
@@ -95,7 +97,9 @@
                   :readonly="isReadonly"
                   :loading="isLoading"
                   :disabled="isDisabled"
-                  @priority-change="simulateError ? handlePriorityChangeWithError : handlePriorityChange"
+                  @priority-change="
+                    simulateError ? handlePriorityChangeWithError : handlePriorityChange
+                  "
                   @error="handleError"
                 />
                 <div class="text-body-2">
@@ -108,11 +112,7 @@
             <div class="mb-6">
               <h3 class="text-h6 mb-3">All Priority Values (1-4) with Proper Labeling</h3>
               <div class="d-flex flex-wrap gap-4">
-                <div
-                  v-for="priority in priorityOptions"
-                  :key="priority.value"
-                  class="text-center"
-                >
+                <div v-for="priority in priorityOptions" :key="priority.value" class="text-center">
                   <div class="mb-2">
                     <div class="text-body-2 font-weight-medium">
                       Priority {{ priority.value }}: {{ priority.text }}
@@ -121,11 +121,7 @@
                       {{ getPriorityDescription(priority.value) }}
                     </div>
                   </div>
-                  <PriorityChip
-                    :priority="priority.value"
-                    :size="selectedSize"
-                    readonly
-                  />
+                  <PriorityChip :priority="priority.value" :size="selectedSize" readonly />
                 </div>
               </div>
             </div>
@@ -155,20 +151,11 @@
               <div class="d-flex flex-wrap gap-4">
                 <div class="text-center">
                   <div class="mb-2">Normal Loading</div>
-                  <PriorityChip
-                    :priority="currentPriority"
-                    :size="selectedSize"
-                    loading
-                  />
+                  <PriorityChip :priority="currentPriority" :size="selectedSize" loading />
                 </div>
                 <div class="text-center">
                   <div class="mb-2">Loading + Disabled</div>
-                  <PriorityChip
-                    :priority="currentPriority"
-                    :size="selectedSize"
-                    loading
-                    disabled
-                  />
+                  <PriorityChip :priority="currentPriority" :size="selectedSize" loading disabled />
                 </div>
                 <div class="text-center">
                   <div class="mb-2">Simulated Update</div>
@@ -181,10 +168,10 @@
                 </div>
               </div>
               <div class="mt-2">
-                <v-btn 
-                  @click="triggerLoadingDemo" 
-                  color="primary" 
-                  variant="outlined" 
+                <v-btn
+                  @click="triggerLoadingDemo"
+                  color="primary"
+                  variant="outlined"
                   size="small"
                   :disabled="simulateUpdateLoading"
                 >
@@ -226,12 +213,7 @@
                 </div>
               </div>
               <div class="mt-2">
-                <v-btn 
-                  @click="triggerRandomError" 
-                  color="error" 
-                  variant="outlined" 
-                  size="small"
-                >
+                <v-btn @click="triggerRandomError" color="error" variant="outlined" size="small">
                   Trigger Random Error
                 </v-btn>
               </div>
@@ -251,27 +233,15 @@
                 </div>
                 <div class="text-center">
                   <div class="mb-2">Readonly</div>
-                  <PriorityChip
-                    :priority="currentPriority"
-                    :size="selectedSize"
-                    readonly
-                  />
+                  <PriorityChip :priority="currentPriority" :size="selectedSize" readonly />
                 </div>
                 <div class="text-center">
                   <div class="mb-2">Disabled</div>
-                  <PriorityChip
-                    :priority="currentPriority"
-                    :size="selectedSize"
-                    disabled
-                  />
+                  <PriorityChip :priority="currentPriority" :size="selectedSize" disabled />
                 </div>
                 <div class="text-center">
                   <div class="mb-2">Loading</div>
-                  <PriorityChip
-                    :priority="currentPriority"
-                    :size="selectedSize"
-                    loading
-                  />
+                  <PriorityChip :priority="currentPriority" :size="selectedSize" loading />
                 </div>
               </div>
             </div>
@@ -292,19 +262,24 @@
                     @error="handleError"
                   />
                   <div class="text-body-2">
-                    <div><strong>Live Component:</strong> All props are controlled by the configuration panel above</div>
+                    <div>
+                      <strong>Live Component:</strong> All props are controlled by the configuration
+                      panel above
+                    </div>
                     <div class="text-caption text-medium-emphasis">
                       Change any setting in the configuration panel to see real-time updates
                     </div>
                   </div>
                 </div>
-                
+
                 <v-divider class="my-4" />
-                
+
                 <div class="text-body-2">
                   <strong>Current Configuration:</strong>
                   <ul class="mt-2">
-                    <li>Priority: {{ currentPriority }} ({{ getPriorityLabel(currentPriority) }})</li>
+                    <li>
+                      Priority: {{ currentPriority }} ({{ getPriorityLabel(currentPriority) }})
+                    </li>
                     <li>Size: {{ selectedSize }}</li>
                     <li>Variant: {{ selectedVariant }}</li>
                     <li>Readonly: {{ isReadonly ? 'Yes' : 'No' }}</li>
@@ -348,7 +323,9 @@
                 <v-col cols="12" md="3">
                   <v-card variant="outlined">
                     <v-card-text>
-                      <div class="text-h6">{{ eventLog.filter(e => e.type === 'loading-demo').length }}</div>
+                      <div class="text-h6">
+                        {{ eventLog.filter((e) => e.type === 'loading-demo').length }}
+                      </div>
                       <div class="text-caption">Loading Demos</div>
                     </v-card-text>
                   </v-card>
@@ -396,7 +373,11 @@ import { ref } from 'vue'
 import PriorityChip from '@/components/data-display/PriorityChip.vue'
 import type { Priority } from '@/types'
 import type { StatusChipSize } from '@/types/status'
-import { getAllPriorityOptions, getPriorityLabel, getPriorityDescription } from '@/utils/priority-utils'
+import {
+  getAllPriorityOptions,
+  getPriorityLabel,
+  getPriorityDescription,
+} from '@/utils/priority-utils'
 
 // Component state
 const selectedSize = ref<StatusChipSize>('medium')
@@ -441,7 +422,7 @@ const variantOptions = [
 ]
 
 // Priority options using shared utilities
-const priorityOptions = getAllPriorityOptions().map(option => ({
+const priorityOptions = getAllPriorityOptions().map((option) => ({
   text: option.label,
   value: option.value,
 }))
@@ -449,30 +430,34 @@ const priorityOptions = getAllPriorityOptions().map(option => ({
 // Methods
 const handlePriorityChange = (newPriority: Priority) => {
   const previousPriority = currentPriority.value
-  
+
   if (enableConsoleLogging.value) {
     console.log('handlePriorityChange called with:', newPriority)
     console.log('Current priority before change:', previousPriority)
   }
-  
+
   currentPriority.value = newPriority
   priorityChangeCount.value++
-  
+
   if (enableConsoleLogging.value) {
     console.log('Current priority after change:', currentPriority.value)
   }
-  
-  logEvent('priority-change', `Priority changed from ${previousPriority} (${getPriorityLabel(previousPriority)}) to ${newPriority} (${getPriorityLabel(newPriority)})`, {
-    componentType: 'PriorityChip',
-    previousPriority,
-    newPriority,
-    previousLabel: getPriorityLabel(previousPriority),
-    priorityLabel: getPriorityLabel(newPriority),
-    size: selectedSize.value,
-    variant: selectedVariant.value,
-    readonly: isReadonly.value,
-    changeCount: priorityChangeCount.value,
-  })
+
+  logEvent(
+    'priority-change',
+    `Priority changed from ${previousPriority} (${getPriorityLabel(previousPriority)}) to ${newPriority} (${getPriorityLabel(newPriority)})`,
+    {
+      componentType: 'PriorityChip',
+      previousPriority,
+      newPriority,
+      previousLabel: getPriorityLabel(previousPriority),
+      priorityLabel: getPriorityLabel(newPriority),
+      size: selectedSize.value,
+      variant: selectedVariant.value,
+      readonly: isReadonly.value,
+      changeCount: priorityChangeCount.value,
+    },
+  )
 }
 
 const handlePriorityChangeWithError = (newPriority: Priority) => {
@@ -494,12 +479,16 @@ const handleError = (error: Error) => {
 }
 
 const handlePriorityControlChange = (newPriority: Priority) => {
-  logEvent('control-change', `Priority changed via control panel to: ${newPriority} (${getPriorityLabel(newPriority)})`, {
-    componentType: 'ControlPanel',
-    newPriority,
-    priorityLabel: getPriorityLabel(newPriority),
-    source: 'configuration-panel',
-  })
+  logEvent(
+    'control-change',
+    `Priority changed via control panel to: ${newPriority} (${getPriorityLabel(newPriority)})`,
+    {
+      componentType: 'ControlPanel',
+      newPriority,
+      priorityLabel: getPriorityLabel(newPriority),
+      source: 'configuration-panel',
+    },
+  )
 }
 
 const logEvent = (type: string, message: string, data?: Record<string, unknown>) => {
@@ -531,7 +520,7 @@ const logEvent = (type: string, message: string, data?: Record<string, unknown>)
   if (enableConsoleLogging.value) {
     const logLevel = type === 'error' ? 'error' : type === 'system' ? 'info' : 'log'
     console[logLevel](`[PriorityPlayground:${type}] ${message}`, eventEntry.data)
-    
+
     // Additional detailed logging for debugging priority changes
     if (type === 'priority-change') {
       console.group('🔄 Priority Change Details')
@@ -625,7 +614,7 @@ const triggerLoadingDemo = () => {
   logEvent('loading-demo', 'Started loading demonstration', {
     duration: '3 seconds',
   })
-  
+
   setTimeout(() => {
     simulateUpdateLoading.value = false
     logEvent('loading-demo', 'Completed loading demonstration', {
@@ -640,7 +629,7 @@ const handleSimulatedUpdate = (newPriority: Priority) => {
     priorityLabel: getPriorityLabel(newPriority),
     simulationType: 'loading-demo',
   })
-  
+
   // Don't actually change the priority during loading demo
   // This simulates a real update scenario where the component
   // would be in loading state during the API call
@@ -651,11 +640,11 @@ logEvent('system', 'Priority Component Playground initialized', {
   component: 'PriorityChip',
   version: '1.0.0',
   features: [
-    'error-simulation', 
-    'event-logging', 
+    'error-simulation',
+    'event-logging',
     'performance-metrics',
     'loading-demonstrations',
-    'comprehensive-testing'
+    'comprehensive-testing',
   ],
 })
 </script>

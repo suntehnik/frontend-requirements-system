@@ -84,8 +84,6 @@ const showAssigneeDropdown = ref(false)
 // Refs for select components
 const assigneeSelectRef = ref()
 
-
-
 // Assignee options
 const assigneeOptions = computed(() => [
   { text: 'Не назначен', value: null },
