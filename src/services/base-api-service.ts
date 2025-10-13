@@ -1,8 +1,9 @@
 import { httpClient } from './http-client'
 import { ErrorHandler, type ApiError } from './error-handler'
+import { API_VERSION } from '@/config/runtime'
 
 export abstract class BaseApiService {
-  protected baseUrl: string = '/api/v1'
+  protected baseUrl: string = `/api/${API_VERSION}`
 
   protected async apiGet<T>(url: string, params?: Record<string, unknown>): Promise<T> {
     try {

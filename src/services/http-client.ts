@@ -6,6 +6,7 @@ import axios, {
 } from 'axios'
 
 import { ErrorHandler } from './error-handler'
+import { API_BASE_URL } from '@/config/runtime'
 
 // HTTP Client Configuration
 interface ApiClientConfig {
@@ -20,7 +21,7 @@ class HttpClient {
 
   constructor(config?: Partial<ApiClientConfig>) {
     this.config = {
-      baseUrl: 'http://localhost:8080',
+      baseUrl: API_BASE_URL,
       timeout: 30000,
       defaultHeaders: {
         'Content-Type': 'application/json',
