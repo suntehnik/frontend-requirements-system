@@ -31,7 +31,7 @@ export function getConfig(): AppConfig {
       ...window.APP_CONFIG,
     }
   }
-  
+
   // Fallback to build-time environment variables
   return defaultConfig
 }
@@ -49,6 +49,6 @@ export const getApiUrl = (endpoint: string = ''): string => {
   const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL
   const apiPath = `/api/${API_VERSION}`
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
-  
+
   return `${baseUrl}${apiPath}${cleanEndpoint}`
 }

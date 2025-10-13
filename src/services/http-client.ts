@@ -6,7 +6,7 @@ import axios, {
 } from 'axios'
 
 import { ErrorHandler } from './error-handler'
-import { getApiUrl, API_BASE_URL } from '@/config/runtime'
+import { API_BASE_URL } from '@/config/runtime'
 
 // HTTP Client Configuration
 interface ApiClientConfig {
