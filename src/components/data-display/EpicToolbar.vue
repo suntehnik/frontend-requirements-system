@@ -50,7 +50,27 @@
         ref="assigneeSelectRef"
       />
     </div>
+
+    <!-- Steering Documents Button -->
+    <v-btn
+      color="primary"
+      variant="outlined"
+      size="large"
+      prepend-icon="mdi-file-document-outline"
+      @click="showSteeringDocumentsDialog"
+      class="toolbar-chip"
+      rounded="xl"
+    >
+      Steering Documents
+    </v-btn>
   </div>
+
+  <!-- Steering Documents Dialog -->
+  <EpicSteeringDocumentsDialog
+    v-model="steeringDocumentsDialogOpen"
+    :epic="epic"
+    @documents-updated="handleDocumentsUpdated"
+  />
 </template>
 
 <script setup lang="ts">
@@ -58,6 +78,7 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { epicService } from '@/services/epic-service'
 import { WorkflowStatusChip } from '@/components/data-display'
 import PriorityChip from '@/components/data-display/PriorityChip.vue'
+import EpicSteeringDocumentsDialog from '@/components/dialogs/EpicSteeringDocumentsDialog.vue'
 import type { Epic, User, EpicStatus, Priority, WorkflowStatus } from '@/types'
 
 interface Props {
@@ -68,6 +89,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   updated: [epic: Epic]
+  documentsUpdated: []
 }>()
 
 // Local state for inline editing
@@ -80,6 +102,9 @@ const users = ref<User[]>([])
 
 // Dropdown visibility states
 const showAssigneeDropdown = ref(false)
+
+// Dialog states
+const steeringDocumentsDialogOpen = ref(false)
 
 // Refs for select components
 const assigneeSelectRef = ref()
@@ -220,6 +245,15 @@ const updateAssignee = async (newAssigneeId: string | null) => {
 const getAssigneeText = () => {
   const assignee = users.value.find((u) => u.id === localAssigneeId.value)
   return assignee?.username || 'Не назначен'
+}
+
+// Steering Documents Dialog methods
+const showSteeringDocumentsDialog = () => {
+  steeringDocumentsDialogOpen.value = true
+}
+
+const handleDocumentsUpdated = () => {
+  emit('documentsUpdated')
 }
 
 onMounted(() => {

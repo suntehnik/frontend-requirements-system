@@ -15,6 +15,7 @@ export type * from './user-story'
 export type * from './acceptance-criteria'
 export type * from './requirement'
 export type * from './comment'
+export type * from './steering-document'
 
 // Configuration types
 export type * from './config'

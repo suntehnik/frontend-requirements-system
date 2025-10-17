@@ -42,8 +42,49 @@
           />
         </v-col>
 
-        <!-- Right Column: Comments -->
+        <!-- Right Column: Steering Documents & Comments -->
         <v-col cols="12" lg="4" md="5" class="pl-md-2">
+          <!-- Steering Documents Section -->
+          <v-card flat outlined class="mb-4">
+            <v-card-title class="text-h6 pb-2 d-flex justify-space-between align-center">
+              <span>Связанные документы</span>
+              <v-btn
+                size="small"
+                variant="text"
+                color="primary"
+                @click="openSteeringDocumentsDialog"
+                prepend-icon="mdi-cog"
+              >
+                Управлять
+              </v-btn>
+            </v-card-title>
+
+            <v-card-text>
+              <div v-if="steeringDocumentsLoading" class="text-center py-4">
+                <v-progress-circular indeterminate size="32" color="primary" />
+              </div>
+              <div v-else-if="steeringDocuments && steeringDocuments.length > 0">
+                <div v-for="document in steeringDocuments" :key="document.id" class="mb-2">
+                  <v-chip
+                    :to="`/steering-documents/${document.reference_id}`"
+                    color="primary"
+                    variant="outlined"
+                    size="small"
+                    class="mr-2 mb-1"
+                    prepend-icon="mdi-file-document-outline"
+                  >
+                    {{ document.title }}
+                  </v-chip>
+                </div>
+              </div>
+              <div v-else class="text-center text-grey-darken-1 py-4">
+                <v-icon size="32" color="grey-lighten-1" class="mb-2">mdi-file-document-outline</v-icon>
+                <div class="text-body-2">Нет связанных документов</div>
+              </div>
+            </v-card-text>
+          </v-card>
+
+          <!-- Comments Section -->
           <v-card flat outlined class="fill-height d-flex flex-column">
             <v-card-title class="text-h6 pb-2">Комментарии</v-card-title>
 
@@ -169,10 +210,11 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { epicService } from '@/services/epic-service'
 import { commentService } from '@/services/comment-service'
+import { steeringDocumentService } from '@/services/steering-document-service'
 import { useEntitiesStore } from '@/stores/entities'
 import { EpicForm, FullscreenMarkdownEditor } from '@/components/forms'
 import { EpicToolbar, EpicDescription, UserStoriesPanel } from '@/components/data-display'
-import type { Epic, UserStory, Comment, UpdateEpicRequest } from '@/types'
+import type { Epic, UserStory, Comment, UpdateEpicRequest, SteeringDocument } from '@/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -182,9 +224,11 @@ const entitiesStore = useEntitiesStore()
 const epic = ref<Epic | null>(null)
 const userStories = ref<UserStory[] | null>(null)
 const comments = ref<Comment[] | null>(null)
+const steeringDocuments = ref<SteeringDocument[] | null>(null)
 const loading = ref(true)
 const userStoriesLoading = ref(false)
 const commentsLoading = ref(false)
+const steeringDocumentsLoading = ref(false)
 const commentSubmitting = ref(false)
 const error = ref<string | null>(null)
 const newCommentContent = ref('')
@@ -238,6 +282,9 @@ const loadEpic = async () => {
 
     // Always load comments separately to ensure we get the latest data
     await loadComments()
+
+    // Load steering documents
+    await loadSteeringDocuments()
   } catch (err) {
     console.error('Failed to load epic:', err)
     error.value = err instanceof Error ? err.message : 'Не удалось загрузить эпик'
@@ -288,6 +335,22 @@ const loadComments = async () => {
     comments.value = []
   } finally {
     commentsLoading.value = false
+  }
+}
+
+const loadSteeringDocuments = async () => {
+  if (!epic.value) return
+
+  try {
+    steeringDocumentsLoading.value = true
+    const documents = await steeringDocumentService.getEpicDocuments(epic.value.id)
+    steeringDocuments.value = documents
+  } catch (err) {
+    console.error('Failed to load steering documents:', err)
+    // Don't show error for steering documents, just keep empty array
+    steeringDocuments.value = []
+  } finally {
+    steeringDocumentsLoading.value = false
   }
 }
 

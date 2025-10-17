@@ -8,6 +8,7 @@ export { default as PrioritySelector } from './PrioritySelector.vue'
 export { default as StatusSelector } from './StatusSelector.vue'
 export { default as UserSelector } from './UserSelector.vue'
 export { default as UserStoryForm } from './UserStoryForm.vue'
+export { default as SteeringDocumentSelector } from './SteeringDocumentSelector.vue'
 
 // Form component TypeScript interfaces re-exports
 export type {
