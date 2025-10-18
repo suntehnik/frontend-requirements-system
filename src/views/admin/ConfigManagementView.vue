@@ -624,7 +624,7 @@ const confirmDeleteSteeringDocument = async () => {
   try {
     deletingSteeringDocument.value = true
     await steeringDocumentService.delete(documentToDelete.value.id)
-    
+
     // Refresh the list to remove the deleted document
     await loadSteeringDocuments()
     closeDeleteSteeringDocumentDialog()

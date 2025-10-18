@@ -32,7 +32,7 @@ describe('Steering Documents Data Refresh Integration', () => {
     'v-list-item': { template: '<div><slot /></div>' },
     'v-list-item-title': { template: '<div><slot /></div>' },
     'v-list-item-subtitle': { template: '<div><slot /></div>' },
-    'v-autocomplete': { 
+    'v-autocomplete': {
       template: '<input @input="$emit(\'update:modelValue\', $event.target.value)" />',
       emits: ['update:modelValue'],
     },
@@ -40,7 +40,7 @@ describe('Steering Documents Data Refresh Integration', () => {
     'v-spacer': { template: '<div></div>' },
     'v-progress-circular': { template: '<div>Loading...</div>' },
     'v-alert': { template: '<div><slot /></div>' },
-    'SteeringDocumentFormDialog': {
+    SteeringDocumentFormDialog: {
       template: '<div></div>',
       emits: ['submit'],
     },
@@ -108,7 +108,7 @@ describe('Steering Documents Data Refresh Integration', () => {
 
     // Check if wrapper exists and has content
     expect(wrapper.exists()).toBe(true)
-    
+
     // Verify initial load was called
     expect(steeringDocumentService.getEpicDocuments).toHaveBeenCalledWith('epic-1')
     expect(steeringDocumentService.getEpicDocuments).toHaveBeenCalledTimes(1)
@@ -121,7 +121,7 @@ describe('Steering Documents Data Refresh Integration', () => {
 
     // Simulate the component refreshing the documents list after creation
     await steeringDocumentService.getEpicDocuments('epic-1')
-    
+
     // Simulate the component emitting the documentsUpdated event
     wrapper.vm.$emit('documentsUpdated')
 
@@ -160,7 +160,7 @@ describe('Steering Documents Data Refresh Integration', () => {
       global: {
         stubs: {
           ...sharedStubs,
-          'SteeringDocumentSelector': {
+          SteeringDocumentSelector: {
             template: '<div></div>',
             props: ['modelValue'],
             emits: ['update:modelValue'],
@@ -217,10 +217,10 @@ describe('Steering Documents Data Refresh Integration', () => {
 
     // Simulate document unlinking by calling the service directly
     await steeringDocumentService.unlinkFromEpic('epic-1', 'doc-2')
-    
+
     // Simulate the component refreshing the documents list after unlinking
     await steeringDocumentService.getEpicDocuments('epic-1')
-    
+
     // Simulate the component emitting the documentsUpdated event
     wrapper.vm.$emit('documentsUpdated')
 
@@ -264,7 +264,7 @@ describe('Steering Documents Data Refresh Integration', () => {
 
     // Manually emit the documentsUpdated event to simulate the component behavior
     wrapper.vm.$emit('documentsUpdated')
-    
+
     await nextTick()
 
     // Verify the handler was called

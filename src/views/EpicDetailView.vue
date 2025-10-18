@@ -25,13 +25,25 @@
           </div>
 
           <!-- Epic Toolbar (Inline Editing) -->
-          <EpicToolbar :epic="epic" @updated="handleEpicUpdate" @documents-updated="handleDocumentsUpdate" />
+          <EpicToolbar
+            :epic="epic"
+            @updated="handleEpicUpdate"
+            @documents-updated="handleDocumentsUpdate"
+          />
 
           <!-- Epic Description (Markdown) -->
-          <EpicDescription :description="epic.description" @edit="editEpic" @edit-description="editDescription" />
+          <EpicDescription
+            :description="epic.description"
+            @edit="editEpic"
+            @edit-description="editDescription"
+          />
 
           <!-- User Stories Panel -->
-          <UserStoriesPanel :user-stories="userStories" :loading="userStoriesLoading" @add-user-story="addUserStory" />
+          <UserStoriesPanel
+            :user-stories="userStories"
+            :loading="userStoriesLoading"
+            @add-user-story="addUserStory"
+          />
 
           <!-- Steering Documents Section -->
           <v-card flat outlined class="mt-6">
@@ -63,7 +75,9 @@
                 </v-list>
               </div>
               <div v-else class="text-center text-grey-darken-1 py-4">
-                <v-icon size="32" color="grey-lighten-1" class="mb-2">mdi-file-document-outline</v-icon>
+                <v-icon size="32" color="grey-lighten-1" class="mb-2"
+                  >mdi-file-document-outline</v-icon
+                >
                 <div class="text-body-2">Нет связанных документов</div>
               </div>
               <v-divider class="my-3" />
@@ -94,8 +108,13 @@
               <div v-else-if="comments && comments.length > 0">
                 <div v-for="comment in comments" :key="comment.id" class="mb-4">
                   <div class="d-flex align-center mb-2">
-                    <v-chip color="grey-lighten-3" size="small" rounded="xl" class="author-chip"
-                      style="margin-right: 8px">
+                    <v-chip
+                      color="grey-lighten-3"
+                      size="small"
+                      rounded="xl"
+                      class="author-chip"
+                      style="margin-right: 8px"
+                    >
                       <v-icon start size="small">mdi-account</v-icon>
                       {{ comment.author?.username || 'Unknown User' }}
                     </v-chip>
@@ -116,16 +135,32 @@
             <v-divider />
             <v-card-text class="pt-3">
               <v-form ref="commentFormRef" @submit.prevent="submitComment">
-                <v-textarea v-model="newCommentContent" placeholder="Добавить комментарий..." rows="3"
-                  variant="outlined" density="compact" :rules="commentRules" counter="1000" class="mb-3" />
+                <v-textarea
+                  v-model="newCommentContent"
+                  placeholder="Добавить комментарий..."
+                  rows="3"
+                  variant="outlined"
+                  density="compact"
+                  :rules="commentRules"
+                  counter="1000"
+                  class="mb-3"
+                />
                 <div class="d-flex justify-space-between align-center">
                   <div class="text-caption text-grey-darken-1">
                     {{ newCommentContent.length }}/1000 символов
                   </div>
-                  <v-btn type="submit" color="primary" size="small" :disabled="!newCommentContent.trim() ||
-                    commentSubmitting ||
-                    newCommentContent.length > 1000
-                    " :loading="commentSubmitting" prepend-icon="mdi-send">
+                  <v-btn
+                    type="submit"
+                    color="primary"
+                    size="small"
+                    :disabled="
+                      !newCommentContent.trim() ||
+                      commentSubmitting ||
+                      newCommentContent.length > 1000
+                    "
+                    :loading="commentSubmitting"
+                    prepend-icon="mdi-send"
+                  >
                     Отправить
                   </v-btn>
                 </div>
@@ -146,14 +181,23 @@
 
     <!-- Edit Epic Modal -->
     <v-dialog v-model="showEditDialog" max-width="800px" persistent scrollable>
-      <EpicForm :epic="epic || undefined" :loading="formLoading" @submit="handleEpicSubmit"
-        @cancel="handleEpicCancel" />
+      <EpicForm
+        :epic="epic || undefined"
+        :loading="formLoading"
+        @submit="handleEpicSubmit"
+        @cancel="handleEpicCancel"
+      />
     </v-dialog>
 
     <!-- Fullscreen Markdown Editor for Description -->
-    <FullscreenMarkdownEditor v-model:show="showDescriptionEditor" v-model="descriptionEditorValue"
-      :saving="descriptionSaving" placeholder="Введите описание эпика в формате Markdown..."
-      @save="handleDescriptionSave" @cancel="handleDescriptionCancel" />
+    <FullscreenMarkdownEditor
+      v-model:show="showDescriptionEditor"
+      v-model="descriptionEditorValue"
+      :saving="descriptionSaving"
+      placeholder="Введите описание эпика в формате Markdown..."
+      @save="handleDescriptionSave"
+      @cancel="handleDescriptionCancel"
+    />
 
     <!-- Success Snackbar -->
     <v-snackbar v-model="showSuccessMessage" color="success" timeout="4000" location="top">
@@ -332,7 +376,6 @@ const loadSteeringDocuments = async () => {
     steeringDocumentsLoading.value = false
   }
 }
-
 
 const submitComment = async () => {
   // Validate form

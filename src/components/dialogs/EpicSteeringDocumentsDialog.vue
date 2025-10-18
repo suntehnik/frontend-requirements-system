@@ -327,12 +327,12 @@ const handleDocumentSubmit = async (
 
     showFormDialog.value = false
     await loadEpicDocuments()
-    
+
     // Refresh the selector to update available documents
     if (selectorRef.value?.loadDocuments) {
       await selectorRef.value.loadDocuments()
     }
-    
+
     emit('documentsUpdated')
   } catch (error: unknown) {
     console.error('Error saving document:', error)
@@ -363,12 +363,12 @@ const handleDocumentLinkConfirm = async () => {
     showSelectorDialog.value = false
     selectedDocumentId.value = null
     await loadEpicDocuments()
-    
+
     // Refresh the selector to update available documents
     if (selectorRef.value?.loadDocuments) {
       await selectorRef.value.loadDocuments()
     }
-    
+
     emit('documentsUpdated')
   } catch (error: unknown) {
     console.error('Error linking document:', error)
@@ -391,12 +391,12 @@ const handleDocumentUnlink = async () => {
     showUnlinkDialog.value = false
     documentToUnlink.value = undefined
     await loadEpicDocuments()
-    
+
     // Refresh the selector to update available documents
     if (selectorRef.value?.loadDocuments) {
       await selectorRef.value.loadDocuments()
     }
-    
+
     emit('documentsUpdated')
   } catch (error: unknown) {
     console.error('Error unlinking document:', error)

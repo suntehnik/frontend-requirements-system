@@ -390,7 +390,9 @@ describe('SteeringDocumentSelector', () => {
 
   it('handles null API response gracefully', async () => {
     // Mock a null response
-    vi.mocked(steeringDocumentService.list).mockResolvedValue(null as unknown as SteeringDocumentListResponse)
+    vi.mocked(steeringDocumentService.list).mockResolvedValue(
+      null as unknown as SteeringDocumentListResponse,
+    )
 
     const wrapper = mount(SteeringDocumentSelector, {
       global: {
