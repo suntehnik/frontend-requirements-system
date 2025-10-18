@@ -36,6 +36,8 @@ export interface SteeringDocumentListParams {
 }
 
 export interface SteeringDocumentListResponse {
-  steering_documents: SteeringDocument[]
-  count: number
+  data: SteeringDocument[]
+  total_count: number
+  limit: number
+  offset: number
 }

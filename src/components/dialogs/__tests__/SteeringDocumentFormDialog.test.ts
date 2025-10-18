@@ -194,7 +194,7 @@ describe('SteeringDocumentFormDialog', () => {
       const markdownEditor = wrapper.findComponent({ name: 'MarkdownEditor' })
       expect(markdownEditor.exists()).toBe(true)
       expect(markdownEditor.props('label')).toBe('Описание (Markdown)')
-      expect(markdownEditor.props('counter')).toBe(50000)
+      expect(markdownEditor.props('counter')).toBe(true)
     })
 
     it('shows epic auto-link info when epicId is provided', () => {
@@ -306,7 +306,7 @@ describe('SteeringDocumentFormDialog', () => {
       const wrapper = createWrapper({ mode: 'create' })
 
       const titleField = wrapper.find('input[type="text"]')
-      expect(titleField.element.value).toBe('')
+      expect((titleField.element as HTMLInputElement).value).toBe('')
     })
 
     it('emits create request with correct data structure', async () => {
@@ -377,7 +377,7 @@ describe('SteeringDocumentFormDialog', () => {
       await wrapper.vm.$nextTick()
 
       const titleField = wrapper.find('input[type="text"]')
-      expect(titleField.element.value).toBe(mockSteeringDocument.title)
+      expect((titleField.element as HTMLInputElement).value).toBe(mockSteeringDocument.title)
     })
 
     it('emits update request with correct data structure', async () => {
@@ -510,7 +510,7 @@ describe('SteeringDocumentFormDialog', () => {
       await wrapper.vm.$nextTick()
 
       const titleField = wrapper.find('input[type="text"]')
-      expect(titleField.element.value).toBe(mockSteeringDocument.title)
+      expect((titleField.element as HTMLInputElement).value).toBe(mockSteeringDocument.title)
     })
   })
 
@@ -558,7 +558,7 @@ describe('SteeringDocumentFormDialog', () => {
       await wrapper.vm.$nextTick()
 
       const titleField = wrapper.find('input[type="text"]')
-      expect(titleField.element.value).toBe('New Document Title')
+      expect((titleField.element as HTMLInputElement).value).toBe('New Document Title')
     })
 
     it('initializes form when dialog opens', async () => {
@@ -572,7 +572,7 @@ describe('SteeringDocumentFormDialog', () => {
       await wrapper.vm.$nextTick()
 
       const titleField = wrapper.find('input[type="text"]')
-      expect(titleField.element.value).toBe(mockSteeringDocument.title)
+      expect((titleField.element as HTMLInputElement).value).toBe(mockSteeringDocument.title)
     })
   })
 })

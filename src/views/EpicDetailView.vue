@@ -25,65 +25,63 @@
           </div>
 
           <!-- Epic Toolbar (Inline Editing) -->
-          <EpicToolbar :epic="epic" @updated="handleEpicUpdate" />
+          <EpicToolbar :epic="epic" @updated="handleEpicUpdate" @documents-updated="handleDocumentsUpdate" />
 
           <!-- Epic Description (Markdown) -->
-          <EpicDescription
-            :description="epic.description"
-            @edit="editEpic"
-            @edit-description="editDescription"
-          />
+          <EpicDescription :description="epic.description" @edit="editEpic" @edit-description="editDescription" />
 
           <!-- User Stories Panel -->
-          <UserStoriesPanel
-            :user-stories="userStories"
-            :loading="userStoriesLoading"
-            @add-user-story="addUserStory"
-          />
-        </v-col>
+          <UserStoriesPanel :user-stories="userStories" :loading="userStoriesLoading" @add-user-story="addUserStory" />
 
-        <!-- Right Column: Steering Documents & Comments -->
-        <v-col cols="12" lg="4" md="5" class="pl-md-2">
           <!-- Steering Documents Section -->
-          <v-card flat outlined class="mb-4">
-            <v-card-title class="text-h6 pb-2 d-flex justify-space-between align-center">
-              <span>Связанные документы</span>
-              <v-btn
-                size="small"
-                variant="text"
-                color="primary"
-                @click="openSteeringDocumentsDialog"
-                prepend-icon="mdi-cog"
-              >
-                Управлять
-              </v-btn>
+          <v-card flat outlined class="mt-6">
+            <v-card-title class="text-h6 pb-2">
+              <v-icon start>mdi-file-document-outline</v-icon>
+              Связанные документы
             </v-card-title>
-
             <v-card-text>
               <div v-if="steeringDocumentsLoading" class="text-center py-4">
                 <v-progress-circular indeterminate size="32" color="primary" />
               </div>
               <div v-else-if="steeringDocuments && steeringDocuments.length > 0">
-                <div v-for="document in steeringDocuments" :key="document.id" class="mb-2">
-                  <v-chip
-                    :to="`/steering-documents/${document.reference_id}`"
-                    color="primary"
-                    variant="outlined"
-                    size="small"
-                    class="mr-2 mb-1"
-                    prepend-icon="mdi-file-document-outline"
+                <v-list density="compact">
+                  <v-list-item
+                    v-for="document in steeringDocuments"
+                    :key="document.id"
+                    :title="document.title"
+                    :subtitle="document.reference_id"
+                    @click="navigateToSteeringDocument(document)"
+                    class="cursor-pointer"
                   >
-                    {{ document.title }}
-                  </v-chip>
-                </div>
+                    <template #prepend>
+                      <v-icon color="primary">mdi-file-document-outline</v-icon>
+                    </template>
+                    <template #append>
+                      <v-icon>mdi-chevron-right</v-icon>
+                    </template>
+                  </v-list-item>
+                </v-list>
               </div>
               <div v-else class="text-center text-grey-darken-1 py-4">
                 <v-icon size="32" color="grey-lighten-1" class="mb-2">mdi-file-document-outline</v-icon>
                 <div class="text-body-2">Нет связанных документов</div>
               </div>
+              <v-divider class="my-3" />
+              <v-btn
+                color="primary"
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-cog"
+                @click="showSteeringDocumentsManagement"
+              >
+                Управлять документами
+              </v-btn>
             </v-card-text>
           </v-card>
+        </v-col>
 
+        <!-- Right Column: Comments -->
+        <v-col cols="12" lg="4" md="5" class="pl-md-2">
           <!-- Comments Section -->
           <v-card flat outlined class="fill-height d-flex flex-column">
             <v-card-title class="text-h6 pb-2">Комментарии</v-card-title>
@@ -96,13 +94,8 @@
               <div v-else-if="comments && comments.length > 0">
                 <div v-for="comment in comments" :key="comment.id" class="mb-4">
                   <div class="d-flex align-center mb-2">
-                    <v-chip
-                      color="grey-lighten-3"
-                      size="small"
-                      rounded="xl"
-                      class="author-chip"
-                      style="margin-right: 8px"
-                    >
+                    <v-chip color="grey-lighten-3" size="small" rounded="xl" class="author-chip"
+                      style="margin-right: 8px">
                       <v-icon start size="small">mdi-account</v-icon>
                       {{ comment.author?.username || 'Unknown User' }}
                     </v-chip>
@@ -123,32 +116,16 @@
             <v-divider />
             <v-card-text class="pt-3">
               <v-form ref="commentFormRef" @submit.prevent="submitComment">
-                <v-textarea
-                  v-model="newCommentContent"
-                  placeholder="Добавить комментарий..."
-                  rows="3"
-                  variant="outlined"
-                  density="compact"
-                  :rules="commentRules"
-                  counter="1000"
-                  class="mb-3"
-                />
+                <v-textarea v-model="newCommentContent" placeholder="Добавить комментарий..." rows="3"
+                  variant="outlined" density="compact" :rules="commentRules" counter="1000" class="mb-3" />
                 <div class="d-flex justify-space-between align-center">
                   <div class="text-caption text-grey-darken-1">
                     {{ newCommentContent.length }}/1000 символов
                   </div>
-                  <v-btn
-                    type="submit"
-                    color="primary"
-                    size="small"
-                    :disabled="
-                      !newCommentContent.trim() ||
-                      commentSubmitting ||
-                      newCommentContent.length > 1000
-                    "
-                    :loading="commentSubmitting"
-                    prepend-icon="mdi-send"
-                  >
+                  <v-btn type="submit" color="primary" size="small" :disabled="!newCommentContent.trim() ||
+                    commentSubmitting ||
+                    newCommentContent.length > 1000
+                    " :loading="commentSubmitting" prepend-icon="mdi-send">
                     Отправить
                   </v-btn>
                 </div>
@@ -169,23 +146,14 @@
 
     <!-- Edit Epic Modal -->
     <v-dialog v-model="showEditDialog" max-width="800px" persistent scrollable>
-      <EpicForm
-        :epic="epic || undefined"
-        :loading="formLoading"
-        @submit="handleEpicSubmit"
-        @cancel="handleEpicCancel"
-      />
+      <EpicForm :epic="epic || undefined" :loading="formLoading" @submit="handleEpicSubmit"
+        @cancel="handleEpicCancel" />
     </v-dialog>
 
     <!-- Fullscreen Markdown Editor for Description -->
-    <FullscreenMarkdownEditor
-      v-model:show="showDescriptionEditor"
-      v-model="descriptionEditorValue"
-      :saving="descriptionSaving"
-      placeholder="Введите описание эпика в формате Markdown..."
-      @save="handleDescriptionSave"
-      @cancel="handleDescriptionCancel"
-    />
+    <FullscreenMarkdownEditor v-model:show="showDescriptionEditor" v-model="descriptionEditorValue"
+      :saving="descriptionSaving" placeholder="Введите описание эпика в формате Markdown..."
+      @save="handleDescriptionSave" @cancel="handleDescriptionCancel" />
 
     <!-- Success Snackbar -->
     <v-snackbar v-model="showSuccessMessage" color="success" timeout="4000" location="top">
@@ -202,6 +170,13 @@
         <v-btn color="white" variant="text" @click="showErrorMessage = false"> Закрыть </v-btn>
       </template>
     </v-snackbar>
+
+    <!-- Steering Documents Management Dialog -->
+    <EpicSteeringDocumentsDialog
+      v-model="showSteeringDocumentsDialog"
+      :epic="epic || undefined"
+      @documents-updated="handleDocumentsUpdate"
+    />
   </div>
 </template>
 
@@ -210,10 +185,12 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { epicService } from '@/services/epic-service'
 import { commentService } from '@/services/comment-service'
-import { steeringDocumentService } from '@/services/steering-document-service'
+import { steeringDocumentService } from '@/services'
+
 import { useEntitiesStore } from '@/stores/entities'
 import { EpicForm, FullscreenMarkdownEditor } from '@/components/forms'
 import { EpicToolbar, EpicDescription, UserStoriesPanel } from '@/components/data-display'
+import EpicSteeringDocumentsDialog from '@/components/dialogs/EpicSteeringDocumentsDialog.vue'
 import type { Epic, UserStory, Comment, UpdateEpicRequest, SteeringDocument } from '@/types'
 
 const route = useRoute()
@@ -241,6 +218,9 @@ const formLoading = ref(false)
 const showDescriptionEditor = ref(false)
 const descriptionEditorValue = ref('')
 const descriptionSaving = ref(false)
+
+// Steering documents dialog state
+const showSteeringDocumentsDialog = ref(false)
 
 // Success/Error messages
 const showSuccessMessage = ref(false)
@@ -339,12 +319,11 @@ const loadComments = async () => {
 }
 
 const loadSteeringDocuments = async () => {
-  if (!epic.value) return
+  if (!epic.value?.id) return
 
   try {
     steeringDocumentsLoading.value = true
-    const documents = await steeringDocumentService.getEpicDocuments(epic.value.id)
-    steeringDocuments.value = documents
+    steeringDocuments.value = await steeringDocumentService.getEpicDocuments(epic.value.id)
   } catch (err) {
     console.error('Failed to load steering documents:', err)
     // Don't show error for steering documents, just keep empty array
@@ -353,6 +332,7 @@ const loadSteeringDocuments = async () => {
     steeringDocumentsLoading.value = false
   }
 }
+
 
 const submitComment = async () => {
   // Validate form
@@ -472,6 +452,19 @@ const handleEpicUpdate = (updatedEpic: Epic) => {
   showSuccess('Эпик успешно обновлен')
 }
 
+const handleDocumentsUpdate = () => {
+  // Refresh steering documents when they are updated
+  loadSteeringDocuments()
+}
+
+const showSteeringDocumentsManagement = () => {
+  showSteeringDocumentsDialog.value = true
+}
+
+const navigateToSteeringDocument = (document: SteeringDocument) => {
+  router.push(`/steering-documents/${document.reference_id}`)
+}
+
 const formatCommentDate = (dateString: string) => {
   const date = new Date(dateString)
   const now = new Date()
@@ -500,5 +493,9 @@ onMounted(() => {
 <style scoped>
 .author-chip {
   color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>

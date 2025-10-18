@@ -70,8 +70,10 @@ const mockDocuments: SteeringDocument[] = [
 ]
 
 const mockListResponse: SteeringDocumentListResponse = {
-  steering_documents: mockDocuments,
-  count: mockDocuments.length,
+  data: mockDocuments,
+  total_count: mockDocuments.length,
+  limit: 50,
+  offset: 0,
 }
 
 // Mock the steering document service
@@ -340,8 +342,10 @@ describe('SteeringDocumentSelector', () => {
 
   it('handles empty document list', async () => {
     vi.mocked(steeringDocumentService.list).mockResolvedValue({
-      steering_documents: [],
-      count: 0,
+      data: [],
+      total_count: 0,
+      limit: 50,
+      offset: 0,
     })
 
     const wrapper = mount(SteeringDocumentSelector, {
@@ -357,5 +361,114 @@ describe('SteeringDocumentSelector', () => {
 
     expect(wrapper.vm.documents).toEqual([])
     expect(wrapper.vm.filteredDocuments).toEqual([])
+  })
+
+  it('handles malformed API response gracefully', async () => {
+    // Mock a malformed response where data is undefined
+    vi.mocked(steeringDocumentService.list).mockResolvedValue({
+      data: undefined as unknown as SteeringDocument[],
+      total_count: 0,
+      limit: 50,
+      offset: 0,
+    })
+
+    const wrapper = mount(SteeringDocumentSelector, {
+      global: {
+        plugins: [vuetify],
+        stubs,
+      },
+    })
+
+    // Wait for documents to load
+    await wrapper.vm.$nextTick()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    expect(wrapper.vm.documents).toEqual([])
+    expect(wrapper.vm.filteredDocuments).toEqual([])
+    expect(wrapper.vm.error).toBeNull()
+  })
+
+  it('handles null API response gracefully', async () => {
+    // Mock a null response
+    vi.mocked(steeringDocumentService.list).mockResolvedValue(null as unknown as SteeringDocumentListResponse)
+
+    const wrapper = mount(SteeringDocumentSelector, {
+      global: {
+        plugins: [vuetify],
+        stubs,
+      },
+    })
+
+    // Wait for documents to load
+    await wrapper.vm.$nextTick()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    expect(wrapper.vm.documents).toEqual([])
+    expect(wrapper.vm.filteredDocuments).toEqual([])
+    expect(wrapper.vm.error).toBeNull()
+  })
+
+  it('handles undefined excludeDocumentIds prop gracefully', async () => {
+    const wrapper = mount(SteeringDocumentSelector, {
+      props: {
+        excludeDocumentIds: undefined as unknown as string[],
+      },
+      global: {
+        plugins: [vuetify],
+        stubs,
+      },
+    })
+
+    // Wait for documents to load
+    await wrapper.vm.$nextTick()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    // Should not throw error and should show all documents
+    expect(wrapper.vm.filteredDocuments).toHaveLength(3)
+    expect(wrapper.vm.filteredDocuments.map((d) => d.id)).toEqual(['1', '2', '3'])
+  })
+
+  it('handles documents with missing properties gracefully', async () => {
+    const documentsWithMissingProps = [
+      {
+        id: '1',
+        reference_id: 'STD-001',
+        title: undefined as unknown as string, // Missing title
+        creator_id: 'user1',
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
+      },
+      {
+        id: '2',
+        reference_id: undefined as unknown as string, // Missing reference_id
+        title: 'API Guidelines',
+        creator_id: 'user2',
+        created_at: '2024-01-02T00:00:00Z',
+        updated_at: '2024-01-02T00:00:00Z',
+      },
+    ]
+
+    vi.mocked(steeringDocumentService.list).mockResolvedValue({
+      data: documentsWithMissingProps,
+      total_count: documentsWithMissingProps.length,
+      limit: 50,
+      offset: 0,
+    })
+
+    const wrapper = mount(SteeringDocumentSelector, {
+      global: {
+        plugins: [vuetify],
+        stubs,
+      },
+    })
+
+    // Wait for documents to load
+    await wrapper.vm.$nextTick()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    // Should not throw error during search
+    await wrapper.vm.handleSearch('API')
+    expect(wrapper.vm.filteredDocuments).toHaveLength(1)
+    expect(wrapper.vm.filteredDocuments[0].title).toBe('API Guidelines')
   })
 })

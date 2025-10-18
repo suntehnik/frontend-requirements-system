@@ -91,6 +91,11 @@ const props = withDefaults(defineProps<Props>(), {
   excludeDocumentIds: () => [],
 })
 
+// Ensure excludeDocumentIds is always an array
+const safeExcludeDocumentIds = computed(() => {
+  return Array.isArray(props.excludeDocumentIds) ? props.excludeDocumentIds : []
+})
+
 const emit = defineEmits<Emits>()
 
 // Local state
@@ -101,11 +106,16 @@ const error = ref<string | null>(null)
 
 // Computed
 const filteredDocuments = computed<SteeringDocument[]>(() => {
+  // Ensure documents.value is an array before filtering
+  if (!Array.isArray(documents.value)) {
+    return []
+  }
+
   let filteredDocs = documents.value
 
   // Exclude already linked documents
-  if (props.excludeDocumentIds.length > 0) {
-    filteredDocs = filteredDocs.filter((doc) => !props.excludeDocumentIds.includes(doc.id))
+  if (safeExcludeDocumentIds.value.length > 0) {
+    filteredDocs = filteredDocs.filter((doc) => !safeExcludeDocumentIds.value.includes(doc.id))
   }
 
   // Filter by search query
@@ -113,8 +123,8 @@ const filteredDocuments = computed<SteeringDocument[]>(() => {
     const query = searchQuery.value.toLowerCase()
     filteredDocs = filteredDocs.filter(
       (doc) =>
-        doc.title.toLowerCase().includes(query) ||
-        doc.reference_id.toLowerCase().includes(query) ||
+        doc.title?.toLowerCase().includes(query) ||
+        doc.reference_id?.toLowerCase().includes(query) ||
         (doc.description && doc.description.toLowerCase().includes(query)),
     )
   }
@@ -123,7 +133,7 @@ const filteredDocuments = computed<SteeringDocument[]>(() => {
 })
 
 const selectedDocument = computed(() => {
-  if (!props.modelValue) return null
+  if (!props.modelValue || !Array.isArray(documents.value)) return null
   return documents.value.find((doc) => doc.id === props.modelValue) || null
 })
 
@@ -141,10 +151,13 @@ const loadDocuments = async (): Promise<void> => {
     loading.value = true
     error.value = null
     const response = await steeringDocumentService.list()
-    documents.value = response.steering_documents
+    // Ensure we always have an array, even if the response is malformed
+    documents.value = Array.isArray(response?.data) ? response.data : []
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Ошибка загрузки документов'
     console.error('Error loading steering documents:', err)
+    // Ensure documents is still an array on error
+    documents.value = []
   } finally {
     loading.value = false
   }

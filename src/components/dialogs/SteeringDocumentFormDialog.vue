@@ -35,7 +35,8 @@
                   v-model="form.description"
                   label="Описание (Markdown)"
                   :rules="descriptionRules"
-                  :counter="50000"
+                  :counter="true"
+                  :max-length="50000"
                   :disabled="loading"
                   placeholder="Подробное описание steering-документа с поддержкой Markdown..."
                 />
@@ -226,6 +227,7 @@ onMounted(() => {
 // Expose methods for parent component
 defineExpose({
   resetForm,
+  handleSubmit,
 })
 </script>
 

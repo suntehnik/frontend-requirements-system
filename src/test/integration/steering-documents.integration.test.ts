@@ -58,8 +58,10 @@ describe('Steering Documents Integration Tests', () => {
 
     // Setup default mock implementations
     mockSteeringDocumentService.list.mockResolvedValue({
-      steering_documents: mockSteeringDocuments,
-      count: mockSteeringDocuments.length,
+      data: mockSteeringDocuments,
+      total_count: mockSteeringDocuments.length,
+      limit: 50,
+      offset: 0,
     })
 
     mockSteeringDocumentService.get.mockResolvedValue(mockSteeringDocument)
@@ -86,7 +88,7 @@ describe('Steering Documents Integration Tests', () => {
       // Test Read (list)
       const listResponse = await steeringDocumentService.list()
       expect(mockSteeringDocumentService.list).toHaveBeenCalled()
-      expect(listResponse.steering_documents).toEqual(mockSteeringDocuments)
+      expect(listResponse.data).toEqual(mockSteeringDocuments)
 
       // Test Read (get)
       const document = await steeringDocumentService.get('STD-001')

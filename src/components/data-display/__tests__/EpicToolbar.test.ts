@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import EpicToolbar from '../EpicToolbar.vue'
 import { epicService } from '@/services/epic-service'
-import type { Epic, User, WorkflowStatus } from '@/types'
+import type { Epic, User, WorkflowStatus, Priority } from '@/types'
 
 // Mock services
 vi.mock('@/services/epic-service', () => ({
@@ -83,7 +83,7 @@ describe('EpicToolbar', () => {
     id: 'user1',
     username: 'testuser',
     email: 'test@example.com',
-    role: 'user' as const,
+    role: 'User' as const,
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
   }
@@ -256,14 +256,14 @@ describe('EpicToolbar', () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
 
-      const updatedEpic = { ...mockEpic, priority: 2 } // High priority
+      const updatedEpic = { ...mockEpic, priority: 2 as Priority } // High priority
       await wrapper.setProps({ epic: updatedEpic })
 
       expect(vm.localPriority).toBe(2)
     })
 
     it('calls epicService.update when priority is updated', async () => {
-      const mockUpdatedEpic = { ...mockEpic, priority: 2 } // High priority
+      const mockUpdatedEpic = { ...mockEpic, priority: 2 as Priority } // High priority
       vi.mocked(epicService.update).mockResolvedValue(mockUpdatedEpic)
 
       const wrapper = createWrapper()

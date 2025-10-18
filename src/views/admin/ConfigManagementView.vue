@@ -312,7 +312,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { steeringDocumentService } from '@/services'
 import type { SteeringDocument } from '@/types'
@@ -553,9 +553,10 @@ const loadSteeringDocuments = async () => {
   try {
     steeringDocumentsLoading.value = true
     const response = await steeringDocumentService.list({ include: 'creator' })
-    steeringDocuments.value = response.steering_documents
+    steeringDocuments.value = response.data || []
   } catch (error) {
     console.error('Error loading steering documents:', error)
+    steeringDocuments.value = []
   } finally {
     steeringDocumentsLoading.value = false
   }
@@ -593,6 +594,7 @@ const saveSteeringDocument = async () => {
       })
     }
 
+    // Refresh the list to show the new/updated document
     await loadSteeringDocuments()
     closeSteeringDocumentDialog()
   } catch (error) {
@@ -622,6 +624,8 @@ const confirmDeleteSteeringDocument = async () => {
   try {
     deletingSteeringDocument.value = true
     await steeringDocumentService.delete(documentToDelete.value.id)
+    
+    // Refresh the list to remove the deleted document
     await loadSteeringDocuments()
     closeDeleteSteeringDocumentDialog()
   } catch (error) {
@@ -630,6 +634,13 @@ const confirmDeleteSteeringDocument = async () => {
     deletingSteeringDocument.value = false
   }
 }
+
+// Watch for tab changes to refresh data when needed
+watch(activeTab, (newTab) => {
+  if (newTab === 'steering-documents') {
+    loadSteeringDocuments()
+  }
+})
 
 // Load steering documents when component mounts
 onMounted(() => {

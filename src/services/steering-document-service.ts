@@ -74,11 +74,11 @@ export class SteeringDocumentService extends BaseApiService {
    * Get all steering documents linked to an epic
    */
   async getEpicDocuments(epicId: string): Promise<SteeringDocument[]> {
-    const response = await this.apiGet<{ steering_documents: SteeringDocument[] }>(
+    const response = await this.apiGet<{ data: SteeringDocument[] }>(
       `/epics/${epicId}/steering-documents`,
       {},
     )
-    return response.steering_documents
+    return response.data
   }
 }
 

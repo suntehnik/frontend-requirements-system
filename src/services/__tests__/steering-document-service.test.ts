@@ -41,8 +41,10 @@ describe('SteeringDocumentService', () => {
   describe('list', () => {
     it('should get list of steering documents without parameters', async () => {
       const mockResponse: SteeringDocumentListResponse = {
-        steering_documents: [mockSteeringDocument],
-        count: 1,
+        data: [mockSteeringDocument],
+        total_count: 1,
+        limit: 50,
+        offset: 0,
       }
 
       vi.mocked(httpClient.get).mockResolvedValue(mockResponse)
@@ -63,8 +65,10 @@ describe('SteeringDocumentService', () => {
       }
 
       const mockResponse: SteeringDocumentListResponse = {
-        steering_documents: [mockSteeringDocument],
-        count: 1,
+        data: [mockSteeringDocument],
+        total_count: 1,
+        limit: 50,
+        offset: 0,
       }
 
       vi.mocked(httpClient.get).mockResolvedValue(mockResponse)
@@ -303,7 +307,7 @@ describe('SteeringDocumentService', () => {
   describe('getEpicDocuments', () => {
     it('should get epic documents successfully', async () => {
       const mockResponse = {
-        steering_documents: [mockSteeringDocument],
+        data: [mockSteeringDocument],
       }
 
       vi.mocked(httpClient.get).mockResolvedValue(mockResponse)
@@ -316,7 +320,7 @@ describe('SteeringDocumentService', () => {
 
     it('should handle empty epic documents response', async () => {
       const mockResponse = {
-        steering_documents: [],
+        data: [],
       }
 
       vi.mocked(httpClient.get).mockResolvedValue(mockResponse)
@@ -348,8 +352,10 @@ describe('SteeringDocumentService', () => {
       }
 
       const mockResponse: SteeringDocumentListResponse = {
-        steering_documents: [],
-        count: 0,
+        data: [],
+        total_count: 0,
+        limit: 50,
+        offset: 0,
       }
 
       vi.mocked(httpClient.get).mockResolvedValue(mockResponse)
@@ -380,8 +386,10 @@ describe('SteeringDocumentService', () => {
       }
 
       const mockResponse: SteeringDocumentListResponse = {
-        steering_documents: [],
-        count: 0,
+        data: [],
+        total_count: 0,
+        limit: 50,
+        offset: 0,
       }
 
       vi.mocked(httpClient.get).mockResolvedValue(mockResponse)

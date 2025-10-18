@@ -140,6 +140,7 @@
         <v-card-title>Выберите документ для привязки</v-card-title>
         <v-card-text>
           <SteeringDocumentSelector
+            ref="selectorRef"
             v-model="selectedDocumentId"
             :exclude-document-ids="linkedDocumentIds"
             label="Документ"
@@ -244,6 +245,9 @@ const selectedDocument = ref<SteeringDocument>()
 const documentToUnlink = ref<SteeringDocument>()
 const selectedDocumentId = ref<string | null>(null)
 
+// Component refs
+const selectorRef = ref()
+
 // Computed
 const internalValue = computed({
   get: () => props.modelValue,
@@ -289,7 +293,11 @@ const editDocument = (document: SteeringDocument) => {
   showFormDialog.value = true
 }
 
-const showLinkDialog = () => {
+const showLinkDialog = async () => {
+  // Refresh the selector data before showing the dialog
+  if (selectorRef.value?.loadDocuments) {
+    await selectorRef.value.loadDocuments()
+  }
   showSelectorDialog.value = true
 }
 
@@ -319,6 +327,12 @@ const handleDocumentSubmit = async (
 
     showFormDialog.value = false
     await loadEpicDocuments()
+    
+    // Refresh the selector to update available documents
+    if (selectorRef.value?.loadDocuments) {
+      await selectorRef.value.loadDocuments()
+    }
+    
     emit('documentsUpdated')
   } catch (error: unknown) {
     console.error('Error saving document:', error)
@@ -342,13 +356,19 @@ const handleDocumentLinkConfirm = async () => {
 
     await steeringDocumentService.linkToEpic(props.epic.id, selectedDocumentId.value)
 
-    // Find the document to show in success message
-    const linkedDocument = epicDocuments.value?.find((doc) => doc.id === selectedDocumentId.value)
+    // Get the document title from the selector before clearing
+    const linkedDocument = selectorRef.value?.selectedDocument
     successMessage.value = `Документ "${linkedDocument?.title || 'выбранный документ'}" успешно привязан к эпику`
 
     showSelectorDialog.value = false
     selectedDocumentId.value = null
     await loadEpicDocuments()
+    
+    // Refresh the selector to update available documents
+    if (selectorRef.value?.loadDocuments) {
+      await selectorRef.value.loadDocuments()
+    }
+    
     emit('documentsUpdated')
   } catch (error: unknown) {
     console.error('Error linking document:', error)
@@ -371,6 +391,12 @@ const handleDocumentUnlink = async () => {
     showUnlinkDialog.value = false
     documentToUnlink.value = undefined
     await loadEpicDocuments()
+    
+    // Refresh the selector to update available documents
+    if (selectorRef.value?.loadDocuments) {
+      await selectorRef.value.loadDocuments()
+    }
+    
     emit('documentsUpdated')
   } catch (error: unknown) {
     console.error('Error unlinking document:', error)
