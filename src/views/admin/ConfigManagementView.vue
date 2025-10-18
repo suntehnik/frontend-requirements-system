@@ -13,6 +13,7 @@
             <v-tab value="requirement-types">Типы требований</v-tab>
             <v-tab value="relationship-types">Типы связей</v-tab>
             <v-tab value="status-models">Модели статусов</v-tab>
+            <v-tab value="steering-documents">Steering Documents</v-tab>
           </v-tabs>
 
           <v-tabs-window v-model="activeTab">
@@ -150,6 +151,62 @@
                 </v-data-table>
               </v-card-text>
             </v-tabs-window-item>
+
+            <!-- Steering Documents Tab -->
+            <v-tabs-window-item value="steering-documents">
+              <v-card-text>
+                <div class="d-flex justify-space-between align-center mb-4">
+                  <h3 class="text-h6">Steering Documents</h3>
+                  <v-btn
+                    color="primary"
+                    prepend-icon="mdi-plus"
+                    @click="openSteeringDocumentDialog"
+                  >
+                    Создать документ
+                  </v-btn>
+                </div>
+
+                <v-data-table
+                  :headers="steeringDocumentHeaders"
+                  :items="steeringDocuments"
+                  :loading="steeringDocumentsLoading"
+                  class="elevation-1"
+                  @click:row="navigateToSteeringDocument"
+                >
+                  <template v-slot:[`item.reference_id`]="{ item }">
+                    <v-btn
+                      variant="text"
+                      color="primary"
+                      @click.stop="navigateToSteeringDocument(null, { item })"
+                    >
+                      {{ item.reference_id }}
+                    </v-btn>
+                  </template>
+
+                  <template v-slot:[`item.creator`]="{ item }">
+                    {{ item.creator?.username || 'Неизвестно' }}
+                  </template>
+
+                  <template v-slot:[`item.created_at`]="{ item }">
+                    {{ formatDate(item.created_at) }}
+                  </template>
+
+                  <template v-slot:[`item.updated_at`]="{ item }">
+                    {{ formatDate(item.updated_at) }}
+                  </template>
+
+                  <template v-slot:[`item.actions`]="{ item }">
+                    <v-btn
+                      icon="mdi-delete"
+                      size="small"
+                      variant="text"
+                      color="error"
+                      @click.stop="openDeleteSteeringDocumentDialog(item)"
+                    />
+                  </template>
+                </v-data-table>
+              </v-card-text>
+            </v-tabs-window-item>
           </v-tabs-window>
         </v-card>
       </v-col>
@@ -187,13 +244,78 @@
       </v-card>
     </v-dialog>
 
+    <!-- Steering Document Dialog -->
+    <v-dialog v-model="steeringDocumentDialog" max-width="600px">
+      <v-card>
+        <v-card-title>
+          {{ editingSteeringDocument ? 'Редактировать документ' : 'Создать документ' }}
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="steeringDocumentFormRef" v-model="steeringDocumentFormValid">
+            <v-text-field
+              v-model="steeringDocumentForm.title"
+              label="Название"
+              variant="outlined"
+              class="mb-3"
+              :rules="titleRules"
+              required
+            />
+            <v-textarea
+              v-model="steeringDocumentForm.description"
+              label="Описание (Markdown поддерживается)"
+              variant="outlined"
+              rows="5"
+              :rules="descriptionRules"
+            />
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn @click="closeSteeringDocumentDialog">Отмена</v-btn>
+          <v-btn
+            color="primary"
+            @click="saveSteeringDocument"
+            :disabled="!steeringDocumentFormValid"
+            :loading="savingSteeringDocument"
+          >
+            {{ editingSteeringDocument ? 'Сохранить' : 'Создать' }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Delete Steering Document Confirmation Dialog -->
+    <v-dialog v-model="deleteSteeringDocumentDialog" max-width="400px">
+      <v-card>
+        <v-card-title>Подтверждение удаления</v-card-title>
+        <v-card-text>
+          Вы уверены, что хотите удалить документ "{{ documentToDelete?.title }}"? Это действие
+          нельзя отменить.
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn @click="closeDeleteSteeringDocumentDialog">Отмена</v-btn>
+          <v-btn
+            color="error"
+            @click="confirmDeleteSteeringDocument"
+            :loading="deletingSteeringDocument"
+          >
+            Удалить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- Similar dialogs for relationship types and status models would go here -->
     <!-- For brevity, I'll include just the structure -->
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { steeringDocumentService } from '@/services'
+import type { SteeringDocument } from '@/types'
 
 interface RequirementType {
   id: string
@@ -217,9 +339,23 @@ interface StatusModel {
   created_at: string
 }
 
+const router = useRouter()
+
 const activeTab = ref('requirement-types')
 const requirementTypeDialog = ref(false)
 const editingRequirementType = ref<RequirementType | null>(null)
+
+// Steering Documents state
+const steeringDocuments = ref<SteeringDocument[]>([])
+const steeringDocumentsLoading = ref(false)
+const steeringDocumentDialog = ref(false)
+const editingSteeringDocument = ref<SteeringDocument | null>(null)
+const deleteSteeringDocumentDialog = ref(false)
+const documentToDelete = ref<SteeringDocument | null>(null)
+const savingSteeringDocument = ref(false)
+const deletingSteeringDocument = ref(false)
+const steeringDocumentFormValid = ref(false)
+const steeringDocumentFormRef = ref()
 
 // Headers
 const requirementTypeHeaders = [
@@ -242,6 +378,15 @@ const statusModelHeaders = [
   { title: 'По умолчанию', key: 'is_default', sortable: true },
   { title: 'Создана', key: 'created_at', sortable: true },
   { title: 'Действия', key: 'actions', sortable: false },
+]
+
+const steeringDocumentHeaders = [
+  { title: 'Reference ID', key: 'reference_id', sortable: true },
+  { title: 'Title', key: 'title', sortable: true },
+  { title: 'Creator', key: 'creator', sortable: false },
+  { title: 'Created At', key: 'created_at', sortable: true },
+  { title: 'Updated At', key: 'updated_at', sortable: true },
+  { title: 'Actions', key: 'actions', sortable: false },
 ]
 
 // Mock data
@@ -316,6 +461,21 @@ const requirementTypeForm = ref({
   description: '',
 })
 
+const steeringDocumentForm = ref({
+  title: '',
+  description: '',
+})
+
+// Validation rules
+const titleRules = [
+  (v: string) => !!v || 'Название обязательно',
+  (v: string) => (v && v.length <= 500) || 'Название должно быть не более 500 символов',
+]
+
+const descriptionRules = [
+  (v: string) => !v || v.length <= 50000 || 'Описание должно быть не более 50000 символов',
+]
+
 // Methods
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('ru-RU')
@@ -387,4 +547,103 @@ const openDeleteStatusModelDialog = (item: StatusModel) => {
 const viewStatusModel = (item: StatusModel) => {
   console.log('View status model:', item)
 }
+
+// Steering Documents methods
+const loadSteeringDocuments = async () => {
+  try {
+    steeringDocumentsLoading.value = true
+    const response = await steeringDocumentService.list({ include: 'creator' })
+    steeringDocuments.value = response.data || []
+  } catch (error) {
+    console.error('Error loading steering documents:', error)
+    steeringDocuments.value = []
+  } finally {
+    steeringDocumentsLoading.value = false
+  }
+}
+
+const openSteeringDocumentDialog = () => {
+  editingSteeringDocument.value = null
+  steeringDocumentForm.value = { title: '', description: '' }
+  steeringDocumentDialog.value = true
+}
+
+const closeSteeringDocumentDialog = () => {
+  steeringDocumentDialog.value = false
+  editingSteeringDocument.value = null
+  steeringDocumentFormValid.value = false
+}
+
+const saveSteeringDocument = async () => {
+  if (!steeringDocumentFormValid.value) return
+
+  try {
+    savingSteeringDocument.value = true
+
+    if (editingSteeringDocument.value) {
+      // Update existing document
+      await steeringDocumentService.update(editingSteeringDocument.value.id, {
+        title: steeringDocumentForm.value.title,
+        description: steeringDocumentForm.value.description || undefined,
+      })
+    } else {
+      // Create new document
+      await steeringDocumentService.create({
+        title: steeringDocumentForm.value.title,
+        description: steeringDocumentForm.value.description || undefined,
+      })
+    }
+
+    // Refresh the list to show the new/updated document
+    await loadSteeringDocuments()
+    closeSteeringDocumentDialog()
+  } catch (error) {
+    console.error('Error saving steering document:', error)
+  } finally {
+    savingSteeringDocument.value = false
+  }
+}
+
+const navigateToSteeringDocument = (event: Event | null, { item }: { item: SteeringDocument }) => {
+  router.push(`/steering-documents/${item.reference_id}`)
+}
+
+const openDeleteSteeringDocumentDialog = (item: SteeringDocument) => {
+  documentToDelete.value = item
+  deleteSteeringDocumentDialog.value = true
+}
+
+const closeDeleteSteeringDocumentDialog = () => {
+  deleteSteeringDocumentDialog.value = false
+  documentToDelete.value = null
+}
+
+const confirmDeleteSteeringDocument = async () => {
+  if (!documentToDelete.value) return
+
+  try {
+    deletingSteeringDocument.value = true
+    await steeringDocumentService.delete(documentToDelete.value.id)
+
+    // Refresh the list to remove the deleted document
+    await loadSteeringDocuments()
+    closeDeleteSteeringDocumentDialog()
+  } catch (error) {
+    console.error('Error deleting steering document:', error)
+  } finally {
+    deletingSteeringDocument.value = false
+  }
+}
+
+// Watch for tab changes to refresh data when needed
+watch(activeTab, (newTab) => {
+  if (newTab === 'steering-documents') {
+    loadSteeringDocuments()
+  }
+})
+
+// Load steering documents when component mounts
+onMounted(() => {
+  loadSteeringDocuments()
+})
 </script>

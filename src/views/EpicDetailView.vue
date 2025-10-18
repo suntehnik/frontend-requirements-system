@@ -25,7 +25,11 @@
           </div>
 
           <!-- Epic Toolbar (Inline Editing) -->
-          <EpicToolbar :epic="epic" @updated="handleEpicUpdate" />
+          <EpicToolbar
+            :epic="epic"
+            @updated="handleEpicUpdate"
+            @documents-updated="handleDocumentsUpdate"
+          />
 
           <!-- Epic Description (Markdown) -->
           <EpicDescription
@@ -40,10 +44,59 @@
             :loading="userStoriesLoading"
             @add-user-story="addUserStory"
           />
+
+          <!-- Steering Documents Section -->
+          <v-card flat outlined class="mt-6">
+            <v-card-title class="text-h6 pb-2">
+              <v-icon start>mdi-file-document-outline</v-icon>
+              Связанные документы
+            </v-card-title>
+            <v-card-text>
+              <div v-if="steeringDocumentsLoading" class="text-center py-4">
+                <v-progress-circular indeterminate size="32" color="primary" />
+              </div>
+              <div v-else-if="steeringDocuments && steeringDocuments.length > 0">
+                <v-list density="compact">
+                  <v-list-item
+                    v-for="document in steeringDocuments"
+                    :key="document.id"
+                    :title="document.title"
+                    :subtitle="document.reference_id"
+                    @click="navigateToSteeringDocument(document)"
+                    class="cursor-pointer"
+                  >
+                    <template #prepend>
+                      <v-icon color="primary">mdi-file-document-outline</v-icon>
+                    </template>
+                    <template #append>
+                      <v-icon>mdi-chevron-right</v-icon>
+                    </template>
+                  </v-list-item>
+                </v-list>
+              </div>
+              <div v-else class="text-center text-grey-darken-1 py-4">
+                <v-icon size="32" color="grey-lighten-1" class="mb-2"
+                  >mdi-file-document-outline</v-icon
+                >
+                <div class="text-body-2">Нет связанных документов</div>
+              </div>
+              <v-divider class="my-3" />
+              <v-btn
+                color="primary"
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-cog"
+                @click="showSteeringDocumentsManagement"
+              >
+                Управлять документами
+              </v-btn>
+            </v-card-text>
+          </v-card>
         </v-col>
 
         <!-- Right Column: Comments -->
         <v-col cols="12" lg="4" md="5" class="pl-md-2">
+          <!-- Comments Section -->
           <v-card flat outlined class="fill-height d-flex flex-column">
             <v-card-title class="text-h6 pb-2">Комментарии</v-card-title>
 
@@ -161,6 +214,13 @@
         <v-btn color="white" variant="text" @click="showErrorMessage = false"> Закрыть </v-btn>
       </template>
     </v-snackbar>
+
+    <!-- Steering Documents Management Dialog -->
+    <EpicSteeringDocumentsDialog
+      v-model="showSteeringDocumentsDialog"
+      :epic="epic || undefined"
+      @documents-updated="handleDocumentsUpdate"
+    />
   </div>
 </template>
 
@@ -169,10 +229,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { epicService } from '@/services/epic-service'
 import { commentService } from '@/services/comment-service'
+import { steeringDocumentService } from '@/services'
+
 import { useEntitiesStore } from '@/stores/entities'
 import { EpicForm, FullscreenMarkdownEditor } from '@/components/forms'
 import { EpicToolbar, EpicDescription, UserStoriesPanel } from '@/components/data-display'
-import type { Epic, UserStory, Comment, UpdateEpicRequest } from '@/types'
+import EpicSteeringDocumentsDialog from '@/components/dialogs/EpicSteeringDocumentsDialog.vue'
+import type { Epic, UserStory, Comment, UpdateEpicRequest, SteeringDocument } from '@/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -182,9 +245,11 @@ const entitiesStore = useEntitiesStore()
 const epic = ref<Epic | null>(null)
 const userStories = ref<UserStory[] | null>(null)
 const comments = ref<Comment[] | null>(null)
+const steeringDocuments = ref<SteeringDocument[] | null>(null)
 const loading = ref(true)
 const userStoriesLoading = ref(false)
 const commentsLoading = ref(false)
+const steeringDocumentsLoading = ref(false)
 const commentSubmitting = ref(false)
 const error = ref<string | null>(null)
 const newCommentContent = ref('')
@@ -197,6 +262,9 @@ const formLoading = ref(false)
 const showDescriptionEditor = ref(false)
 const descriptionEditorValue = ref('')
 const descriptionSaving = ref(false)
+
+// Steering documents dialog state
+const showSteeringDocumentsDialog = ref(false)
 
 // Success/Error messages
 const showSuccessMessage = ref(false)
@@ -238,6 +306,9 @@ const loadEpic = async () => {
 
     // Always load comments separately to ensure we get the latest data
     await loadComments()
+
+    // Load steering documents
+    await loadSteeringDocuments()
   } catch (err) {
     console.error('Failed to load epic:', err)
     error.value = err instanceof Error ? err.message : 'Не удалось загрузить эпик'
@@ -288,6 +359,21 @@ const loadComments = async () => {
     comments.value = []
   } finally {
     commentsLoading.value = false
+  }
+}
+
+const loadSteeringDocuments = async () => {
+  if (!epic.value?.id) return
+
+  try {
+    steeringDocumentsLoading.value = true
+    steeringDocuments.value = await steeringDocumentService.getEpicDocuments(epic.value.id)
+  } catch (err) {
+    console.error('Failed to load steering documents:', err)
+    // Don't show error for steering documents, just keep empty array
+    steeringDocuments.value = []
+  } finally {
+    steeringDocumentsLoading.value = false
   }
 }
 
@@ -409,6 +495,19 @@ const handleEpicUpdate = (updatedEpic: Epic) => {
   showSuccess('Эпик успешно обновлен')
 }
 
+const handleDocumentsUpdate = () => {
+  // Refresh steering documents when they are updated
+  loadSteeringDocuments()
+}
+
+const showSteeringDocumentsManagement = () => {
+  showSteeringDocumentsDialog.value = true
+}
+
+const navigateToSteeringDocument = (document: SteeringDocument) => {
+  router.push(`/steering-documents/${document.reference_id}`)
+}
+
 const formatCommentDate = (dateString: string) => {
   const date = new Date(dateString)
   const now = new Date()
@@ -437,5 +536,9 @@ onMounted(() => {
 <style scoped>
 .author-chip {
   color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>

@@ -68,6 +68,14 @@ const router = createRouter({
           component: () => import('@/views/RequirementDetailView.vue'),
         },
 
+        // Steering Documents
+        {
+          path: '/steering-documents/:referenceId',
+          name: 'steering-document-detail',
+          component: () => import('@/views/SteeringDocumentDetailView.vue'),
+          meta: { requiresAuth: true },
+        },
+
         // Search
         {
           path: '/search',
