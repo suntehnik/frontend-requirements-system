@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
 import EpicToolbar from '../EpicToolbar.vue'
 import { epicService } from '@/services/epic-service'
 import type { Epic, User, WorkflowStatus, Priority } from '@/types'
@@ -30,11 +29,7 @@ const globalStubs = {
     props: ['priority', 'size', 'variant', 'loading'],
     emits: ['priority-change', 'error'],
   },
-  EpicSteeringDocumentsDialog: {
-    template: '<div class="epic-steering-documents-dialog-stub" />',
-    props: ['modelValue', 'epic'],
-    emits: ['update:modelValue', 'documents-updated'],
-  },
+
   'v-chip': {
     template: '<div class="v-chip-stub"><slot /></div>',
     props: ['color', 'size', 'loading', 'class', 'rounded'],
@@ -119,85 +114,7 @@ describe('EpicToolbar', () => {
       expect(wrapper.find('.v-chip-stub').exists()).toBe(true) // Assignee chip
     })
 
-    it('renders Steering Documents button', () => {
-      const wrapper = createWrapper()
 
-      const steeringButton = wrapper.find('.v-btn-stub')
-      expect(steeringButton.exists()).toBe(true)
-      expect(steeringButton.text()).toContain('Steering Documents')
-    })
-
-    it('renders EpicSteeringDocumentsDialog component', () => {
-      const wrapper = createWrapper()
-
-      const dialog = wrapper.find('.epic-steering-documents-dialog-stub')
-      expect(dialog.exists()).toBe(true)
-    })
-  })
-
-  describe('Steering Documents Integration', () => {
-    it('passes epic prop to EpicSteeringDocumentsDialog', () => {
-      const wrapper = createWrapper()
-
-      const dialog = wrapper.find('.epic-steering-documents-dialog-stub')
-      expect(dialog.exists()).toBe(true)
-
-      // Check that the dialog component receives the epic prop through the component instance
-      const vm = wrapper.vm as any
-      expect(vm.epic).toEqual(mockEpic)
-    })
-
-    it('opens steering documents dialog when button is clicked', async () => {
-      const wrapper = createWrapper()
-      const vm = wrapper.vm as any
-
-      // Initially dialog should be closed
-      expect(vm.steeringDocumentsDialogOpen).toBe(false)
-
-      // Click the steering documents button
-      await vm.showSteeringDocumentsDialog()
-
-      expect(vm.steeringDocumentsDialogOpen).toBe(true)
-    })
-
-    it('binds dialog visibility to steeringDocumentsDialogOpen state', async () => {
-      const wrapper = createWrapper()
-      const vm = wrapper.vm as any
-
-      const dialog = wrapper.find('.epic-steering-documents-dialog-stub')
-      expect(dialog.exists()).toBe(true)
-
-      // Initially closed
-      expect(vm.steeringDocumentsDialogOpen).toBe(false)
-
-      // Open dialog
-      vm.steeringDocumentsDialogOpen = true
-      await nextTick()
-
-      expect(vm.steeringDocumentsDialogOpen).toBe(true)
-    })
-
-    it('emits documentsUpdated event when dialog emits documents-updated', async () => {
-      const wrapper = createWrapper()
-      const vm = wrapper.vm as any
-
-      // Call the handler directly to test the event emission
-      vm.handleDocumentsUpdated()
-      await nextTick()
-
-      expect(wrapper.emitted('documentsUpdated')).toBeTruthy()
-    })
-
-    it('handles documents updated event correctly', async () => {
-      const wrapper = createWrapper()
-      const vm = wrapper.vm as any
-
-      // Call the handler directly
-      vm.handleDocumentsUpdated()
-      await nextTick()
-
-      expect(wrapper.emitted('documentsUpdated')).toBeTruthy()
-    })
   })
 
   describe('Status Management', () => {
@@ -413,7 +330,7 @@ describe('EpicToolbar', () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
       const error = new Error('Status error')
 
       vm.handleStatusError(error)
@@ -426,7 +343,7 @@ describe('EpicToolbar', () => {
       const wrapper = createWrapper()
       const vm = wrapper.vm as any
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
       const error = new Error('Priority error')
 
       vm.handlePriorityError(error)

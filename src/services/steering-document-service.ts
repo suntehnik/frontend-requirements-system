@@ -16,12 +16,12 @@ export class SteeringDocumentService extends BaseApiService {
   async list(params?: SteeringDocumentListParams): Promise<SteeringDocumentListResponse> {
     const queryParams = params
       ? this.buildQueryParams({
-          creator_id: params.creator_id,
-          order_by: params.order_by,
-          limit: params.limit,
-          offset: params.offset,
-          include: this.buildIncludeParam(params.include),
-        })
+        creator_id: params.creator_id,
+        order_by: params.order_by,
+        limit: params.limit,
+        offset: params.offset,
+        include: this.buildIncludeParam(params.include),
+      })
       : {}
 
     return await this.apiGet<SteeringDocumentListResponse>(this.entityPath, queryParams)
@@ -74,11 +74,10 @@ export class SteeringDocumentService extends BaseApiService {
    * Get all steering documents linked to an epic
    */
   async getEpicDocuments(epicId: string): Promise<SteeringDocument[]> {
-    const response = await this.apiGet<{ data: SteeringDocument[] }>(
+    return await this.apiGet<SteeringDocument[]>(
       `/epics/${epicId}/steering-documents`,
       {},
     )
-    return response.data
   }
 }
 
