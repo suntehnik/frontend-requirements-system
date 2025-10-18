@@ -28,7 +28,6 @@
           <EpicToolbar
             :epic="epic"
             @updated="handleEpicUpdate"
-            @documents-updated="handleDocumentsUpdate"
           />
 
           <!-- Epic Description (Markdown) -->
