@@ -306,9 +306,7 @@ describe('SteeringDocumentService', () => {
 
   describe('getEpicDocuments', () => {
     it('should get epic documents successfully', async () => {
-      const mockResponse = {
-        data: [mockSteeringDocument],
-      }
+      const mockResponse: SteeringDocument[] = [mockSteeringDocument]
 
       vi.mocked(httpClient.get).mockResolvedValue(mockResponse)
 
@@ -319,9 +317,7 @@ describe('SteeringDocumentService', () => {
     })
 
     it('should handle empty epic documents response', async () => {
-      const mockResponse = {
-        data: [],
-      }
+      const mockResponse: SteeringDocument[] = []
 
       vi.mocked(httpClient.get).mockResolvedValue(mockResponse)
 
