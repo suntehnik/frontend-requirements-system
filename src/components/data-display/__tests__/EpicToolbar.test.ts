@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
 import EpicToolbar from '../EpicToolbar.vue'
 import { epicService } from '@/services/epic-service'
 import type { Epic, User, WorkflowStatus, Priority } from '@/types'
@@ -117,8 +116,6 @@ describe('EpicToolbar', () => {
 
 
   })
-
-
 
   describe('Status Management', () => {
     it('initializes with epic status', () => {
