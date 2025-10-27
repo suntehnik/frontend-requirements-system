@@ -62,6 +62,7 @@ export interface UserStoryListProps extends BaseListProps {
 export interface UserStoryListEmits {
   (e: 'create'): void
   (e: 'delete', userStory: UserStory): void
+  (e: 'status-change', userStory: UserStory, newStatus: UserStoryStatus): void
   (e: 'filter-change', filters: UserStoryFilterState): void
   (e: 'options-change', options: DataTableOptions): void
   (e: 'search-change', query: string): void

@@ -1,0 +1,15 @@
+{
+  "image": "ghcr.io/suntehnik/frontend-requirements-system",
+  "version": "feature-update-typescript-interfaces-ebc3472",
+  "latest_tag": "ghcr.io/suntehnik/frontend-requirements-system:latest",
+  "version_tag": "ghcr.io/suntehnik/frontend-requirements-system:feature-update-typescript-interfaces-ebc3472",
+  "git_commit": "ebc34724a5ee646a5ec77f77cdd4998711fcc434",
+  "git_branch": "feature/update-typescript-interfaces",
+  "git_tag": "",
+  "build_date": "2025-10-24T21:36:39Z",
+  "registry": "ghcr.io",
+  "repository": "suntehnik/frontend-requirements-system",
+  "build_type": "multi-platform",
+  "platforms": "linux/amd64,linux/arm64",
+  "buildx_enabled": true
+}

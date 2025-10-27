@@ -5,7 +5,7 @@
 set -e
 
 # Default values
-API_URL=${API_URL:-"https://app.spexus.ai"}
+API_URL=${API_URL:-"http://spexus.msk.avito.ru"}
 APP_TITLE=${APP_TITLE:-"Requirements Management System"}
 APP_VERSION=${APP_VERSION:-"1.0.0"}
 IMAGE_NAME=${IMAGE_NAME:-"frontend-requirements-system"}

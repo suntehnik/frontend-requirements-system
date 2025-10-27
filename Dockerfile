@@ -14,7 +14,7 @@ RUN npm ci --only=production=false
 COPY . .
 
 # Build arguments for environment variables
-ARG API_URL=https://app.spexus.ai
+ARG API_URL=http://spexus.msk.avito.ru
 ARG APP_TITLE="Requirements Management System"
 ARG APP_VERSION=1.0.0
 
@@ -31,16 +31,17 @@ RUN apk add --no-cache gettext
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy nginx configuration template
-COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+# COPY ci-cd/nginx.conf.template /etc/nginx/templates/default.conf.template
 
 # Copy environment substitution script
-COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY ci-cd/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 # Environment variables that can be set at runtime
-ENV API_URL=https://app.spexus.ai
+ENV API_URL=http://spexus.msk.avito.ru
 ENV APP_TITLE="Requirements Management System"
 ENV APP_VERSION=1.0.0
+ENV API_VERSION=v1
 
 # Expose port 80
 EXPOSE 80
