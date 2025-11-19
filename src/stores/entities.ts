@@ -394,13 +394,13 @@ export const useEntitiesStore = defineStore('entities', () => {
     }
   }
 
-  async function fetchUserStory(id: string, include?: string) {
+  async function fetchUserStory(id: string) {
     const key = `user-story-${id}`
     setLoading(key, true)
     clearError(key)
 
     try {
-      const story = await userStoryService.get(id, include)
+      const story = await userStoryService.get(id)
       userStories.value.set(story.id, story)
       return story
     } catch (error) {

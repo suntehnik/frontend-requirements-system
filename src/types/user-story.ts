@@ -59,3 +59,33 @@ export interface UserStoryListParams {
 }
 
 export type UserStoryListResponse = ListResponse<UserStory>
+
+// Response types for nested endpoints
+export interface UserStoryWithAcceptanceCriteria extends Omit<UserStory, 'acceptance_criteria'> {
+  acceptance_criteria: Array<{
+    id: string
+    reference_id: string
+    description: string
+    user_story_id: string
+    author_id: string
+    created_at: string
+    updated_at: string
+  }>
+}
+
+export interface UserStoryWithRequirements extends Omit<UserStory, 'requirements'> {
+  requirements: Array<{
+    id: string
+    reference_id: string
+    title: string
+    description?: string
+    status: string
+    priority: Priority
+    user_story_id: string
+    type_id: string
+    creator_id: string
+    assignee_id?: string
+    created_at: string
+    updated_at: string
+  }>
+}

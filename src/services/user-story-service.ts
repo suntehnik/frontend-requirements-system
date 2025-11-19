@@ -38,9 +38,8 @@ export class UserStoryService extends BaseApiService {
     return await this.apiGet<UserStoryListResponse>(this.entityPath, queryParams)
   }
 
-  async get(id: string, include?: string): Promise<UserStory> {
-    const params = include ? { include: this.buildIncludeParam(include) } : {}
-    return await this.apiGet<UserStory>(`${this.entityPath}/${id}`, params)
+  async get(id: string): Promise<UserStory> {
+    return await this.apiGet<UserStory>(`${this.entityPath}/${id}`)
   }
 
   async create(request: CreateUserStoryRequest): Promise<UserStory> {
@@ -56,7 +55,12 @@ export class UserStoryService extends BaseApiService {
   }
 
   async getAcceptanceCriteria(id: string): Promise<AcceptanceCriteria[]> {
-    return await this.apiGet<AcceptanceCriteria[]>(`${this.entityPath}/${id}/acceptance-criteria`)
+    const response = await this.apiGet<{ data: AcceptanceCriteria[] }>('/acceptance-criteria', {
+      user_story_id: id,
+      limit: 50,
+      offset: 0,
+    })
+    return response.data || []
   }
 
   async createAcceptanceCriteria(
@@ -70,7 +74,12 @@ export class UserStoryService extends BaseApiService {
   }
 
   async getRequirements(id: string): Promise<Requirement[]> {
-    return await this.apiGet<Requirement[]>(`${this.entityPath}/${id}/requirements`)
+    const response = await this.apiGet<{ data: Requirement[] }>('/requirements', {
+      user_story_id: id,
+      limit: 50,
+      offset: 0,
+    })
+    return response.data || []
   }
 
   async createRequirement(
