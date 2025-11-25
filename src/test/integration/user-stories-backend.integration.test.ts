@@ -481,7 +481,7 @@ describe('User Stories Backend Integration - CRUD Operations', () => {
       const existingUserStoryId = listResponse.data[0].id
 
       // Retrieve the user story by ID
-      const userStory = await userStoryService.get(existingUserStoryId, 'epic,creator,assignee')
+      const userStory = await userStoryService.get(existingUserStoryId)
 
       expect(userStory).toBeDefined()
       expect(userStory.id).toBe(existingUserStoryId)

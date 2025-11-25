@@ -87,8 +87,55 @@
             </v-card-text>
           </v-card>
 
-          <!-- Acceptance Criteria -->
+          <!-- Requirements -->
           <v-card class="mb-4">
+            <v-card-title>
+              Требования
+              <v-spacer />
+              <v-btn
+                color="primary"
+                size="small"
+                prepend-icon="mdi-plus"
+                @click="addRequirement"
+                :disabled="actionLoading"
+              >
+                Добавить требование
+              </v-btn>
+            </v-card-title>
+            <v-card-text>
+              <div v-if="requirementsLoading" class="text-center py-4">
+                <v-progress-circular indeterminate size="32" color="primary" />
+              </div>
+              <v-list v-else-if="requirements && requirements.length > 0">
+                <v-list-item
+                  v-for="requirement in requirements"
+                  :key="requirement.id"
+                  :to="`/requirements/${requirement.id}`"
+                >
+                  <template v-slot:prepend>
+                    <v-icon>mdi-file-document</v-icon>
+                  </template>
+                  <v-list-item-title>
+                    {{ requirement.reference_id }}: {{ requirement.title }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ requirement.type?.name || 'Неизвестный тип' }} • Создано
+                    {{ formatDate(requirement.created_at) }}
+                    <span v-if="requirement.assignee"> • {{ requirement.assignee.username }}</span>
+                  </v-list-item-subtitle>
+                  <template v-slot:append>
+                    <v-chip :color="getStatusColor(requirement.status)" size="small">
+                      {{ requirement.status }}
+                    </v-chip>
+                  </template>
+                </v-list-item>
+              </v-list>
+              <div v-else class="text-center text-grey-darken-1 py-4">Требования не найдены</div>
+            </v-card-text>
+          </v-card>
+
+          <!-- Acceptance Criteria -->
+          <v-card>
             <v-card-title>
               Критерии приемки
               <v-spacer />
@@ -135,53 +182,6 @@
               </div>
             </v-card-text>
           </v-card>
-
-          <!-- Requirements -->
-          <v-card>
-            <v-card-title>
-              Требования
-              <v-spacer />
-              <v-btn
-                color="primary"
-                size="small"
-                prepend-icon="mdi-plus"
-                @click="addRequirement"
-                :disabled="actionLoading"
-              >
-                Добавить требование
-              </v-btn>
-            </v-card-title>
-            <v-card-text>
-              <div v-if="requirementsLoading" class="text-center py-4">
-                <v-progress-circular indeterminate size="32" color="primary" />
-              </div>
-              <v-list v-else-if="requirements && requirements.length > 0">
-                <v-list-item
-                  v-for="requirement in requirements"
-                  :key="requirement.id"
-                  :to="`/requirements/${requirement.id}`"
-                >
-                  <template v-slot:prepend>
-                    <v-icon>mdi-file-document</v-icon>
-                  </template>
-                  <v-list-item-title>
-                    {{ requirement.reference_id }}: {{ requirement.title }}
-                  </v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ requirement.type?.name || 'Неизвестный тип' }} • Создано
-                    {{ formatDate(requirement.created_at) }}
-                    <span v-if="requirement.assignee"> • {{ requirement.assignee.username }}</span>
-                  </v-list-item-subtitle>
-                  <template v-slot:append>
-                    <v-chip :color="getStatusColor(requirement.status)" size="small">
-                      {{ requirement.status }}
-                    </v-chip>
-                  </template>
-                </v-list-item>
-              </v-list>
-              <div v-else class="text-center text-grey-darken-1 py-4">Требования не найдены</div>
-            </v-card-text>
-          </v-card>
         </v-col>
 
         <!-- Sidebar -->
@@ -202,16 +202,6 @@
               </v-btn>
               <v-btn
                 block
-                color="success"
-                class="mb-2"
-                prepend-icon="mdi-plus"
-                @click="addAcceptanceCriteria"
-                :disabled="actionLoading"
-              >
-                Добавить критерий
-              </v-btn>
-              <v-btn
-                block
                 color="info"
                 class="mb-2"
                 prepend-icon="mdi-plus"
@@ -219,6 +209,16 @@
                 :disabled="actionLoading"
               >
                 Добавить требование
+              </v-btn>
+              <v-btn
+                block
+                color="success"
+                class="mb-2"
+                prepend-icon="mdi-plus"
+                @click="addAcceptanceCriteria"
+                :disabled="actionLoading"
+              >
+                Добавить критерий
               </v-btn>
               <v-btn
                 block
@@ -238,14 +238,14 @@
             <v-card-title>Статистика</v-card-title>
             <v-card-text>
               <div class="d-flex justify-space-between mb-2">
+                <span>Требований:</span>
+                <strong>{{ Array.isArray(requirements) ? requirements.length : 0 }}</strong>
+              </div>
+              <div class="d-flex justify-space-between mb-2">
                 <span>Критериев приемки:</span>
                 <strong>{{
                   Array.isArray(acceptanceCriteria) ? acceptanceCriteria.length : 0
                 }}</strong>
-              </div>
-              <div class="d-flex justify-space-between mb-2">
-                <span>Требований:</span>
-                <strong>{{ Array.isArray(requirements) ? requirements.length : 0 }}</strong>
               </div>
               <div class="d-flex justify-space-between">
                 <span>Активных требований:</span>
@@ -302,25 +302,12 @@ const loadUserStory = async () => {
     loading.value = true
     error.value = null
 
-    // Load user story with related data
-    const userStoryData = await userStoryService.get(
-      userStoryId.value,
-      'epic,creator,assignee,acceptance_criteria,requirements',
-    )
+    // Load user story basic data
+    const userStoryData = await userStoryService.get(userStoryId.value)
     userStory.value = userStoryData
 
-    // Extract acceptance criteria and requirements from user story data or load separately
-    if (userStoryData.acceptance_criteria) {
-      acceptanceCriteria.value = userStoryData.acceptance_criteria as AcceptanceCriteria[]
-    } else {
-      await loadAcceptanceCriteria()
-    }
-
-    if (userStoryData.requirements) {
-      requirements.value = userStoryData.requirements as Requirement[]
-    } else {
-      await loadRequirements()
-    }
+    // Load acceptance criteria and requirements separately
+    await Promise.all([loadAcceptanceCriteria(), loadRequirements()])
   } catch (err) {
     console.error('Failed to load user story:', err)
     error.value =
@@ -333,8 +320,7 @@ const loadUserStory = async () => {
 const loadAcceptanceCriteria = async () => {
   try {
     acceptanceCriteriaLoading.value = true
-    const criteriaData = await userStoryService.getAcceptanceCriteria(userStoryId.value)
-    acceptanceCriteria.value = criteriaData
+    acceptanceCriteria.value = await userStoryService.getAcceptanceCriteria(userStoryId.value)
   } catch (err) {
     console.error('Failed to load acceptance criteria:', err)
     // Don't show error for acceptance criteria, just keep empty array
@@ -347,8 +333,7 @@ const loadAcceptanceCriteria = async () => {
 const loadRequirements = async () => {
   try {
     requirementsLoading.value = true
-    const requirementsData = await userStoryService.getRequirements(userStoryId.value)
-    requirements.value = requirementsData
+    requirements.value = await userStoryService.getRequirements(userStoryId.value)
   } catch (err) {
     console.error('Failed to load requirements:', err)
     // Don't show error for requirements, just keep empty array
