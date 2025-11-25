@@ -31,9 +31,38 @@
                 :rules="descriptionRules"
                 :counter="50000"
                 rows="4"
-                placeholder="Подробное описание пользовательской истории"
+                placeholder="As [role], I want [function], so that [goal]"
                 :disabled="loading"
-              />
+                @focus="handleDescriptionFocus"
+              >
+                <template #append-inner>
+                  <v-tooltip text="Заполнить шаблон">
+                    <template #activator="{ props }">
+                      <v-btn
+                        v-bind="props"
+                        icon="mdi-auto-fix"
+                        size="small"
+                        variant="text"
+                        @click="fillTemplate"
+                        :disabled="loading"
+                      />
+                    </template>
+                  </v-tooltip>
+                </template>
+              </v-textarea>
+              <v-alert
+                v-if="showTemplateHint"
+                type="info"
+                variant="tonal"
+                density="compact"
+                class="mt-2"
+              >
+                <div class="text-caption">
+                  <strong>Шаблон:</strong> As [role], I want [function], so that [goal]
+                  <br />
+                  <strong>Пример:</strong> As a user, I want to create requirements, so that I can track project needs
+                </div>
+              </v-alert>
             </v-col>
           </v-row>
 
@@ -140,6 +169,11 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { PrioritySelector, UserSelector } from '@/components/forms'
 import { useEntitiesStore } from '@/stores/entities'
+import {
+  validateUserStoryTemplate,
+  getUserStoryTemplateErrorMessage,
+  fillUserStoryTemplate,
+} from '@/utils/user-story-validators'
 import type {
   CreateUserStoryRequest,
   Priority,
@@ -161,6 +195,7 @@ const entitiesStore = useEntitiesStore()
 // Form state
 const formRef = ref()
 const isValid = ref(false)
+const showTemplateHint = ref(false)
 
 const form = ref<{
   title: string
@@ -170,7 +205,7 @@ const form = ref<{
   assignee_id: string | null
 }>({
   title: '',
-  description: '',
+  description: fillUserStoryTemplate(''), // Заполняем шаблон сразу при инициализации
   epic_id: null,
   priority: null,
   assignee_id: null,
@@ -194,10 +229,23 @@ const titleRules: ValidationRule[] = [
 ]
 
 const descriptionRules: ValidationRule[] = [
+  (v: unknown) => {
+    if (!v || (typeof v === 'string' && v.trim() === '')) {
+      return 'Описание обязательно'
+    }
+    return true
+  },
   (v: unknown) =>
     !v ||
     (typeof v === 'string' && v.length <= 50000) ||
     'Описание не должно превышать 50000 символов',
+  (v: unknown) => {
+    if (!v || typeof v !== 'string') return true
+    const trimmedValue = v.trim()
+    if (trimmedValue === '') return true
+    
+    return validateUserStoryTemplate(trimmedValue) || getUserStoryTemplateErrorMessage()
+  },
 ]
 
 const epicRules: ValidationRule[] = [(v: unknown) => !!v || 'Эпик обязателен']
@@ -243,15 +291,25 @@ const handleCancel = () => {
   emit('cancel')
 }
 
+const handleDescriptionFocus = () => {
+  showTemplateHint.value = true
+}
+
+const fillTemplate = () => {
+  form.value.description = fillUserStoryTemplate('')
+  showTemplateHint.value = true
+}
+
 const resetForm = () => {
   formRef.value?.reset()
   form.value = {
     title: '',
-    description: '',
+    description: fillUserStoryTemplate(''), // Заполняем шаблон при сбросе формы
     epic_id: null,
     priority: null,
     assignee_id: null,
   }
+  showTemplateHint.value = false
 }
 
 const loadEpics = async () => {
@@ -279,6 +337,8 @@ watch(
 // Lifecycle
 onMounted(() => {
   loadEpics()
+  // Показываем подсказку сразу при открытии формы
+  showTemplateHint.value = true
 })
 
 // Expose methods for parent component

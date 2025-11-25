@@ -9,7 +9,7 @@ interface AppConfig {
 
 // Default configuration (fallback)
 const defaultConfig: AppConfig = {
-  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://app.spexus.ai',
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://spexus.msk.avito.ru',
   APP_TITLE: import.meta.env.VITE_APP_TITLE || 'Requirements Management System',
   APP_VERSION: import.meta.env.VITE_APP_VERSION || '1.0.0',
   API_VERSION: import.meta.env.VITE_API_VERSION || 'v1',

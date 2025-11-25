@@ -276,10 +276,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { userStoryService } from '@/services/user-story-service'
-import type { UserStory, AcceptanceCriteria, Requirement } from '@/types'
+import { useEntitiesStore } from '@/stores/entities'
+import type { UserStory, AcceptanceCriteria, Requirement, UserStoryStatus } from '@/types'
 
 const route = useRoute()
 const router = useRouter()
+const entitiesStore = useEntitiesStore()
 
 // Reactive state
 const userStory = ref<UserStory | null>(null)
@@ -377,9 +379,30 @@ const deleteAcceptanceCriteria = (criteriaId: string) => {
   console.log('Delete acceptance criteria:', criteriaId)
 }
 
-const changeStatus = () => {
-  // TODO: Implement status change dialog
-  console.log('Change status functionality to be implemented')
+const changeStatus = async () => {
+  if (!userStory.value) return
+  
+  try {
+    actionLoading.value = true
+    
+    // For now, let's cycle through statuses as a demo
+    const statuses = ['Backlog', 'Draft', 'In Progress', 'Done', 'Cancelled']
+    const currentIndex = statuses.indexOf(userStory.value.status)
+    const nextStatus = statuses[(currentIndex + 1) % statuses.length]
+    
+    // Update the user story status via store (which will update both local and global state)
+    const updatedStory = await entitiesStore.changeUserStoryStatus(userStoryId.value, nextStatus as UserStoryStatus)
+    
+    // Update local state
+    userStory.value = updatedStory
+    
+    console.log(`Status changed from ${userStory.value.status} to ${nextStatus}`)
+  } catch (err) {
+    console.error('Failed to change status:', err)
+    error.value = err instanceof Error ? err.message : 'Не удалось изменить статус'
+  } finally {
+    actionLoading.value = false
+  }
 }
 
 const formatDate = (dateString: string) => {

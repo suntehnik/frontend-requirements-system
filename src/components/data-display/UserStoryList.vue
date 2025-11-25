@@ -4,12 +4,7 @@
     <div class="page-header">
       <div class="d-flex justify-space-between align-center">
         <h1 class="text-h4">Пользовательские истории</h1>
-        <v-btn
-          color="primary"
-          prepend-icon="mdi-plus"
-          @click="handleCreateUserStory"
-          :disabled="loading"
-        >
+        <v-btn color="primary" prepend-icon="mdi-plus" @click="handleCreateUserStory" :disabled="loading">
           Создать историю
         </v-btn>
       </div>
@@ -18,88 +13,44 @@
     <!-- Filters -->
     <v-row>
       <v-col cols="12" md="3">
-        <v-select
-          v-model="filters.status"
-          :items="statusOptions"
-          label="Статус"
-          variant="outlined"
-          density="compact"
-          clearable
-          @update:model-value="applyFilters"
-        />
+        <v-select v-model="filters.status" :items="statusOptions" label="Статус" variant="outlined" density="compact"
+          clearable @update:model-value="applyFilters" />
       </v-col>
       <v-col cols="12" md="3">
-        <v-select
-          v-model="filters.priority"
-          :items="priorityOptions"
-          label="Приоритет"
-          variant="outlined"
-          density="compact"
-          clearable
-          @update:model-value="applyFilters"
-        />
+        <v-select v-model="filters.priority" :items="priorityOptions" label="Приоритет" variant="outlined"
+          density="compact" clearable @update:model-value="applyFilters" />
       </v-col>
       <v-col cols="12" md="3">
-        <v-select
-          v-model="filters.epic_id"
-          :items="epicOptions"
-          label="Эпик"
-          variant="outlined"
-          density="compact"
-          clearable
-          @update:model-value="applyFilters"
-        />
+        <v-select v-model="filters.epic_id" :items="epicOptions" label="Эпик" variant="outlined" density="compact"
+          clearable @update:model-value="applyFilters" />
       </v-col>
       <v-col cols="12" md="3">
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Поиск пользовательских историй"
-          single-line
-          hide-details
-          variant="outlined"
-          density="compact"
-          clearable
-          @update:model-value="handleSearchChange"
-        />
+        <v-text-field v-model="search" append-icon="mdi-magnify" label="Поиск пользовательских историй" single-line
+          hide-details variant="outlined" density="compact" clearable @update:model-value="handleSearchChange" />
       </v-col>
     </v-row>
 
     <v-row>
       <v-col cols="12">
         <v-card>
-          <v-data-table-server
-            :headers="headers"
-            :items="userStories"
-            :loading="loading"
-            class="elevation-1"
-            :items-per-page="pageSize"
-            :items-per-page-options="pageSizeOptions"
-            :page="currentPage"
-            :sort-by="sortBy"
-            @update:options="handleOptionsChange"
-            @click:row="handleRowClick"
-            :items-length="totalCount"
-            :multi-sort="false"
-            :must-sort="false"
-            :hide-default-footer="!shouldShowPagination"
-          >
+          <v-data-table-server :headers="headers" :items="userStories" :loading="loading" class="elevation-1"
+            :items-per-page="pageSize" :items-per-page-options="pageSizeOptions" :page="currentPage" :sort-by="sortBy"
+            @update:options="handleOptionsChange" @click:row="handleRowClick" :items-length="totalCount"
+            :multi-sort="false" :must-sort="false" :hide-default-footer="!shouldShowPagination">
             <!-- Table content templates -->
             <template v-slot:[`item.epic`]="{ item }">
-              <v-btn
-                v-if="item.epic"
-                variant="text"
-                size="small"
-                color="primary"
-                @click="handleEpicClick($event, item.epic)"
-              >
+              <v-btn v-if="item.epic" variant="text" size="small" color="primary"
+                @click="handleEpicClick($event, item.epic)">
                 {{ item.epic.reference_id }}
               </v-btn>
               <span v-else class="text-grey">Не указан</span>
             </template>
 
             <template v-slot:[`item.status`]="{ item }">
-              <WorkflowStatusChip :status="item.status" size="medium" readonly />
+              <div @click.stop>
+                <WorkflowStatusChip :status="item.status" size="medium"
+                  @status-change="(newStatus) => handleStatusChange(item, newStatus)" />
+              </div>
             </template>
 
             <template v-slot:[`item.priority`]="{ item }">
@@ -112,14 +63,8 @@
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
-              <v-btn
-                icon="mdi-delete"
-                size="small"
-                variant="text"
-                color="error"
-                @click="handleDeleteClick($event, item)"
-                title="Удалить"
-              />
+              <v-btn icon="mdi-delete" size="small" variant="text" color="error"
+                @click="handleDeleteClick($event, item)" title="Удалить" />
             </template>
 
             <template v-slot:no-data>
@@ -131,12 +76,8 @@
                   <p class="text-body-2 text-grey mb-4">
                     По вашим критериям поиска ничего не найдено.
                   </p>
-                  <v-btn
-                    variant="outlined"
-                    color="primary"
-                    @click="clearFiltersAndSearch"
-                    prepend-icon="mdi-filter-off"
-                  >
+                  <v-btn variant="outlined" color="primary" @click="clearFiltersAndSearch"
+                    prepend-icon="mdi-filter-off">
                     Очистить фильтры
                   </v-btn>
                 </div>
@@ -150,13 +91,8 @@
                     Пользовательские истории помогают описать функциональность с точки зрения
                     пользователя.
                   </p>
-                  <v-btn
-                    variant="elevated"
-                    color="primary"
-                    size="large"
-                    @click="handleCreateUserStory"
-                    prepend-icon="mdi-plus"
-                  >
+                  <v-btn variant="elevated" color="primary" size="large" @click="handleCreateUserStory"
+                    prepend-icon="mdi-plus">
                     Создать первую пользовательскую историю
                   </v-btn>
                 </div>
@@ -181,6 +117,7 @@ import type {
   SortItem,
   TableHeader,
   FilterOption,
+  UserStoryStatus,
 } from '@/types'
 import type { BaseEpic } from '@/types/base-entities'
 import WorkflowStatusChip from '@/components/data-display/WorkflowStatusChip.vue'
@@ -298,6 +235,10 @@ const clearFiltersAndSearch = () => {
 
 const handleCreateUserStory = () => {
   emit('create')
+}
+
+const handleStatusChange = (item: UserStory, newStatus: UserStoryStatus) => {
+  emit('status-change', item, newStatus)
 }
 </script>
 

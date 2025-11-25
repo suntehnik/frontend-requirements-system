@@ -23,6 +23,7 @@ import type {
   UpdateAcceptanceCriteriaRequest,
   PaginationState,
   EpicStatus,
+  UserStoryStatus,
   Priority,
 } from '@/types'
 
@@ -451,6 +452,24 @@ export const useEntitiesStore = defineStore('entities', () => {
     }
   }
 
+  async function changeUserStoryStatus(id: string, status: UserStoryStatus) {
+    const key = `change-user-story-status-${id}`
+    setLoading(key, true)
+    clearError(key)
+
+    try {
+      const story = await userStoryService.changeStatus(id, status)
+      userStories.value.set(story.id, story)
+      return story
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to change user story status'
+      setError(key, errorMessage)
+      throw error
+    } finally {
+      setLoading(key, false)
+    }
+  }
+
   async function deleteUserStory(id: string) {
     const key = `delete-user-story-${id}`
     setLoading(key, true)
@@ -860,6 +879,7 @@ export const useEntitiesStore = defineStore('entities', () => {
     fetchUserStory,
     createUserStory,
     updateUserStory,
+    changeUserStoryStatus,
     deleteUserStory,
     setUserStoriesPage,
     setUserStoriesPageSize,

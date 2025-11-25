@@ -10,6 +10,7 @@
       :epics="epics"
       @create="handleCreateUserStory"
       @delete="handleDeleteUserStory"
+      @status-change="handleStatusChange"
       @filter-change="handleFilterChange"
       @options-change="handleOptionsChange"
       @search-change="handleSearchChange"
@@ -90,6 +91,7 @@ import type {
   UserStoryListParams,
   DataTableOptions,
   UserStoryFilterState,
+  UserStoryStatus,
 } from '@/types'
 
 const entitiesStore = useEntitiesStore()
@@ -261,6 +263,19 @@ const handleClearFilters = () => {
   // Reset to first page when clearing filters
   entitiesStore.setUserStoriesPage(1)
   loadUserStories()
+}
+
+const handleStatusChange = async (userStory: UserStory, newStatus: UserStoryStatus) => {
+  try {
+    await entitiesStore.changeUserStoryStatus(userStory.id, newStatus)
+    showSuccess(`Статус пользовательской истории изменен на "${newStatus}"`)
+    
+    // Refresh the list to show updated status
+    await loadUserStories()
+  } catch (error) {
+    console.error('Failed to change user story status:', error)
+    showError('Не удалось изменить статус пользовательской истории')
+  }
 }
 
 // Utility functions
